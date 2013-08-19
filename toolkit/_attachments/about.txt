@@ -1,0 +1,7 @@
+Unmanaged Data Toolkit
+----------------------
+
+As it says, I'll drop a bunch of tools here to handle large quantities of data
+and to test things. Nothing is quaranteed to be available at any time nor is
+documented except for this explanation. There will be no old versions available
+hereof.
