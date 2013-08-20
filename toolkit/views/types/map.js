@@ -1,6 +1,6 @@
-// Lists type and then available fields. Fields are a simple string
-// "field1/field2/..." because there is no inherent hierarchy between
-// sets of fields of arbitrary order that could be used by group_level.
+// Lists type and then available fields. Fields are a simple
+// string "field1/field2/..." because fields have arbitrary
+// order and are therefore useless to group_level.
 
 function(doc) {
   key = [];

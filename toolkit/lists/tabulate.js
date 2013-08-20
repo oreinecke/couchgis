@@ -1,4 +1,4 @@
-// tabulates over members if include_docs is given.
+// Tabulates over members if include_docs is given.
 // This was originally part of COBRA's 'meta4re' design doc.
 
 function(head, req) {
