@@ -12,11 +12,11 @@ function(head, req) {
       tabs=tabs.concat(query.split(':'));
     else
       // ignore _view API query arguments
-      if (query.match(/^(key\.|(val|doc)($|\.))/)) cuts[query]=req.query[query];
+      if (query.match(/^(key\.|(value|doc)($|\.))/)) cuts[query]=req.query[query];
   var row={}, doc={}, last_row=null;
   while(row) {
     if (row) row=getRow();
-    if (!row || last_row && last_row.id!=row.id) {
+    if (!row || last_row && (!last_row.id || last_row.id!=row.id)) {
       for (cut in cuts) {
         fields=cut.split('.');
         var val=last_row;
