@@ -11,5 +11,5 @@ function(doc) {
         collect_ids(obj[prop]);
   }
   collect_ids(doc);
-  for (id in ids) emit(null, {_id:id});
+  for (id in ids) emit(doc.type, {_id:id});
 }
