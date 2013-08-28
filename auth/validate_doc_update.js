@@ -4,7 +4,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
   if (userCtx.roles.indexOf("user")==-1)
     throw({unauthorized: 'Database is read-only for non-members!'});
 // request some self-explanatory power
-  var types=["Gemarkung", "FlurStk"];
+  var types=["Gemarkung", "FlurStk", "Adresse"];
   if (!newDoc._deleted && types.indexOf(newDoc.type)==-1)
     throw({forbidden: "doc.type must be set and one of "+types.join("/")});
 }
