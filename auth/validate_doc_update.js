@@ -12,21 +12,22 @@ function(newDoc, oldDoc, userCtx, secObj) {
 // linked documents should look like "link:{_id:id}"
 // and 'link' itself has to be on of 'types' because
 // we have to know what we're linking to
-  var inspect_ids=function(obj) {
+  ;function inspect_ids(obj, addr) {
     if (typeof(obj)!="array" && typeof(obj)!="object")
       return;
     for (key in obj) {
-      var prop=obj[key];
-      // because typeof(null)=="object"
-      if (!prop) continue;
       if (obj!==newDoc && obj._id!==undefined && key!="_id")
-        throw({forbidden: "Link objects must consist of _id only"});
-      if (typeof(prop)=="object" && prop._id!==undefined) {
-        if (typeof(prop._id)!="string") throw({forbidden: "Linked document ID "+prop._id+" must be a string"});
-        if (types.indexOf(key)==-1) throw({forbidden: "Property "+key+" must indicate known type"});
+        throw({forbidden: "Link object "+addr+" must consist of _id only"});
+      var obj2=obj[key];
+      // because typeof(null)=="object"
+      if (!obj2) continue;
+      var addr2=addr+"."+key;
+      if (typeof(obj2)=="object" && obj2._id!==undefined) {
+        if (typeof(obj2._id)!="string") throw({forbidden: "Link "+addr2+"._id must be a string"});
+        if (types.indexOf(key)==-1) throw({forbidden: "Link object "+addr2+" must indicate known type"});
       }
-      inspect_ids(prop);
+      inspect_ids(obj2, addr2);
     }
   };
-  inspect_ids(newDoc);
+  inspect_ids(newDoc, "doc");
 }
