@@ -3,7 +3,7 @@
 function(doc) {
   var ids={};
   // erica only pushes anonymous functions
-  var collect_ids=function(obj) {
+  ;function collect_ids(obj) {
     if (typeof(obj)=="object" && typeof(obj._id)=="string")
       ids[obj._id]=null;
     if (typeof(obj)=="array" || typeof(obj)=="object")
