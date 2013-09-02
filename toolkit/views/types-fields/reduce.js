@@ -4,9 +4,9 @@
 function(keys, values, rereduce) {
   var result=[];
   var K=(rereduce?values.length:keys.length);
-  for (k=0;k<K;k++) {
+  for (var k=0;k<K;k++) {
     fields=(rereduce?values[k]:keys[k][0][1].split('/'));
-    for (f=0;f<fields.length;f++) {
+    for (var f=0;f<fields.length;f++) {
       var field=fields[f];
       if (result.indexOf(field)==-1) result.push(field);
     }

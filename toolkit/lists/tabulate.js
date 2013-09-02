@@ -7,7 +7,7 @@ function(head, req) {
   start({'headers':{'Content-Type':'text/plain'}});
   var tabs = [];
   var cuts = {};
-  for (query in req.query)
+  for (var query in req.query)
     if (req.query[query]=="")
       tabs=tabs.concat(query.split(':'));
     else
@@ -17,10 +17,10 @@ function(head, req) {
   while(row) {
     if (row) row=getRow();
     if (!row || last_row && (!last_row.id || last_row.id!=row.id)) {
-      for (cut in cuts) {
+      for (var cut in cuts) {
         fields=cut.split('.');
         var val=last_row;
-        for (f=0;f<fields.length;f++) {
+        for (var f=0;f<fields.length;f++) {
           val=val[fields[f]];
           if (!val) break;
           // dive into linked docs if the are available
@@ -33,11 +33,11 @@ function(head, req) {
       }
       if (!last_row) continue;
       fields=null;
-      for (t=0;t<tabs.length;t++) {
+      for (var t=0;t<tabs.length;t++) {
         if (fields) send(' ');
         fields=tabs[t].split('.');
         var val=last_row;
-        for (f=0;f<fields.length;f++) {
+        for (var f=0;f<fields.length;f++) {
           val=val[fields[f]];
           if (!val) break;
           // dive into linked docs if the are available

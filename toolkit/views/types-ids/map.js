@@ -7,9 +7,9 @@ function(doc) {
     if (typeof(obj)=="object" && typeof(obj._id)=="string")
       ids[obj._id]=null;
     if (typeof(obj)=="array" || typeof(obj)=="object")
-      for (prop in obj)
+      for (var prop in obj)
         collect_ids(obj[prop]);
   }
   collect_ids(doc);
-  for (id in ids) emit(doc.type, {_id:id});
+  for (var id in ids) emit(doc.type, {_id:id});
 }
