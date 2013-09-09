@@ -7,5 +7,5 @@ function(doc) {
   for (var field in doc)
     if (["_id", "_rev", "type"].indexOf(field)==-1)
       key.push(field);
-  emit([doc.type, key.sort().join('/')]);
+  emit([doc.type, key.join('/')]);
 }
