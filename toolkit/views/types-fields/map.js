@@ -1,11 +1,12 @@
 // Lists type and then available fields. Fields are a simple
 // string "field1/field2/..." because fields have arbitrary
-// order and are therefore useless to group_level.
+// order and are henceforth useless to group_level.
 
 function(doc) {
   key = [];
   for (var field in doc)
-    if (["_id", "_rev", "type"].indexOf(field)==-1)
+    if (["_id", "_rev", "_conflicts",
+         "_deleted_conflicts", "type"].indexOf(field)==-1)
       key.push(field);
   emit([doc.type, key.join('/')]);
 }
