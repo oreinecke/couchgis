@@ -24,16 +24,20 @@ specific language governing permissions and limitations under the License.
 $(document).ready(function() {
   var log={
     success: function(resp) {
-      if (resp.userCtx.name===null) {
-        $("#login").show();
-        $("#logout").hide();
-      } else {
+      if (resp.userCtx.name!==null || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")>=0) {
         $("#logout").show();
         href=$("#logout .username");
-        href.text(resp.userCtx.name);
+        // expect admin party if name==null
+        href.text(resp.userCtx.name||"Administrator (keine Benutzer festgelegt)");
         // link to futon user doc
-        href.attr({href:"/_utils/document.html?_users/org.couchdb.user:"+href.text()});
+        if (resp.userCtx.name)
+          href.attr({href:"/_utils/document.html?_users/org.couchdb.user:"+href.text()});
+        else
+          $("#logout input").hide();
         $("#login").hide();
+      } else {
+        $("#login").show();
+        $("#logout").hide();
       }
     }
   };
