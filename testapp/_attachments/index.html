@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+-->
+<html lang="de">
+  <head>
+    <title>Hauptmen&uuml</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="script/couch.js"></script>
+    <script src="script/jquery.js"></script>
+    <script src="script/jquery.couch.js"></script>
+
+<script>
+$(document).ready(function() {
+  var log={
+    success: function(resp) {
+      if (resp.userCtx.name===null) {
+        $("#login").show();
+        $("#logout").hide();
+      } else {
+        $("#logout").show();
+        href=$("#logout .username");
+        href.text(resp.userCtx.name);
+        // link to futon user doc
+        href.attr({href:"/_utils/document.html?_users/org.couchdb.user:"+href.text()});
+        $("#login").hide();
+      }
+    }
+  };
+  $.couch.session(log);
+  $("#login form").submit(function(e) {
+    e.preventDefault();
+    var login={
+      name:     $("#login .username").val(),
+      password: $("#login .password").val(),
+      success:function(resp) {
+        log.success({userCtx:{name:this.name}});
+      },
+    };
+    $.couch.login(login);
+  });
+  $("#logout form").submit(function(e) {
+    e.preventDefault();
+    $.couch.logout();
+    log.success({userCtx:{name:null}});
+  });
+});
+</script>
+
+  </head>
+  <body>
+  <h1> LSH Geografischer Informationsdienst </h1>
+  <div id="login" style="display:none"> <form action="" method="post" autocomplete="on">
+    Benutzername: <input type="text" class="username" size="24">
+    Kennwort: <input type="password" class="password" size="24">
+    <input type="submit" value="Anmelden">
+  </form> </div>
+  <div id="logout" style="display:none"> <form action="" method="get">
+    Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden">
+  </form> </div>
+  </body>
+</html>
