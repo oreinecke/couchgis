@@ -35,6 +35,7 @@ $(document).ready(function() {
         else
           $("#logout input").hide();
         $("#login").hide();
+        $("#login .error").hide();
       } else {
         $("#login").show();
         $("#logout").hide();
@@ -50,6 +51,9 @@ $(document).ready(function() {
       success:function(resp) {
         log.success({userCtx:{name:this.name}});
       },
+      error:function() {
+        $("#login .error").show();
+      }
     };
     $.couch.login(login);
   });
@@ -68,6 +72,7 @@ $(document).ready(function() {
     Benutzername: <input type="text" class="username" size="24">
     Kennwort: <input type="password" class="password" size="24">
     <input type="submit" value="Anmelden">
+    <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
   </form> </div>
   <div id="logout" style="display:none"> <form action="" method="get">
     Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden">
