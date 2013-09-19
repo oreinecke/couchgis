@@ -5,8 +5,7 @@
 function(doc) {
   key = [];
   for (var field in doc)
-    if (["_id", "_rev", "_conflicts",
-         "_deleted_conflicts", "type"].indexOf(field)==-1)
+    if (field!="type"&&field[0]!='_');
       key.push(field);
   emit([doc.type, key.join('/')]);
 }
