@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!--
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+-->
+<html lang="de">
+  <head>
+    <title>Datenbank-Replikation</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="script/jquery-1.10.2.js"></script>
+    <script src="script/jquery.couch.js"></script>
+
+<script>
+$(document).ready(function() {
+  var host=window.location.hostname;
+  // for now our central couch installation is located here
+  var centralhost="http://192.168.120.230:5984";
+  // in case I want to rename db/app/replicator.html
+  // they are obtained from window.location here
+  var parts=window.location.pathname.match(/[^/]+/g);
+  var db=parts[0];
+  var app=parts[2];
+  var page=parts[3];
+  $("#localapp").attr({href:"http://localhost:5984/"+db+"/_design/"+app+'/'+page});
+  $("#centralapp").attr({href:centralhost+'/'+db+"/_design/"+app+'/'+page});
+  if (host=="localhost" || host=="127.0.0.1") {
+    form=$("form");
+    form.show();
+    form.submit(function (e) {
+      // to be read as 'are we (localhost) the source??'
+      var source=$("form .push").prop('checked');
+      var target=!source;
+      var username=$("form .username").val();
+      var password=$("form .password").val();
+      var login="";
+      if (source && username!="") login=username+'@';
+      if (source && password!="") login=username+':'+password+'@';
+      // did not want to split up centralhost any more
+      var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
+      var settings={
+        success:function(data) { 
+          // display some replication results
+          r=$("#response");
+          r.html("")
+          // write key and value in bold real quick
+          function append(obj, keys) {
+            for (k=0;k<keys.length;k++)
+              if (obj[keys[k]]!=null)
+                r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
+          }
+          append(data, ["ok", "no_changes"]);
+          if (!data.history || data.no_changes) return;
+          // show latest replication history
+          append(data.history[0], ["start_time", "end_time",
+            "missing_checked", "missing_found", "docs_read",
+            "docs_written", "doc_write_failures"]);
+        },
+        error:function(jqXHR, error) { $("#response").html("Fehler: <b>"+error+"</b>"); }
+      }
+      $.couch.replicate(addr[source], addr[target], settings,
+       { continuous: $("form .continuous").prop('checked') } );
+      e.preventDefault();
+    });
+  } else
+    $("div").show();
+  // enable login if 2nd option is checked
+  function enable_log() {
+    var pull=$("form .pull").prop('checked');
+    $("form .username").attr({disabled:pull});
+    $("form .password").attr({disabled:pull});
+  }
+  $("form .pull").change(enable_log);
+  $("form .push").change(enable_log);
+});
+</script>
+
+  </head>
+  <body>
+  <h1> Datenbank-Replikation </h1>
+  <form style="display:none" action="" method="post">
+    <input type="radio" class="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
+    <input type="radio" class="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
+    Benutzername: <input type="text" class="username" size="14" disabled>
+    Kennwort: <input type="password" class="password" size="14" disabled><br>
+    <input type="checkbox" class="continuous"> Fortlaufend <input type="submit" value="Los!"><br>
+    <div id="response"></div>
+    <a href="#" id="centralapp">Zur zentralen Datenbank wechseln</a>
+   </div>
+  </form>
+  <div style="display:none">
+    <b>Datenbank-Replikation funktioniert nur vom localhost.</b>
+    <ul><li><a href="#" id="localapp">Zur lokalen Datenbank</a>
+        <li><a href="http://localhost:5984/_utils/replicator.html">Zum Replikator (Futon)</a>
+        <li><a href="http://couchdb.apache.org/">CouchDB installeren</a> </ul>
+  </div>
+  </body>
+</html>
