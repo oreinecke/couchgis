@@ -19,6 +19,7 @@ specific language governing permissions and limitations under the License.
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script src="script/jquery-1.10.2.js"></script>
     <script src="script/jquery.couch.js"></script>
+    <script src="script/login_bar.js"></script>
 
 <script>
 $(document).ready(function() {
@@ -38,10 +39,10 @@ $(document).ready(function() {
     form.show();
     form.submit(function (e) {
       // to be read as 'are we (localhost) the source??'
-      var source=$("form .push").prop('checked');
+      var source=$("#replicate .push").prop('checked');
       var target=!source;
-      var username=$("form .username").val();
-      var password=$("form .password").val();
+      var username=$("#replicate .username").val();
+      var password=$("#replicate .password").val();
       var login="";
       if (source && username!="") login=username+'@';
       if (source && password!="") login=username+':'+password+'@';
@@ -49,6 +50,7 @@ $(document).ready(function() {
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
       var settings={
         success:function(data) { 
+          $("#replicate .submit").attr({disabled:false});
           // display some replication results
           r=$("#response");
           r.html("")
@@ -65,34 +67,49 @@ $(document).ready(function() {
             "missing_checked", "missing_found", "docs_read",
             "docs_written", "doc_write_failures"]);
         },
-        error:function(jqXHR, error) { $("#response").html("Fehler: <b>"+error+"</b>"); }
+        error:function(jqXHR, error) { 
+          $("#replicate .submit").attr({disabled:false});
+          $("#response").html("Fehler: <b>"+error+"</b>");
+        }
       }
       $.couch.replicate(addr[source], addr[target], settings,
-       { continuous: $("form .continuous").prop('checked') } );
+       { continuous: $("#replicate .continuous").prop('checked') } );
+      $("#replicate .submit").attr({disabled:true});
       e.preventDefault();
     });
   } else
     $("div").show();
   // enable login if 2nd option is checked
   function enable_log() {
-    var pull=$("form .pull").prop('checked');
-    $("form .username").attr({disabled:pull});
-    $("form .password").attr({disabled:pull});
+    var pull=$("#replicate .pull").prop('checked');
+    $("#replicate .username").attr({disabled:pull});
+    $("#replicate .password").attr({disabled:pull});
   }
-  $("form .pull").change(enable_log);
-  $("form .push").change(enable_log);
+  $("#replicate .pull").change(enable_log);
+  $("#replicate .push").change(enable_log);
 });
 </script>
 
   </head>
   <body>
+
+  <form id="login" style="display:none"action="" method="post" autocomplete="on">
+    Benutzername: <input type="text" class="username" size="14">
+    Kennwort: <input type="password" class="password" size="14">
+    <input type="submit" value="Anmelden">
+    <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
+  </form> </div>
+  <form id="logout" style="display:none" action="" method="get">
+    Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden">
+  </form> 
+
   <h1> Datenbank-Replikation </h1>
-  <form style="display:none" action="" method="post">
+  <form style="display:none" action="" method="post" id="replicate" autocomplete="on">
     <input type="radio" class="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
     <input type="radio" class="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
     Benutzername: <input type="text" class="username" size="14" disabled>
     Kennwort: <input type="password" class="password" size="14" disabled><br>
-    <input type="checkbox" class="continuous"> Fortlaufend <input type="submit" value="Los!"><br>
+    <input type="checkbox" class="continuous"> Fortlaufend <input class="submit" type="submit" value="Los!"><br>
     <div id="response"></div>
     <a href="#" id="centralapp">Zur zentralen Datenbank wechseln</a>
    </div>
