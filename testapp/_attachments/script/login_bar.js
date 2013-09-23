@@ -20,7 +20,7 @@ $(document).ready(function() {
     }
   };
   $.couch.session(log);
-  $("#login form").submit(function(e) {
+  $("#login").submit(function(e) {
     e.preventDefault();
     var login={
       name:     $("#login .username").val(),
@@ -34,7 +34,7 @@ $(document).ready(function() {
     };
     $.couch.login(login);
   });
-  $("#logout form").submit(function(e) {
+  $("#logout").submit(function(e) {
     e.preventDefault();
     $.couch.logout();
     log.success({userCtx:{name:null}});
