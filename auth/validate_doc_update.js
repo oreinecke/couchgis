@@ -13,7 +13,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
 // and 'link' itself has to be on of 'types' because
 // we have to know what we're linking to
   ;function inspect_ids(obj, addr) {
-    if (typeof(obj)!="array" && typeof(obj)!="object")
+    if (typeof(obj)!="object")
       return;
     for (key in obj) {
       if (obj!==newDoc && obj._id!==undefined && key!="_id")
