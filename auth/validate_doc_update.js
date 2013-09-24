@@ -30,4 +30,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
     }
   };
   inspect_ids(newDoc, "doc");
+// allow either GeoJSON or GeoJSON_clone but not both
+  if ("GeoJSON" in newDoc && "GeoJSON_clone" in newDoc)
+    throw({forbidden: "Either set doc.GeoJSON or doc.GeoJSON_clone"});
 }
