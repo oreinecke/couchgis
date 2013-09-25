@@ -18,7 +18,7 @@ function(doc) {
       } else for (field in obj) {
         if (["geometries", "coordinates", "features", "geometry"].indexOf(field)!=-1)
           update_bbox(obj[field]);
-        if (field.match(/^[0-9]+$/))
+        if (field.search(/^[0-9]+$/)>=0)
           update_bbox(obj[field]);
       }
     }
@@ -29,8 +29,8 @@ function(doc) {
   var properties={_id:doc._id, type:doc.type};
   for (field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
-    if (!field.match(/^[A-Z]/)) continue;
-    if (field.match("GeoJSON")) continue;
+    if (field.search(/^[A-Z]/)==-1) continue;
+    if (field.search("GeoJSON")==-1) continue;
     properties[field]=doc[field];
   }
   emit(id, {doc:properties});
