@@ -81,8 +81,8 @@ $(document).ready(function() {
   <body>
 
   <form id="login" style="display:none"action="" method="post" autocomplete="on">
-    Benutzername: <input type="text" class="username" size="14">
-    Kennwort: <input type="password" class="password" size="14">
+    Benutzername: <input type="text" class="username" size="7">
+    Kennwort: <input type="password" class="password" size="7">
     <input type="submit" value="Anmelden">
     <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
   </form> </div>
@@ -94,8 +94,8 @@ $(document).ready(function() {
   <form style="display:none" action="" method="post" id="replicate" autocomplete="on">
     <input type="radio" class="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
     <input type="radio" class="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
-    Benutzername: <input type="text" class="username" size="14" disabled>
-    Kennwort: <input type="password" class="password" size="14" disabled><br>
+    Benutzername: <input type="text" class="username" size="7" disabled>
+    Kennwort: <input type="password" class="password" size="7" disabled><br>
     <input type="checkbox" class="continuous"> Fortlaufend <input class="submit" type="submit" value="Los!"><br>
     <div id="response"></div>
     <a href="#" id="centralapp">Zur zentralen Datenbank wechseln</a>
