@@ -4,50 +4,51 @@
 // originally part of COBRA's 'meta4re' design doc.
 
 function(head, req) {
-  start({'headers':{'Content-Type':'text/plain'}});
+  start({'headers':{'Content-Type':'text/plain;charset=utf-8'}});
+  send('\n');
   var tabs = [];
-  var cuts = {};
+  var cuts = [];
   for (var query in req.query)
     if (req.query[query]=="")
       tabs=tabs.concat(query.split(':'));
-    else
       // ignore _view API query arguments
-      if (query.search(/^(key\.|(value|doc)($|\.))/)>=0)
-        cuts[query]=req.query[query];
+    else if (query.search(/^(key\.|(value|doc)($|\.))/)>=0)
+      cuts.push({fields:query.split('.'), val:req.query[query]});
+  // stash split fields in tabs
+  for (var t=0;t<tabs.length;t++) tabs[t]=tabs[t].split('.');
   var row={}, doc={}, last_row=null;
   while (row) {
     if (row) row=getRow();
-    if (!row || last_row && last_row.id!=row.id) {
-      for (var cut in cuts) {
-        fields=cut.split('.');
+    if (last_row && (row==null||!row.id||last_row.id!=row.id)) {
+      for (var c=0;c<cuts.length;c++) {
+        var fields=cuts[c].fields;
         var val=last_row;
         for (var f=0;f<fields.length;f++) {
           val=val[fields[f]];
-          if (val==undefined) break;
-          // dive into linked docs if the are available
-          if ('id' in val && val._id in doc) val=doc[val._id];
+          if (val==null) break;
+          // dive into linked docs if available
+          if (val._id in doc) val=doc[val._id];
         }
-        if (val!=cuts[cut]) {
+        if (val!=cuts[c].val) {
           last_row=null;
           break;
         }
       }
-      if (!last_row) continue;
       fields=null;
-      for (var t=0;t<tabs.length;t++) {
+      for (var t=0;last_row&&t<tabs.length;t++) {
         if (fields) send(' ');
-        fields=tabs[t].split('.');
+        fields=tabs[t];
         var val=last_row;
         for (var f=0;f<fields.length;f++) {
           val=val[fields[f]];
           if (val==null) break;
           // dive into linked docs if the are available
-          if ('id' in val && val._id in doc) val=doc[val._id];
+          if (val._id in doc) val=doc[val._id];
         }
         if (val!=null)
           send(JSON.stringify(val).replace(/^"|"$/g,''));
       }
-      send("\n");
+      if (fields) send("\n");
       doc={};
     }
     if (!row) continue;
