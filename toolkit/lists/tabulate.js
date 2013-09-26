@@ -12,21 +12,22 @@ function(head, req) {
       tabs=tabs.concat(query.split(':'));
     else
       // ignore _view API query arguments
-      if (query.search(/^(key\.|(value|doc)($|\.))/)>=0) cuts[query]=req.query[query];
+      if (query.search(/^(key\.|(value|doc)($|\.))/)>=0)
+        cuts[query]=req.query[query];
   var row={}, doc={}, last_row=null;
-  while(row) {
+  while (row) {
     if (row) row=getRow();
-    if (!row || last_row && (!last_row.id || last_row.id!=row.id)) {
+    if (!row || last_row && last_row.id!=row.id) {
       for (var cut in cuts) {
         fields=cut.split('.');
         var val=last_row;
         for (var f=0;f<fields.length;f++) {
           val=val[fields[f]];
-          if (!val) break;
+          if (val==undefined) break;
           // dive into linked docs if the are available
-          if (val._id && doc[val._id]) val=doc[val._id];
+          if ('id' in val && val._id in doc) val=doc[val._id];
         }
-        if (val && val!=cuts[cut]) {
+        if (val!=cuts[cut]) {
           last_row=null;
           break;
         }
@@ -39,11 +40,12 @@ function(head, req) {
         var val=last_row;
         for (var f=0;f<fields.length;f++) {
           val=val[fields[f]];
-          if (!val) break;
+          if (val==null) break;
           // dive into linked docs if the are available
-          if (val._id && doc[val._id]) val=doc[val._id];
+          if ('id' in val && val._id in doc) val=doc[val._id];
         }
-        if (val) send(JSON.stringify(val).replace(/^"|"$/g,''));
+        if (val!=null)
+          send(JSON.stringify(val).replace(/^"|"$/g,''));
       }
       send("\n");
       doc={};
@@ -51,8 +53,8 @@ function(head, req) {
     if (!row) continue;
     last_row=row;
     // store linked docs for later use
-    if (row.doc) doc[row.doc._id]=row.doc;
+    if ('doc' in row) doc[row.doc._id]=row.doc;
     // always start from the unlinked doc
-    if (doc[row.id]) last_row.doc=doc[row.id];
+    if (row.id in doc) last_row.doc=doc[row.id];
   }
 }

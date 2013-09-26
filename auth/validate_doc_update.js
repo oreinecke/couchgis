@@ -20,9 +20,9 @@ function(newDoc, oldDoc, userCtx, secObj) {
         throw({forbidden: "Link object "+addr+" must consist of _id only"});
       var obj2=obj[key];
       // because typeof(null)=="object"
-      if (!obj2) continue;
+      if (obj2===null) continue;
       var addr2=addr+"."+key;
-      if (typeof(obj2)=="object" && obj2._id!==undefined) {
+      if (typeof(obj2)=="object" && '_id' in obj2) {
         if (typeof(obj2._id)!="string") throw({forbidden: "Link "+addr2+"._id must be a string"});
         if (types.indexOf(key)==-1) throw({forbidden: "Link object "+addr2+" must indicate known type"});
       }

@@ -6,8 +6,8 @@ function(doc, req) {
     return[null, 'Only admins are allowed to use /_update/substitute!\n'];
   if (!doc)
     return[null, 'Document must be specified and existing!\n'];
-  // keep special members and exclude from substitution
-  var special={_id:doc._id,_rev:doc._rev};
+  // keep doc._id and exclude from substitution
+  var id=doc._id;
   delete doc._id;
   delete doc._rev;
   doc=JSON.stringify(doc);
@@ -29,8 +29,7 @@ function(doc, req) {
   } catch(err) {
     return[null, "Invalid JSON by bad substitution\n"];
   }
-  doc._id=special._id;
-  doc._rev=special._rev;
+  doc._id=id;
   // avoid new revisions if no apparent changes
   if (changed) return[doc, 'Substituted '+doc._id+'\n'];
   else return[null, 'Unchanged '+doc._id+'\n'];

@@ -1,15 +1,16 @@
 // Emits GeoJSON w/bbox and associated properties.
 
 function(doc) {
-  if (!doc.type) return;
-  if ("GeoJSON" in doc) {
+  var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
+  if (id==null) return;
+  if (id===doc._id) {
 //  I need a copy that can be modified
     var GeoJSON=JSON.parse(JSON.stringify(doc.GeoJSON));
-    GeoJSON.bbox=null;
     ;function update_bbox(obj) {
       if (typeof(obj)!="object") return;
       if (typeof(obj[0])=="number") {
-        if (!GeoJSON.bbox) GeoJSON.bbox=obj.slice(0,1).concat(obj);
+        if (GeoJSON.bbox===undefined)
+          GeoJSON.bbox=[obj[0],obj[1],obj[0],obj[1]];
         var bbox=GeoJSON.bbox;
         bbox[0]=(bbox[0]<obj[0])?bbox[0]:obj[0];
         bbox[1]=(bbox[1]<obj[1])?bbox[1]:obj[1];
@@ -24,8 +25,8 @@ function(doc) {
     }
     update_bbox(GeoJSON);
     emit(doc._id, {GeoJSON: GeoJSON});
-  }
-  var id=doc["GeoJSON_clone" in doc?"GeoJSON_clone":"_id"];
+  // abort if no GeoJSON is set at all
+  };
   var properties={_id:doc._id, type:doc.type};
   for (field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
