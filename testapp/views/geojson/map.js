@@ -2,6 +2,7 @@
 
 function(doc) {
   var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
+  // abort if no GeoJSON is set at all
   if (id==null) return;
   if (id===doc._id) {
 //  I need a copy that can be modified
@@ -24,8 +25,11 @@ function(doc) {
       }
     }
     update_bbox(GeoJSON);
-    emit(id, {GeoJSON: GeoJSON});
-  // abort if no GeoJSON is set at all
+    // I also decide on some kind of 'importance' here
+    // to choose what items to draw first. We use the
+    // bbox circumfence and we'll see how this goes.
+    var size=(GeoJSON.bbox[2]-GeoJSON.bbox[0])+(GeoJSON.bbox[3]-GeoJSON.bbox[1])
+    emit(id, {GeoJSON: GeoJSON, size: size});
   };
   var properties={_id:doc._id, type:doc.type};
   for (field in doc) {
