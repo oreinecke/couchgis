@@ -8,10 +8,21 @@ function(head, req) {
   send('\n');
   var tabs = [];
   var cuts = [];
+  var expr = [];
   for (var query in req.query)
     if (req.query[query]=="")
-      tabs=tabs.concat(query.split(':'));
-      // ignore _view API query arguments
+      // interpret /<match-expr>/<flags>
+      if (query[0]=='/') {
+        var flags=query.match(/\/[^/]*$/);
+        try {
+          expr.push(new RegExp(query.substring(1,flags.index), flags[0].substring(1)));
+        } catch(err) {
+          send("RegExp error: "+err.message+'\n');
+          return;
+        }
+      // and anything else as field
+      } else tabs=tabs.concat(query.split(':'));
+    // ignore _view API query arguments
     else if (query.search(/^(key\.|(value|doc)($|\.))/)>=0)
       cuts.push({fields:query.split('.'), val:req.query[query]});
   // stash split fields in tabs
@@ -20,7 +31,13 @@ function(head, req) {
   while (row) {
     if (row) row=getRow();
     if (last_row && (row==null||!row.id||last_row.id!=row.id)) {
-      for (var c=0;c<cuts.length;c++) {
+      var s=(expr.length?JSON.stringify(last_row):undefined);
+      for (var e=0;e<expr.length;e++)
+        if (s.search(expr[e])==-1) {
+          last_row=null;
+          break;
+        }
+      for (var c=0;last_row&&c<cuts.length;c++) {
         var fields=cuts[c].fields;
         var val=last_row;
         for (var f=0;f<fields.length;f++) {
