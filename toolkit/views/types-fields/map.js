@@ -6,7 +6,7 @@
 function(doc) {
   key = [];
   for (var field in doc)
-    if (field!="type" && field.search(/^GeoJSON/)==-1 && field[0]!='_')
+    if (field.search(/^[A-Z]/)!=-1 && field.search(/^GeoJSON/)==-1)
       key.push(field);
   emit([doc.type, key.join('/')]);
 }
