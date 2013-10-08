@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="de">
+  <head>
+    <title>GeoJSON Upload</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="script/jquery-1.10.2.js"></script>
+    <script src="script/jquery.couch.js"></script>
+    <script src="script/login_bar.js"></script>
+
+<script>
+$(document).ready(function() {
+  var GeoJSON;
+  var r=$("#upload div");
+  r.html("");
+  // write key and value in bold real quick
+  function append(obj, keys) {
+    for (k=0;k<keys.length;k++)
+      if (obj[keys[k]]!=null)
+        r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
+  }
+  $("#upload .file").change(function(e) {
+    $("#upload .submit").attr({disabled:true});
+    var reader=new FileReader();
+    reader.onload=function(evt) {
+      GeoJSON=JSON.parse(evt.target.result);
+      $("#upload .submit").attr({disabled:false});
+    };
+    reader.readAsText(e.target.files[0]);
+  });
+  $("#upload").submit(function(e) {
+    e.preventDefault();
+    var crs=GeoJSON.crs;
+    var features;
+    if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
+    else if (GeoJSON.type=="Feature") features=[GeoJSON];
+    else return;
+    for (prop in features[0].properties)
+      append(features[0].properties, [prop]);
+  });
+});
+</script>
+
+  </head>
+  <body>
+  <form id="login" style="display:none" autocomplete="on">
+    Benutzername: <input type="text" class="username" size="7">
+    Kennwort: <input type="password" class="password" size="7">
+    <input type="submit" value="Anmelden">
+    <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
+  </form>
+  <form id="logout" style="display:none">
+    Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden"><br>
+  </form>
+  <h1> GeoJSON Upload </h1>
+  <form id="upload" action="">
+    <input type="file" class="file"> <input type="submit" class="submit" value="Los!" disabled><br>
+    <div></div>
+  </form>
+  </body>
+</html>

@@ -17,10 +17,10 @@ $(document).ready(function() {
   // they are obtained from window.location here
   var parts=window.location.pathname.match(/[^/]+/g);
   var db=parts[0];
-  var app=parts[2];
+  var app=parts[1]+'/'+parts[2];
   var page=parts[3];
-  $("#localapp").attr({href:"http://localhost:5984/"+db+"/_design/"+app+'/'+page});
-  $("#centralapp").attr({href:centralhost+'/'+db+"/_design/"+app+'/'+page});
+  $("#localapp").attr({href:"http://localhost:5984/"+db+'/'+app+'/'+page});
+  $("#centralapp").attr({href:centralhost+'/'+db+'/'+app+'/'+page});
   if (host=="localhost" || host=="127.0.0.1") {
     form=$("form");
     form.show();
@@ -64,8 +64,7 @@ $(document).ready(function() {
       $("#replicate .submit").attr({disabled:true});
       e.preventDefault();
     });
-  } else
-    $("div").show();
+  } else $("div").show();
   // enable login if 2nd option is checked
   function enable_log() {
     var pull=$("#replicate .pull").prop('checked');
@@ -80,18 +79,18 @@ $(document).ready(function() {
   </head>
   <body>
 
-  <form id="login" style="display:none"action="" method="post" autocomplete="on">
+  <form id="login" style="display:none" autocomplete="on">
     Benutzername: <input type="text" class="username" size="7">
     Kennwort: <input type="password" class="password" size="7">
     <input type="submit" value="Anmelden">
     <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
-  </form> </div>
-  <form id="logout" style="display:none" action="" method="get">
+  </form>
+  <form id="logout" style="display:none">
     Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden">
   </form> 
 
   <h1> Datenbank-Replikation </h1>
-  <form style="display:none" action="" method="post" id="replicate" autocomplete="on">
+  <form style="display:none" id="replicate">
     <input type="radio" class="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
     <input type="radio" class="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
     Benutzername: <input type="text" class="username" size="7" disabled>
@@ -99,7 +98,6 @@ $(document).ready(function() {
     <input type="checkbox" class="continuous"> Fortlaufend <input class="submit" type="submit" value="Los!"><br>
     <div id="response"></div>
     <a href="#" id="centralapp">Zur zentralen Datenbank wechseln</a>
-   </div>
   </form>
   <div style="display:none">
     <b>Datenbank-Replikation funktioniert nur vom localhost.</b>
