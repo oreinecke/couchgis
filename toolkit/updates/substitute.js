@@ -12,7 +12,7 @@ function(doc, req) {
   delete doc._rev;
   doc=JSON.stringify(doc);
   var changed=false;
-  for (q in req.query) {
+  for (var q in req.query) {
     var flags=q.match(/\/[^/]*$/);
     var pattern;
     try {

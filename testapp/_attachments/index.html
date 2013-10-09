@@ -16,7 +16,7 @@ $(document).ready(function() {
   function list_attachments(doc) {
     var list=$("#list");
     // list top level html pages
-    for (a in doc._attachments)
+    for (var a in doc._attachments)
       if (a.search(/^[^/]+html$/i)>=0)
         list.append('<li><a href="'+a+'">'+a+"</a>");
   }

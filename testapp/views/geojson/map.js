@@ -12,7 +12,7 @@ function(doc) {
     emit(id, {GeoJSON: GeoJSON, size: util.size(GeoJSON.bbox)});
   };
   var properties={_id:doc._id, type:doc.type};
-  for (field in doc) {
+  for (var field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
     if (field.search(/^[A-Z]/)==-1) continue;
     if (field.search("GeoJSON")!=-1) continue;

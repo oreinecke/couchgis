@@ -15,7 +15,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
   ;function inspect_ids(obj, addr) {
     if (typeof(obj)!="object")
       return;
-    for (key in obj) {
+    for (var key in obj) {
       if (obj!==newDoc && obj._id!==undefined && key!="_id")
         throw({forbidden: "Link object "+addr+" must consist of _id only"});
       var obj2=obj[key];

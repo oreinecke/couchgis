@@ -43,7 +43,7 @@ $(document).ready(function() {
           r.html("")
           // write key and value in bold real quick
           function append(obj, keys) {
-            for (k=0;k<keys.length;k++)
+            for (var k=0;k<keys.length;k++)
               if (obj[keys[k]]!=null)
                 r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
           }

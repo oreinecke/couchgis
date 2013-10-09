@@ -9,7 +9,7 @@ exports.bbox=function(GeoJSON) {
       bbox[1]=(bbox[1]<obj[1])?bbox[1]:obj[1];
       bbox[2]=(bbox[2]>obj[0])?bbox[2]:obj[0];
       bbox[3]=(bbox[3]>obj[1])?bbox[3]:obj[1];
-    } else for (field in obj) {
+    } else for (var field in obj) {
       if (["geometries", "coordinates", "features", "geometry"].indexOf(field)!=-1)
         update_bbox(obj[field]);
       if (field.search(/^[0-9]+$/)>=0)
