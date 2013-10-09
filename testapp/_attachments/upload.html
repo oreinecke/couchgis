@@ -10,33 +10,38 @@
 
 <script>
 $(document).ready(function() {
-  var GeoJSON;
-  var r=$("#upload div");
-  r.html("");
+  var GeoJSON, crs, features;
   // write key and value in bold real quick
-  function append(obj, keys) {
+  var append=function() {
+    var r=$("#upload div");
+    r.html("");
+    return function(obj, keys) {
     for (k=0;k<keys.length;k++)
       if (obj[keys[k]]!=null)
         r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
-  }
+    }
+  }();
   $("#upload .file").change(function(e) {
     $("#upload .submit").attr({disabled:true});
+    $("#upload .error").html("");
     var reader=new FileReader();
     reader.onload=function(evt) {
-      GeoJSON=JSON.parse(evt.target.result);
-      $("#upload .submit").attr({disabled:false});
+      try {
+        GeoJSON=JSON.parse(evt.target.result);
+        crs=GeoJSON.crs;
+        if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
+        if (GeoJSON.type=="Feature") features=[GeoJSON];
+        if (!features) throw{message:"Useless GeoJSON type!"};
+        if (!crs) throw{message:"No top-level CRS defined!"};
+        $("#upload .submit").attr({disabled:false});
+      } catch(err) {
+        $("#upload .error").html(err.message+"<br>");
+      }
     };
     reader.readAsText(e.target.files[0]);
   });
   $("#upload").submit(function(e) {
     e.preventDefault();
-    var crs=GeoJSON.crs;
-    var features;
-    if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
-    else if (GeoJSON.type=="Feature") features=[GeoJSON];
-    else return;
-    for (prop in features[0].properties)
-      append(features[0].properties, [prop]);
   });
 });
 </script>
@@ -55,6 +60,7 @@ $(document).ready(function() {
   <h1> GeoJSON Upload </h1>
   <form id="upload" action="">
     <input type="file" class="file"> <input type="submit" class="submit" value="Los!" disabled><br>
+    <b class="error"></b>
     <div></div>
   </form>
   </body>
