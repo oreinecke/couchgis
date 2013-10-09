@@ -16,7 +16,7 @@ $(document).ready(function() {
     var r=$("#upload div");
     r.html("");
     return function(obj, keys) {
-    for (k=0;k<keys.length;k++)
+    for (var k=0;k<keys.length;k++)
       if (obj[keys[k]]!=null)
         r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
     }
@@ -28,10 +28,10 @@ $(document).ready(function() {
     reader.onload=function(evt) {
       try {
         GeoJSON=JSON.parse(evt.target.result);
-        crs=GeoJSON.crs;
         if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
-        if (GeoJSON.type=="Feature") features=[GeoJSON];
-        if (!features) throw{message:"Useless GeoJSON type!"};
+        else if (GeoJSON.type=="Feature") features=[GeoJSON];
+        else throw{message:"Useless GeoJSON type!"};
+        crs=GeoJSON.crs;
         if (!crs) throw{message:"No top-level CRS defined!"};
         $("#upload .submit").attr({disabled:false});
       } catch(err) {
@@ -41,6 +41,26 @@ $(document).ready(function() {
     reader.readAsText(e.target.files[0]);
   });
   $("#upload").submit(function(e) {
+    var update_status=function() {
+      var docs_written=0;
+      var submit=$("#upload .submit");
+      return function() {
+        docs_written++;
+        submit.val(docs_written+"/"+features.length);
+      }
+    }();
+    for (var f=0;f<features.length;f++) {
+      var feature=features[f];
+      // place properties on top-level
+      var doc=feature.properties;
+      // and remove useless undefined 
+      for (var prop in doc)
+        if (doc[prop]==null) doc[prop]=undefined;
+      // store geometry as GeoJSON
+      doc.GeoJSON=feature.geometry;
+      doc.GeoJSON.crs=crs;
+      $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).saveDoc(doc, {success:update_status});
+    }
     e.preventDefault();
   });
 });
