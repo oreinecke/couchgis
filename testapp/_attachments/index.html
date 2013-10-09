@@ -2,15 +2,31 @@
 
 <html lang="de">
   <head>
-    <title>Hauptmen&uuml</title>
+    <title>Übersicht</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script src="script/jquery-1.10.2.js"></script>
     <script src="script/jquery.couch.js"></script>
     <script src="script/login_bar.js"></script>
 
+<script>
+$(document).ready(function() {
+  var parts=window.location.pathname.match(/[^/]+/g);
+  var db=parts[0];
+  var app=parts[1]+'/'+parts[2];
+  function list_attachments(doc) {
+    var list=$("#list");
+    // list top level html pages
+    for (a in doc._attachments)
+      if (a.search(/^[^/]+html$/i)>=0)
+        list.append('<li><a href="'+a+'">'+a+"</a>");
+  }
+  $.couch.db(db).openDoc(app, {success:list_attachments});
+});
+</script>
+
   </head>
   <body>
-  <h1> LSH Geografischer Informationsdienst </h1>
+  <h1> Übersicht </h1>
   <form id="login" style="display:none" autocomplete="on">
     Benutzername: <input type="text" class="username" size="7">
     Kennwort: <input type="password" class="password" size="7">
@@ -19,6 +35,7 @@
   </form>
   <form id="logout" style="display:none">
     Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden">
-  </form> 
+  </form>
+  <ul id="list"></ul>
   </body>
 </html>
