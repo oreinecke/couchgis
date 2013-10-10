@@ -26,15 +26,17 @@ $(document).ready(function() {
 
   </head>
   <body>
-  <form id="login" style="display:none" autocomplete="on">
-    Benutzername: <input type="text" class="username" size="7">
-    Kennwort: <input type="password" class="password" size="7">
+
+  <form id="login" autocomplete="on">
+    Benutzername: <input type="text" size="7">
+    Kennwort: <input type="password" size="7">
     <input type="submit" value="Anmelden">
-    <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
+    <b style="display:none"><br>Benutzername/Kennwort falsch!!</b>
   </form>
   <form id="logout" style="display:none">
-    Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden">
+    Angemeldet als <a>?</a> <input type="submit" value="Abmelden">
   </form>
+
   <h1> Übersicht </h1>
   <ul id="list"></ul>
   </body>

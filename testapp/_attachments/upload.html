@@ -12,18 +12,9 @@
 $(document).ready(function() {
   var GeoJSON, crs, features;
   // write key and value in bold real quick
-  var append=function() {
-    var r=$("#upload div");
-    r.html("");
-    return function(obj, keys) {
-    for (var k=0;k<keys.length;k++)
-      if (obj[keys[k]]!=null)
-        r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
-    }
-  }();
-  $("#upload .file").change(function(e) {
-    $("#upload .submit").attr({disabled:true});
-    $("#upload .error").html("");
+  $("#upload :file").change(function(e) {
+    $("#upload :submit").attr({disabled:true});
+    $("#upload b").html("");
     var reader=new FileReader();
     reader.onload=function(evt) {
       try {
@@ -33,9 +24,9 @@ $(document).ready(function() {
         else throw{message:"Useless GeoJSON type!"};
         crs=GeoJSON.crs;
         if (!crs) throw{message:"No top-level CRS defined!"};
-        $("#upload .submit").attr({disabled:false});
+        $("#upload :submit").attr({disabled:false});
       } catch(err) {
-        $("#upload .error").html(err.message+"<br>");
+        $("#upload b").html(err.message+"<br>");
       }
     };
     reader.readAsText(e.target.files[0]);
@@ -43,7 +34,7 @@ $(document).ready(function() {
   $("#upload").submit(function(e) {
     var update_status=function() {
       var docs_written=0;
-      var submit=$("#upload .submit");
+      var submit=$("#upload :submit");
       return function() {
         docs_written++;
         submit.val(docs_written+"/"+features.length);
@@ -68,20 +59,21 @@ $(document).ready(function() {
 
   </head>
   <body>
-  <form id="login" style="display:none" autocomplete="on">
-    Benutzername: <input type="text" class="username" size="7">
-    Kennwort: <input type="password" class="password" size="7">
+
+  <form id="login" autocomplete="on">
+    Benutzername: <input type="text" size="7">
+    Kennwort: <input type="password" size="7">
     <input type="submit" value="Anmelden">
-    <b class="error" style="display:none"><br>Benutzername/Kennwort falsch!!</b>
+    <b style="display:none"><br>Benutzername/Kennwort falsch!!</b>
   </form>
   <form id="logout" style="display:none">
-    Angemeldet als <a class="username">?</a> <input type="submit" value="Abmelden"><br>
+    Angemeldet als <a>?</a> <input type="submit" value="Abmelden">
   </form>
+
   <h1> GeoJSON Upload </h1>
   <form id="upload" action="">
-    <input type="file" class="file"> <input type="submit" class="submit" value="Los!" disabled><br>
-    <b class="error"></b>
-    <div></div>
+    <input type="file"> <input type="submit" value="Los!" disabled><br>
+    <b></b>
   </form>
   </body>
 </html>
