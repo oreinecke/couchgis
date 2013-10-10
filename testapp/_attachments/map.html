@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="de">
+  <head>
+    <title>Karte</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+   <style type="text/css">
+      html { height: 90% }
+      body { height: 90% }
+    </style>
+
+
+    <script src="script/jquery-1.10.2.js"></script>
+    <script src="script/jquery.couch.js"></script>
+    <script src="script/login_bar.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+<script type="text/javascript">
+var map;
+$(document).ready(function() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 8,
+    center: new google.maps.LatLng(50.84821949128975, 373.798296875),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+});
+</script>
+
+  </head>
+  <body>
+
+  <form id="login" autocomplete="on">
+    Benutzername: <input type="text" size="7">
+    Kennwort: <input type="password" size="7">
+    <input type="submit" value="Anmelden">
+    <b style="display:none"><br>Benutzername/Kennwort falsch!!</b>
+  </form>
+  <form id="logout" style="display:none">
+    Angemeldet als <a>?</a> <input type="submit" value="Abmelden">
+  </form>
+
+  <h1> Karte </h1>
+  <div id="map" style="height:90%"></div>
+
+  </body>
+</html>
