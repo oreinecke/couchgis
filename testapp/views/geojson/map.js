@@ -8,8 +8,8 @@ function(doc) {
   if (id===doc._id) {
 //  I need a copy that can be modified
     var GeoJSON=JSON.parse(JSON.stringify(doc.GeoJSON));
-    GeoJSON.bbox=util.bbox(GeoJSON);
-    emit(id, {GeoJSON: GeoJSON, size: util.size(GeoJSON.bbox)});
+    GeoJSON.bbox=utils.bbox(GeoJSON);
+    emit(id, {GeoJSON: GeoJSON, size: utils.size(GeoJSON)});
   };
   var properties={_id:doc._id, type:doc.type};
   for (var field in doc) {

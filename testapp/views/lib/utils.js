@@ -24,6 +24,6 @@ exports.bbox=function(GeoJSON) {
 // what items to draw first. We use the bbox circumfence
 // and we'll see how this goes.
 
-exports.size=function(bbox) {
-  return (bbox[2]-bbox[0])+(bbox[3]-bbox[1]);
+exports.size=function(GeoJSON) {
+  return (GeoJSON.bbox[2]-GeoJSON.bbox[0])+(GeoJSON.bbox[3]-GeoJSON.bbox[1]);
 }
