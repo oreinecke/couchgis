@@ -12,8 +12,9 @@
 $(document).ready(function() {
   var GeoJSON, crs, features;
   // write key and value in bold real quick
+  var submit=$("#upload :submit");
   $("#upload :file").change(function(e) {
-    $("#upload :submit").attr({disabled:true});
+    submit.attr({disabled:true});
     $("#upload b").html("");
     var reader=new FileReader();
     reader.onload=function(evt) {
@@ -24,7 +25,8 @@ $(document).ready(function() {
         else throw{message:"Useless GeoJSON type!"};
         crs=GeoJSON.crs;
         if (!crs) throw{message:"No top-level CRS defined!"};
-        $("#upload :submit").attr({disabled:false});
+        submit.attr({disabled:false});
+        submit.val("Los!");
       } catch(err) {
         $("#upload b").html(err.message+"<br>");
       }
@@ -32,14 +34,8 @@ $(document).ready(function() {
     reader.readAsText(e.target.files[0]);
   });
   $("#upload").submit(function(e) {
-    var update_status=function() {
-      var docs_written=0;
-      var submit=$("#upload :submit");
-      return function() {
-        docs_written++;
-        submit.val(docs_written+"/"+features.length);
-      }
-    }();
+    submit.attr({disabled:true});
+    var docs=[];
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
       // place properties on top-level
@@ -50,8 +46,11 @@ $(document).ready(function() {
       // store geometry as GeoJSON
       doc.GeoJSON=feature.geometry;
       doc.GeoJSON.crs=crs;
-      $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).saveDoc(doc, {success:update_status});
+      docs.push(doc);
     }
+    $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).bulkSave(
+      {docs:docs, all_or_nothing:true}, {success:function() {submit.val("Fertig!");} }
+    );
     e.preventDefault();
   });
 });
