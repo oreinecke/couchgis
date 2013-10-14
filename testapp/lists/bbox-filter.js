@@ -11,6 +11,9 @@ function(head, req) {
   // we need to limit output and server load
   var limit=body.limit;
   if (typeof(limit)!="number") limit=Infinity;
+  var error=body.error;
+  // allow reduced polygons to deviate up to this amount
+  if (typeof(error)!="number") error=0.0;
   // and allow to filter types
   var types=body.types;
   if (typeof(types)!="object" || typeof(types.indexOf)!="function")
@@ -45,7 +48,10 @@ function(head, req) {
     if ('doc' in row.value && (!types||types.indexOf(row.value.doc.type)!==-1))
       docs.push(row.value.doc);
     if ('GeoJSON' in row.value) {
-      GeoJSON=row.value.GeoJSON;
+      var g=0;
+      // skip to the geometry with the best error
+      while (row.value.GeoJSON[g].error>error) g++;
+      GeoJSON=row.value.GeoJSON[g];
       size=row.value.size;
     }
   }

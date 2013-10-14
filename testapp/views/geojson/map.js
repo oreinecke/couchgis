@@ -6,10 +6,12 @@ function(doc) {
   // abort if no GeoJSON is set at all
   if (id==null) return;
   if (id===doc._id) {
-//  I need a copy that can be modified
+    // I need a copy that can be modified
     var GeoJSON=JSON.parse(JSON.stringify(doc.GeoJSON));
     GeoJSON.bbox=utils.bbox(GeoJSON);
-    emit(id, {GeoJSON: GeoJSON, size: utils.size(GeoJSON)});
+    // provide an error for reduced polygons
+    GeoJSON.error=0;
+    emit(id, {GeoJSON: [GeoJSON], size: utils.size(GeoJSON)});
   };
   var properties={_id:doc._id, type:doc.type};
   for (var field in doc) {
