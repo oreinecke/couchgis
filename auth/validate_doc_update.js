@@ -6,7 +6,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
 // don't apply any design restrictions to deleted docs
   if (newDoc._deleted) return;
 // request some self-explanatory power
-  var types=["Gemarkung", "FlurStk", "Adresse", "Schlag"];
+  var types=["Gemarkung", "FlurStk", "Flurstück", "Adresse", "Schlag"];
   if (types.indexOf(newDoc.type)==-1)
     throw({forbidden: "doc.type must be set and one of "+types.join("/")});
 // linked documents should look like "link:{_id:id}"
