@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+
+<html lang="de">
+  <head>
+    <title>Übersicht</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="script/jquery-1.10.2.js"></script>
+    <script src="script/jquery.couch.js"></script>
+
+<script>
 $(document).ready(function() {
   var log={
     success: function(resp) {
@@ -40,3 +50,20 @@ $(document).ready(function() {
     log.success({userCtx:{name:null}});
   });
 });
+</script>
+
+  </head>
+  <body style="margin:0; padding:0">
+
+  <form id="login" style="display:none" autocomplete="on">
+    Benutzername: <input type="text" size="7">
+    Kennwort: <input type="password" size="7">
+    <input type="submit" value="Anmelden">
+    <b style="display:none"><br>Benutzername/Kennwort falsch!!</b>
+  </form>
+  <form id="logout" style="display:none">
+    Angemeldet als <a>?</a> <input type="submit" value="Abmelden">
+  </form>
+
+  </body>
+</html>
