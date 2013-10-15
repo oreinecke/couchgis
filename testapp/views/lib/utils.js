@@ -7,9 +7,9 @@ exports.eachCoord=function(GeoJSON, action) {
       action(obj);
     else for (var field in obj) {
       if (["geometries", "coordinates", "features", "geometry"].indexOf(field)!=-1)
-        inspect(obj[field]);
+        apply_action(obj[field]);
       if (field.search(/^[0-9]+$/)>=0)
-        inspect(obj[field]);
+        apply_action(obj[field]);
     }
   }
   apply_action(GeoJSON);
@@ -34,4 +34,23 @@ exports.bbox=function(GeoJSON) {
 
 exports.size=function(GeoJSON) {
   return (GeoJSON.bbox[2]-GeoJSON.bbox[0])+(GeoJSON.bbox[3]-GeoJSON.bbox[1]);
+};
+
+// Transform to WGS84.
+
+exports.toWGS84=function(GeoJSON) {
+  try {
+    var EPSG=GeoJSON.crs.properties.name.match(/EPSG::([0-9]+)/);
+    var projector=require('./proj4js/core')("EPSG:"+EPSG[1]);
+    exports.eachCoord(GeoJSON, function(coord) {
+      var newCoord=projector.inverse(coord);
+      // Google Maps API uses lat/long
+      coord[1]=newCoord[0];
+      coord[0]=newCoord[1];
+    });
+    // write consistent crs name
+    GeoJSON.crs.properties.name="urn:ogc:def:crs:OGC:1.3:CRS84";
+  } catch(e) {
+    GeoJSON.crs=e.message;
+  }
 };
