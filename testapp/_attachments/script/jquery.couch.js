@@ -817,9 +817,8 @@
           var data = null;
           if (options['keys']) {
             type = 'POST';
-            var keys = options['keys'];
-            delete options['keys'];
-            data = toJSON({'keys': keys });
+            data = toJSON(options);
+            options = null;
           }
           ajax({
               type: type,
