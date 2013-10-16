@@ -44,9 +44,8 @@ exports.toWGS84=function(GeoJSON) {
     var projector=require('./proj4js/core')("EPSG:"+EPSG[1]);
     exports.eachCoord(GeoJSON, function(coord) {
       var newCoord=projector.inverse(coord);
-      // Google Maps API uses lat/long
-      coord[1]=newCoord[0];
-      coord[0]=newCoord[1];
+      coord[0]=newCoord[0];
+      coord[1]=newCoord[1];
     });
     // write consistent crs name
     GeoJSON.crs.properties.name="urn:ogc:def:crs:OGC:1.3:CRS84";
