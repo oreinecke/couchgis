@@ -4,12 +4,12 @@ exports.eachCoords=function(GeoJSON, action) {
   ;function apply_action(obj) {
     if (typeof(obj)!="object") return;
     // ignore sets of unconnected points
-    if (obj.type=="MultiPoint") return;
+    if (obj.type=="Point" || obj.type=="MultiPoint") return;
     if (obj.coordinates) {
       var c=obj.coordinates;
       // LineString
       if (typeof(c[0][0])=="number") action(c);
-      // Polygon/MultiLinestring
+      // Polygon/MultiLineString
       else if (typeof(c[0][0][0])=="number")
         for (var i=0;i<c.length;i++) action(c[i]);
       // MultiPolygon
@@ -78,6 +78,61 @@ exports.toWGS84=function(GeoJSON) {
     // write crs according to GeoJSON spec
     GeoJSON.crs.properties.name="urn:ogc:def:crs:OGC:1.3:CRS84";
   } catch(e) {
-    GeoJSON.crs=e.message;
+    GeoJSON.crs=e;
   }
+};
+
+// Simplify LineStrings and Polygons for a given maximum
+// deviation and store the actual error as GeoJSON.error.
+
+exports.simplify=function(GeoJSON, error) {
+  GeoJSON.error=0;
+  // some vector algebra
+  exports.eachCoords(GeoJSON, function(coords) {
+    ;function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
+    ;function mul(u,m) { return [u[0]*m, u[1]*m]; }
+    ;function add(u,v) { return [u[0]+v[0],u[1]+v[1]]; }
+    ;function sub(u,v) { return [u[0]-v[0],u[1]-v[1]]; }
+
+    // blah blah recursively yada yada
+    ;function inspect_coords(i, k) {
+      // Return index and distance of furthest point.
+      // Return no index if distance is below error.
+      var j=function() {
+        var result={error:0};
+        if (i+1==k) return result;
+        var a=coords[i];
+        var c=coords[k];
+        var d=sub(c,a);
+        for (var j=i+1;j<k;j++) {
+          var b=coords[j];
+          // e = b + (a*((c-b)*(c-a))+c*((a-b)*(c-a)))/(d*d);
+          // if we had operator overloading in JS (luckily we have not)
+          var e=add(mul(
+            add( mul(a,dot(d,sub(c,b))),
+                 mul(c,dot(d,sub(a,b))) ),
+            1.0/dot(d,d)), b);
+          var e2=dot(e,e);
+          if (e2>result.error*result.error) {
+            result.error=Math.sqrt(e2);
+            if (e2>error*error) result.index=j;
+          }
+        }
+        return result;
+      }();
+      if (j.index) {
+        inspect_coords(i, j.index);
+        inspect_coords(j.index, k);
+      } else {
+        if (j.error>GeoJSON.error)
+          GeoJSON.error=j.error;
+        for (var j=i+1;j<k;j++) coords[j]=null;
+      }
+    }
+    if (coords.length<=4) return;
+    inspect_coords(0,coords.length>>1);
+    inspect_coords(coords.length>>1+1,coords.length-1);
+    // remove nulls from coords
+    for (var j; (j=coords.indexOf(null))>=0; coords.splice(j,1));
+  });
 };
