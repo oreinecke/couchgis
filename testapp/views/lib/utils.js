@@ -113,45 +113,44 @@ exports.simplify=function(GeoJSON, error) {
   exports.eachCoords(GeoJSON, function(coords) {
     // http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm
     ;function bisect_or_remove(i, k) {
+      if (i+1==k) return;
       // Return index and distance of furthest point.
       // Return no index if distance is below error.
-      var j=function() {
-        var result={error:0};
-        if (i+1==k) return result;
-        var a=coords[i];
-        var c=coords[k];
-        var d=sub(c,a);
-        for (var j=i+1;j<k;j++) {
-          var b=coords[j], e;
-          var a_b=dot(sub(b,a),d);
-          var b_c=dot(sub(b,c),d);
-          // check if b falls outside the line segment a-c.
-          // an aquidistant line then looks like this:
-          //  ____b___
-          // /        \ I.e. draw circles with the same
-          // | a -- c | radius at a,b and join them with
-          // \________/ tangent lines. Ignore arcs within.
-          if (a_b<=0) e=sub(b,a);
-          else if (b_c<=0) e=sub(c,b);
-          // e = b - (a*((b-a)*(c-a))+c*((b-a)*(c-a)))/(d*d);
-          // if we had operator overloading in JS (luckily we have not)
-          else e=sub(b, mul( add( mul(a,b_c),
-                                  mul(c,a_b) ), 1.0/dot(d,d)) );
-          var e2=dot(e,e);
-          if (e2>result.error*result.error) {
-            result.error=Math.sqrt(e2);
-            if (e2>error*error) result.index=j;
-          }
+      var J={error:0};
+      var a=coords[i];
+      var c=coords[k];
+      var d=sub(c,a);
+      for (var j=i+1;j<k;j++) {
+        var b=coords[j], e;
+        var a_b=dot(sub(b,a),d);
+        var b_c=dot(sub(c,b),d);
+        // check if b falls outside the line segment a-c.
+        // an aquidistant line then looks like this:
+        //  ____b___
+        // /        \ I.e. draw circles with the same
+        // | a -- c | radius at a,b and join them with
+        // \________/ tangent lines. Ignore arcs within.
+        if (a_b<=0) e=sub(b,a);
+        else if (b_c<=0) e=sub(c,b);
+        // e = b - (a*((b-a)*(c-a))+c*((b-a)*(c-a)))/(d*d);
+        // if we had operator overloading in JS (luckily we don't)
+        else {
+          var g=mul(d,dot(sub(b,a),sub(c,a))/dot(d,d));
+          e=sub(sub(b,a),g);
         }
-        return result;
-      }();
-      if (j.index) {
-        bisect_or_remove(i, j.index);
-        bisect_or_remove(j.index, k);
-      } else {
-        if (j.error>GeoJSON.error)
-          GeoJSON.error=j.error;
+        var e2=dot(e,e);
+        if (e2>J.error*J.error) {
+          J.error=Math.sqrt(e2);
+          if (J.error>error) J.index=j;
+        }
+      }
+      if (J.index==null) {
+        if (J.error>GeoJSON.error)
+          GeoJSON.error=J.error;
         for (var j=i+1;j<k;j++) coords[j]=null;
+      } else {
+        bisect_or_remove(i, J.index);
+        bisect_or_remove(J.index, k);
       }
     }
     if (coords.length<=2) return;
