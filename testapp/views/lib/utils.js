@@ -103,8 +103,7 @@ exports.simplify=function(GeoJSON, error) {
       var c=coords[k];
       var d=sub(c,a);
       for (var j=i+1;j<k;j++) {
-        var b=coords[j];
-        var e;
+        var b=coords[j], e;
         var a_b=dot(sub(b,a),d);
         var b_c=dot(sub(b,c),d);
         // check if b falls outside the line segment a-c.
@@ -118,7 +117,7 @@ exports.simplify=function(GeoJSON, error) {
         // e = b - (a*((b-a)*(c-a))+c*((b-a)*(c-a)))/(d*d);
         // if we had operator overloading in JS (luckily we have not)
         else e=sub(b, mul( add( mul(a,b_c),
-                                mul(c,a_b) ), 1.0/dot(d,d)));
+                                mul(c,a_b) ), 1.0/dot(d,d)) );
         var e2=dot(e,e);
         if (e2>result.error*result.error) {
           result.error=Math.sqrt(e2);
@@ -137,9 +136,8 @@ exports.simplify=function(GeoJSON, error) {
     }
   }
   exports.eachCoords(GeoJSON, function(coords) {
-    if (coords.length<=4) return;
-    inspect_coords(0,coords.length>>1);
-    inspect_coords(coords.length>>1+1,coords.length-1);
+    if (coords.length<=2) return;
+    inspect_coords(0,coords.length-1);
     // remove nulls from coords
     for (var j; (j=coords.indexOf(null))>=0; coords.splice(j,1));
   });
