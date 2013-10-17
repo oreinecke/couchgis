@@ -109,52 +109,52 @@ exports.simplify=function(GeoJSON, error) {
   ;function mul(u,m) { return [u[0]*m, u[1]*m]; }
   ;function add(u,v) { return [u[0]+v[0],u[1]+v[1]]; }
   ;function sub(u,v) { return [u[0]-v[0],u[1]-v[1]]; }
-  // blah blah recursively yada yada
-  ;function inspect_coords(coords, i, k) {
-    // Return index and distance of furthest point.
-    // Return no index if distance is below error.
-    var j=function() {
-      var result={error:0};
-      if (i+1==k) return result;
-      var a=coords[i];
-      var c=coords[k];
-      var d=sub(c,a);
-      for (var j=i+1;j<k;j++) {
-        var b=coords[j], e;
-        var a_b=dot(sub(b,a),d);
-        var b_c=dot(sub(b,c),d);
-        // check if b falls outside the line segment a-c.
-        // an aquidistanc line then looks like this:
-        //  ____b___
-        // /        \ I.e. draw circles with the same
-        // | a -- c | radius at a,b and join them with
-        // \________/ tangent lines. Ignore arcs within.
-        if (a_b<=0) e=dot(sub(b,a),sub(b,a));
-        else if (b_c<=0) e=dot(sub(c,b),sub(c,b));
-        // e = b - (a*((b-a)*(c-a))+c*((b-a)*(c-a)))/(d*d);
-        // if we had operator overloading in JS (luckily we have not)
-        else e=sub(b, mul( add( mul(a,b_c),
-                                mul(c,a_b) ), 1.0/dot(d,d)) );
-        var e2=dot(e,e);
-        if (e2>result.error*result.error) {
-          result.error=Math.sqrt(e2);
-          if (e2>error*error) result.index=j;
-        }
-      }
-      return result;
-    }();
-    if (j.index) {
-      inspect_coords(i, j.index);
-      inspect_coords(j.index, k);
-    } else {
-      if (j.error>GeoJSON.error)
-        GeoJSON.error=j.error;
-      for (var j=i+1;j<k;j++) coords[j]=null;
-    }
-  }
   exports.eachCoords(GeoJSON, function(coords) {
+    // http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm
+    ;function bisect_or_remove(i, k) {
+      // Return index and distance of furthest point.
+      // Return no index if distance is below error.
+      var j=function() {
+        var result={error:0};
+        if (i+1==k) return result;
+        var a=coords[i];
+        var c=coords[k];
+        var d=sub(c,a);
+        for (var j=i+1;j<k;j++) {
+          var b=coords[j], e;
+          var a_b=dot(sub(b,a),d);
+          var b_c=dot(sub(b,c),d);
+          // check if b falls outside the line segment a-c.
+          // an aquidistant line then looks like this:
+          //  ____b___
+          // /        \ I.e. draw circles with the same
+          // | a -- c | radius at a,b and join them with
+          // \________/ tangent lines. Ignore arcs within.
+          if (a_b<=0) e=sub(b,a);
+          else if (b_c<=0) e=sub(c,b);
+          // e = b - (a*((b-a)*(c-a))+c*((b-a)*(c-a)))/(d*d);
+          // if we had operator overloading in JS (luckily we have not)
+          else e=sub(b, mul( add( mul(a,b_c),
+                                  mul(c,a_b) ), 1.0/dot(d,d)) );
+          var e2=dot(e,e);
+          if (e2>result.error*result.error) {
+            result.error=Math.sqrt(e2);
+            if (e2>error*error) result.index=j;
+          }
+        }
+        return result;
+      }();
+      if (j.index) {
+        bisect_or_remove(i, j.index);
+        bisect_or_remove(j.index, k);
+      } else {
+        if (j.error>GeoJSON.error)
+          GeoJSON.error=j.error;
+        for (var j=i+1;j<k;j++) coords[j]=null;
+      }
+    }
     if (coords.length<=2) return;
-    inspect_coords(0,coords.length-1);
+    bisect_or_remove(0, coords.length-1);
     // remove nulls from coords
     for (var j; (j=coords.indexOf(null))>=0; coords.splice(j,1));
   });
