@@ -10,7 +10,7 @@ function(doc) {
     // I need a copy that can be modified
     var GeoJSON=utils.clone(doc.GeoJSON);
     utils.toWGS84(GeoJSON);
-    GeoJSON.bbox=utils.bbox(GeoJSON);
+    utils.bbox(GeoJSON);
     // provide an error for reduced polygons
     GeoJSON.error=0;
     val={GeoJSON: [GeoJSON], size: utils.size(GeoJSON)};

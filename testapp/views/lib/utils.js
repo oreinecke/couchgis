@@ -60,17 +60,17 @@ exports.clone=function(GeoJSON) {
   return object;
 }
 
-// Calculate a bounding box.
+// Calculate bounding box and add it to GeoJSON.
 
 exports.bbox=function(GeoJSON) {
-  var bbox=[Infinity,Infinity,-Infinity,-Infinity];
+  var bbox=GeoJSON.bbox=[Infinity,Infinity,-Infinity,-Infinity];
   exports.eachPoint(GeoJSON, function(coord) {
     bbox[0]=(bbox[0]<coord[0])?bbox[0]:coord[0];
     bbox[1]=(bbox[1]<coord[1])?bbox[1]:coord[1];
     bbox[2]=(bbox[2]>coord[0])?bbox[2]:coord[0];
     bbox[3]=(bbox[3]>coord[1])?bbox[3]:coord[1];
   });
-  return bbox;
+  return GeoJSON;
 };
 
 // Also define some kind of 'importance' here to choose
@@ -97,6 +97,7 @@ exports.toWGS84=function(GeoJSON) {
   } catch(e) {
     GeoJSON.crs=e;
   }
+  return GeoJSON;
 };
 
 // Simplify LineStrings and Polygons for a given maximum
@@ -158,4 +159,5 @@ exports.simplify=function(GeoJSON, error) {
     // remove nulls from coords
     for (var j; (j=coords.indexOf(null))>=0; coords.splice(j,1));
   });
+  return GeoJSON;
 };
