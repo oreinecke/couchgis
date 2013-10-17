@@ -31,41 +31,37 @@ function(head, req) {
   while (row) {
     if (row) row=getRow();
     if (last_row && (row==null||!row.id||last_row.id!=row.id)) {
-      var s=(expr.length?JSON.stringify(last_row):undefined);
-      for (var e=0;e<expr.length;e++)
-        if (s.search(expr[e])==-1) {
-          last_row=null;
-          break;
+      if (function() {
+        var s=(expr.length?JSON.stringify([last_row,doc]):undefined);
+        for (var e=0;e<expr.length;e++)
+          if (s.search(expr[e])==-1) return false;
+        for (var c=0;last_row&&c<cuts.length;c++) {
+          var fields=cuts[c].fields;
+          var val=last_row;
+          for (var f=0;f<fields.length;f++) {
+            val=val[fields[f]];
+            if (val==null) return false;
+            // dive into linked docs if available
+            if (val._id in doc) val=doc[val._id];
+          }
+          if (val!=cuts[c].val) return false;
         }
-      for (var c=0;last_row&&c<cuts.length;c++) {
-        var fields=cuts[c].fields;
-        var val=last_row;
-        for (var f=0;f<fields.length;f++) {
-          val=val[fields[f]];
-          if (val==null) break;
-          // dive into linked docs if available
-          if (val._id in doc) val=doc[val._id];
+        var fields=null;
+        for (var t=0;t<tabs.length;t++) {
+          if (fields) send(' ');
+          fields=tabs[t];
+          var val=last_row;
+          for (var f=0;f<fields.length;f++) {
+            val=val[fields[f]];
+            if (val==null) break;
+            // dive into linked docs if the are available
+            if (val._id in doc) val=doc[val._id];
+          }
+          if (val!=null)
+            send(JSON.stringify(val).replace(/^"|"$/g,''));
         }
-        if (val!=cuts[c].val) {
-          last_row=null;
-          break;
-        }
-      }
-      fields=null;
-      for (var t=0;last_row&&t<tabs.length;t++) {
-        if (fields) send(' ');
-        fields=tabs[t];
-        var val=last_row;
-        for (var f=0;f<fields.length;f++) {
-          val=val[fields[f]];
-          if (val==null) break;
-          // dive into linked docs if the are available
-          if (val._id in doc) val=doc[val._id];
-        }
-        if (val!=null)
-          send(JSON.stringify(val).replace(/^"|"$/g,''));
-      }
-      if (fields) send("\n");
+        return (fields!=null);
+      }()) send("\n");
       doc={};
     }
     if (!row) continue;
