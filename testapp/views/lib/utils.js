@@ -43,6 +43,23 @@ exports.eachPoint=function(GeoJSON, action) {
   apply_action(GeoJSON);
 };
 
+// Clone GeoJSON and handle arrays properly.
+
+exports.clone=function(GeoJSON) {
+  if (GeoJSON==null || typeof(GeoJSON)!="object")
+    return GeoJSON;
+  if (Array.isArray(GeoJSON)) {
+    var array=[];
+    for (var i=0;i<GeoJSON.length;i++)
+      array.push(exports.clone(GeoJSON[i]));
+    return array;
+  }
+  var object={};
+  for (var prop in GeoJSON)
+    object[prop]=exports.clone(GeoJSON[prop]);
+  return object;
+}
+
 // Calculate a bounding box.
 
 exports.bbox=function(GeoJSON) {

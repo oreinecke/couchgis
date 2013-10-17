@@ -7,7 +7,7 @@ function(doc) {
   if (id==null) return;
   if (id===doc._id) {
     // I need a copy that can be modified
-    var GeoJSON=JSON.parse(JSON.stringify(doc.GeoJSON));
+    var GeoJSON=utils.clone(doc.GeoJSON);
     utils.toWGS84(GeoJSON);
     GeoJSON.bbox=utils.bbox(GeoJSON);
     // provide an error for reduced polygons
