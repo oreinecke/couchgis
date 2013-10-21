@@ -52,6 +52,8 @@ function(head, req) {
       // skip to the geometry with the best error
       while (row.value.GeoJSON[g].error>error) g++;
       GeoJSON=row.value.GeoJSON[g];
+      GeoJSON.bbox=row.value.GeoJSON[0].bbox;
+      GeoJSON.crs=row.value.GeoJSON[0].crs;
       size=row.value.size;
     }
   }
