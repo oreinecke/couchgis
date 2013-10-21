@@ -134,10 +134,8 @@ exports.simplify=function(GeoJSON, error) {
         else if (b_c<=0) e=sub(c,b);
         // e = b - (a*((b-a)*(c-a))+c*((b-a)*(c-a)))/(d*d);
         // if we had operator overloading in JS (luckily we don't)
-        else {
-          var g=mul(d,dot(sub(b,a),sub(c,a))/dot(d,d));
-          e=sub(sub(b,a),g);
-        }
+        else e=sub(b, mul(add(mul(a,b_c),
+                              mul(c,a_b)), 1.0/dot(d,d)) );
         var e2=dot(e,e);
         if (e2>J.error*J.error) {
           J.error=Math.sqrt(e2);
