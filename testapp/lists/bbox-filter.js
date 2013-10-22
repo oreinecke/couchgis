@@ -22,14 +22,14 @@ function(head, req) {
   // last query and are likely to be returned again) followes by remaining
   // items ordered by decreasing size. If the client provides this 'sort'
   // threshold, we may safely break out of the loop!
-  var unsorted=body.sort_index;
-  if (typeof(sort_index)!="number") sort_index=Infinity;
+  var unsorted=body.unsorted;
+  if (typeof(unsorted)!="number") unsorted=Infinity;
   var items=[];
   var row={}, last_row=null, docs=[], GeoJSON, size;
   while (row) {
     if (row) row=getRow();
     if (last_row && (row==null || last_row.key!=row.key)) {
-      if ( items.length==limit && size <= items[items.length-1]) {
+      if ( items.length==limit && size <= items[items.length-1].size) {
         // no need to look further if only smaller items are expected
         if (!unsorted) break;
       } else if ( docs.length > 0 &&
