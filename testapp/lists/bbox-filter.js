@@ -29,11 +29,11 @@ function(head, req) {
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
-      if (last_GeoJSON && docs.length > 0) {
-        var item={id:last_key,GeoJSON:last_GeoJSON,docs:docs};
-        var i=items.length-1;
-        while (item.GeoJSON.size!=null && i>=0 && items[i].GeoJSON.size>item.GeoJSON.size) i--;
-        items.splice(i+1,0,item);
+      if (last_GeoJSON && docs.length) {
+        var i=items.length;
+        if (last_GeoJSON.size!=null)
+          while (i && items[i-1].GeoJSON.size<last_GeoJSON.size) i--;
+        items.splice(i,0,{id:last_key,GeoJSON:last_GeoJSON,docs:docs});
         items=items.slice(0,limit);
       }
       if (unsorted) unsorted--;
