@@ -817,15 +817,13 @@
           var data = null;
           if (options['keys']) {
             type = 'POST';
-            var keys = options['keys'];
-            delete options['keys'];
-            data = toJSON({'keys': keys });
+            data = options;
           }
           ajax({
               type: type,
               data: data,
               url: this.uri + '_design/' + list[0] +
-                   '/_list/' + list[1] + '/' + view + encodeOptions(options)
+                   '/_list/' + list[1] + '/' + view + (type=="GET"?encodeOptions(options):"");
               },
               ajaxOptions, 'An error occured accessing the list'
           );
