@@ -104,6 +104,7 @@ exports.toWGS84=function(GeoJSON) {
 // deviation and store the actual error as GeoJSON.error.
 
 exports.simplify=function(GeoJSON, error) {
+  if (error==0) return GeoJSON;
   GeoJSON.error=0;
   // some vector algebra
   ;function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
