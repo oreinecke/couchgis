@@ -78,7 +78,8 @@ exports.bbox=function(GeoJSON) {
 // and we'll see how this goes.
 
 exports.size=function(GeoJSON) {
-  return (GeoJSON.bbox[2]-GeoJSON.bbox[0])+(GeoJSON.bbox[3]-GeoJSON.bbox[1]);
+  GeoJSON.size=(GeoJSON.bbox[2]-GeoJSON.bbox[0])+(GeoJSON.bbox[3]-GeoJSON.bbox[1]);
+  return GeoJSON;
 };
 
 // Transform to WGS84.
