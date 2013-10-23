@@ -5,7 +5,7 @@ module.exports = function(defs) {
   defs('EPSG:3857', "+title=WGS 84 / Pseudo-Mercator +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs");
 
   defs('EPSG:3396', "+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +units=m +no_defs");
-  defs('EPSG:3397', "+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +units=m +no_defs");
+  defs('EPSG:3397', "+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500120 +y_0=200 +ellps=bessel +units=m +no_defs");
 
   defs['EPSG:3785'] = defs['EPSG:3857']; // maintain backward compat, official code is 3857
   defs.GOOGLE = defs['EPSG:3857'];
