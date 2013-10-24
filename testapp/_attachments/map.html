@@ -40,9 +40,16 @@ $(document).ready(function() {
     }
   }();
 
-  // stores all retrieved items that are displayed right now.
+  // It is very likely that the oftentimes inexperienced user clicks and
+  // scrolls the map like an ape (on adderall). Then, event handler callbacks
+  // will be fired all over the place and the interface probably won't react
+  // anymore. It should be smarter than that; It should wait a couple of
+  // seconds, then wait for the last ajax to complete, then do the next thing
+  // that needs to be done. 
+  var do_me_next=function() {};
+  // All items that are displayed on the map are in here as "id":{etc.}.
   var items={};
-  // stores a partially ordered list of GeoJSON ids
+  // This contains a partially ordered list of GeoJSON ids for list().
   var keys=[];
 
   // check if accuracy is justified and replace GeoJSON if not
@@ -82,11 +89,11 @@ $(document).ready(function() {
     }});
   }
 
-  // the key initialization should probably happen here:
-  // we just need a query that yields an ordered id list.
-  list("bbox-size", {keys:[doc_id]}, {success:function(data) {
+  // The key initialization should probably happen here: we just need a query
+  // that yields an ordered id list and a bbox as union of all bboxes or at
+  // least a center to point the map to
+  list("bbox-size", {}, {success:function(data) {
     var bbox=data[doc_id].GeoJSON.bbox;
-    // match zoom level to bounds
     map.setCenter(new LatLng((bbox[3]+bbox[1])/2,(bbox[2]+bbox[0])/2));
     var keys=[];
     for (var id in data) {
