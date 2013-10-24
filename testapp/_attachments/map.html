@@ -46,7 +46,7 @@ $(document).ready(function() {
   // anymore. It should be smarter than that; It should wait a couple of
   // seconds, then wait for the last ajax to complete, then do the next thing
   // that needs to be done. 
-  var do_me_next=function() {};
+  var do_me_next=null;
   // All items that are displayed on the map are in here as "id":{etc.}.
   var items={};
   // This contains a partially ordered list of GeoJSON ids for list().
@@ -54,8 +54,14 @@ $(document).ready(function() {
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
+    if (error==null) {
+      var NE=map.getBounds().getNorthEast();
+      var SW=map.getBounds().getSouthWest();
+      // estimate error from screen height
+      error=(NE.lat()-SW.lat())/100;
+    }
     var keys=[];
-    for (id in items) {
+    for (var id in items) {
       var last_error=items[id].GeoJSON.error;
       if (last_error==null||error>2*last_error||last_error>2*error)
         keys.push(id);
@@ -91,7 +97,7 @@ $(document).ready(function() {
 
   // The key initialization should probably happen here: we just need a query
   // that yields an ordered id list and a bbox as union of all bboxes or at
-  // least a center to point the map to
+  // least a center to point the map to.
   list("bbox-size", {}, {success:function(data) {
     var bbox=data[doc_id].GeoJSON.bbox;
     map.setCenter(new LatLng((bbox[3]+bbox[1])/2,(bbox[2]+bbox[0])/2));
@@ -100,17 +106,11 @@ $(document).ready(function() {
       items[id]=data[id];
       keys.push(id);
     }
-    update_geometry(0.000);
+    update_geometry(10e-5);
   }});
 
   // update GeoJSON according to viewport here.
-  Maps.event.addListener(map, 'zoom_changed', function() {
-    var NE=map.getBounds().getNorthEast();
-    var SW=map.getBounds().getSouthWest();
-    // estimate error from screen height
-    var error=(NE.lat()-SW.lat())/100;
-    update_geometry(error);
-  });
+  Maps.event.addListener(map, 'zoom_changed', update_geometry);
 
 });
 </script>
