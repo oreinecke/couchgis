@@ -3,7 +3,7 @@
 
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
-  var body=JSON.parse(req.body);
+  var body=(req.body=="undefined"?{}:JSON.parse(req.body));
   var bbox=body.bbox;
   // initialize to infinite bbox if none provided
   if (bbox==null || typeof(bbox)!="object")
