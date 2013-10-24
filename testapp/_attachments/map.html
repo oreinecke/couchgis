@@ -13,18 +13,23 @@
 <script type="text/javascript">
 $(document).ready(function() {
   // let's try with only one document for now!!!
-  var id="c76eef44f37d9af942135711a602ae3c";
+  var doc_id="c76eef44f37d9af942135711a602ae3c";
   var parts=window.location.pathname.match(/[^/]+/g);
   var db=$.couch.db(parts[0]);
   var app=parts[2];
 
-  var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 8,
-    center: new google.maps.LatLng(50.84821949128975, 13.798296875),
-    mapTypeId: google.maps.MapTypeId.TERRAIN
+  // stash frequently used objects here
+  var Maps=google.maps;
+  var LatLng=Maps.LatLng;
+  var LatLngBounds=Maps.LatLngBounds;
+
+  var map = new Maps.Map(document.getElementById('map'), {
+    zoom: 14,
+    mapTypeId: Maps.MapTypeId.SATELLITE,
+    center: new LatLng(50.84821949128975, 13.798296875)
   });
 
-  MAP=map; // remove me!!
+  MAP=map; // remove me!! I am just for the FF js shell
 
   var list=function() {
     var parts=window.location.pathname.match(/[^/]+/g);
@@ -35,27 +40,73 @@ $(document).ready(function() {
     }
   }();
 
-  list("bbox-size", {keys:[id]}, {success:function(data) {
-    var bbox=data[id].GeoJSON.bbox;
-    map.setCenter(new google.maps.LatLng((bbox[3]+bbox[1])*0.5,(bbox[2]+bbox[0])*0.5));
-    map.setZoom(12);
+  // stores all retrieved items that are displayed right now.
+  var items={};
+  // stores a partially ordered list of GeoJSON ids
+  var keys=[];
+
+  // check if accuracy is justified and replace GeoJSON if not
+  function update_geometry(error) {
+    var keys=[];
+    for (id in items) {
+      console.log(error, last_error, last_error*2, last_error*0.5);
+      var last_error=items[id].GeoJSON.error;
+      if (last_error==null||error>2*last_error||last_error>2*error)
+        keys.push(id);
+    }
+    if (!keys.length) return;
+    list("geojson", {keys:keys, error:error}, {success:function(data) {
+      for (var id in data) {
+        var paths=[];
+        var GeoJSON=data[id].GeoJSON;
+        // remind myself that this needs work!!!
+        if (GeoJSON.type!="Polygon") {
+          alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+          return;
+        }
+        for (var path=0;path<GeoJSON.coordinates.length;path++) {
+          paths.push([]);
+          var coords=GeoJSON.coordinates[path];
+          for (var coord=0;coord<coords.length;coord++) {
+            paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
+          }
+        }
+        var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0 });
+        shape.setMap(map);
+        if (items[id].shape)
+          items[id].shape.setMap();
+        // there is no need to keep all the polygons
+        items[id]={
+          GeoJSON: { error: data[id].GeoJSON.error },
+          docs: items[id].docs,
+          shape: shape
+        }
+      }
+    }});
+  }
+
+  // the key initialization should probably happen here:
+  // we just need a query that yields an ordered id list.
+  list("bbox-size", {keys:[doc_id]}, {success:function(data) {
+    var bbox=data[doc_id].GeoJSON.bbox;
+    // match zoom level to bounds
+    map.setCenter(new LatLng((bbox[3]+bbox[1])/2,(bbox[2]+bbox[0])/2));
+    var keys=[];
+    for (var id in data) {
+      items[id]=data[id];
+      keys.push(id);
+    }
+    update_geometry(0.000);
   }});
 
-  list("geojson", {keys:[id], error:0.00005}, {success:function(data) {
-    var paths=[];
-    var GeoJSON=data[id].GeoJSON;
-    for (path=0;path<GeoJSON.coordinates.length;path++) {
-      paths.push([]);
-      var coords=GeoJSON.coordinates[path];
-      for (coord=0;coord<coords.length;coord++) {
-        paths[path].push(new google.maps.LatLng(coords[coord][1], coords[coord][0]));
-      }
-    }
-    new google.maps.Polygon({
-      paths:paths,
-      fillOpacity: 0
-    }).setMap(map)
-  }});
+  // update GeoJSON according to viewport here.
+  Maps.event.addListener(map, 'bounds_changed', function() {
+    var NE=map.getBounds().getNorthEast();
+    var SW=map.getBounds().getSouthWest();
+    // estimate error from screen height
+    var error=(NE.lat()-SW.lat())/100;
+    update_geometry(error);
+  });
 
 });
 </script>
