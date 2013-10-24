@@ -49,7 +49,6 @@ $(document).ready(function() {
   function update_geometry(error) {
     var keys=[];
     for (id in items) {
-      console.log(error, last_error, last_error*2, last_error*0.5);
       var last_error=items[id].GeoJSON.error;
       if (last_error==null||error>2*last_error||last_error>2*error)
         keys.push(id);
@@ -57,13 +56,11 @@ $(document).ready(function() {
     if (!keys.length) return;
     list("geojson", {keys:keys, error:error}, {success:function(data) {
       for (var id in data) {
-        var paths=[];
         var GeoJSON=data[id].GeoJSON;
+        if (items[id].GeoJSON.error===GeoJSON.error) continue;
+        var paths=[];
         // remind myself that this needs work!!!
-        if (GeoJSON.type!="Polygon") {
-          alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
-          return;
-        }
+        if (GeoJSON.type!="Polygon") { alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!"); return; }
         for (var path=0;path<GeoJSON.coordinates.length;path++) {
           paths.push([]);
           var coords=GeoJSON.coordinates[path];
@@ -100,7 +97,7 @@ $(document).ready(function() {
   }});
 
   // update GeoJSON according to viewport here.
-  Maps.event.addListener(map, 'bounds_changed', function() {
+  Maps.event.addListener(map, 'zoom_changed', function() {
     var NE=map.getBounds().getNorthEast();
     var SW=map.getBounds().getSouthWest();
     // estimate error from screen height
