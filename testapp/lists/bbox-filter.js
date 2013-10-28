@@ -44,28 +44,27 @@ function(head, req) {
     last_key=row.key;
     if ('doc' in row.value && (!types||types.indexOf(row.value.doc.type)!==-1))
       docs.push(row.value.doc);
+    if (row.value.GeoJSON==null) continue;
     // evaluation of geomeric properties follows:
-    if ('GeoJSON' in row.value) {
-      var GeoJSON=row.value.GeoJSON;
-      // skip if outside bbox
-      if ('bbox' in GeoJSON && (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
-                                bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]))
-        continue;
-      // skip if geomtry is too small
-      if ('size' in GeoJSON && items.length==limit &&
-          GeoJSON.size<=items[items.length-1].GeoJSON.size) {
-        // no need to look further if only smaller items are expected
-        if (!unsorted) break;
-        continue;
-      }
-      if ('error' in GeoJSON) {
-        // skip if geometry is too detailed
-        if (GeoJSON.error>error) continue;
-        // skip if we already have a more detailed version
-        if (last_GeoJSON && last_GeoJSON.error>=GeoJSON.error) continue;
-      }
-      last_GeoJSON=GeoJSON;
+    var GeoJSON=row.value.GeoJSON;
+    // skip if outside bbox
+    if ('bbox' in GeoJSON && (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
+                              bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]))
+      continue;
+    // skip if geomtry is too small
+    if ('size' in GeoJSON && items.length==limit &&
+        GeoJSON.size<=items[items.length-1].GeoJSON.size) {
+      // no need to look further if only smaller items are expected
+      if (!unsorted) break;
+      continue;
     }
+    if ('error' in GeoJSON) {
+      // skip if geometry is too detailed
+      if (GeoJSON.error>error) continue;
+      // skip if we already have a more detailed version
+      if (last_GeoJSON && last_GeoJSON.error>=GeoJSON.error) continue;
+    }
+    last_GeoJSON=GeoJSON;
   }
   send('{');
   for (var i=0;i<items.length;i++) {
@@ -74,4 +73,7 @@ function(head, req) {
     send('"'+item.id+'":'+JSON.stringify({GeoJSON:item.GeoJSON,docs:item.docs}));
   }
   send('}\n');
+  // Remove this next line as soon as a new CouchDB release is published: for
+  // some reason, the list crashes if rows are left after the function returned. 
+  while (getRow());
 }
