@@ -11,7 +11,7 @@
 $(document).ready(function() {
   var host=window.location.hostname;
   // for now our central couch installation is located here
-  var centralhost="http://192.168.120.230:5984";
+  var centralhost="http://192.168.120.27:5984";
   // in case I want to rename db/app/replicator.html
   // they are obtained from window.location here
   var parts=window.location.pathname.match(/[^/]+/g);
@@ -25,7 +25,7 @@ $(document).ready(function() {
     form.show();
     form.submit(function (e) {
       // to be read as 'are we (localhost) the source??'
-      var source=$("#replicate [name='push']").prop('checked');
+      var source=$("#push").prop('checked');
       var target=!source;
       var username=$("#replicate :text").val();
       var password=$("#replicate :password").val();
@@ -66,12 +66,12 @@ $(document).ready(function() {
   } else $("div").show();
   // enable login if 2nd option is checked
   function enable_log() {
-    var pull=$("#replicate [name='pull']").prop('checked');
+    var pull=$("#pull").prop('checked');
     $("#replicate :text").attr({disabled:pull});
     $("#replicate :password").attr({disabled:pull});
   }
-  $("#replicate [name='pull']").change(enable_log);
-  $("#replicate [name='push']").change(enable_log);
+  $("#push").change(enable_log);
+  $("#pull").change(enable_log);
 });
 </script>
 
@@ -82,8 +82,8 @@ $(document).ready(function() {
 
   <h1> Datenbank-Replikation </h1>
   <form style="display:none" id="replicate">
-    <input type="radio" name="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
-    <input type="radio" name="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
+    <input type="radio" id="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
+    <input type="radio" id="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
     Benutzername: <input type="text" size="7" disabled>
     Kennwort: <input type="password" size="7" disabled><br>
     <input type="checkbox"> Fortlaufend <input type="submit" value="Los!"><br>
