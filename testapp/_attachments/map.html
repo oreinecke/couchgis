@@ -13,7 +13,6 @@
 <script type="text/javascript">
 $(document).ready(function() {
   // let's try with only one document for now!!!
-  var doc_id="c76eef44f37d9af942135711a602ae3c";
   var parts=window.location.pathname.match(/[^/]+/g);
   var db=$.couch.db(parts[0]);
   var app=parts[2];
@@ -26,7 +25,7 @@ $(document).ready(function() {
   var map = new Maps.Map(document.getElementById('map'), {
     zoom: 14,
     mapTypeId: Maps.MapTypeId.SATELLITE,
-    center: new LatLng(50.84821949128975, 13.798296875)
+    center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
   MAP=map; // remove me!! I am just for the FF js shell
@@ -109,23 +108,46 @@ $(document).ready(function() {
     }});
   }
 
+  // diff-updates items inside viewport
+  function update_items() {
+    var NE=map.getBounds().getNorthEast();
+    var SW=map.getBounds().getSouthWest();
+    var options={
+      keys:keys,
+      limit:50, // unsorted:0,
+      bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
+    };
+    list("bbox-size", options, {success:function(data) {
+      // lists items to be removed as {id:null}
+      var old_items={};
+      for (var id in items) old_items[id]=null;
+      for (var id in data) {
+        if (items[id]==null)
+          items[id]=data[id];
+        delete old_items[id];
+      }
+      for (var id in old_items) {
+        if (items[id].shape)
+          items[id].shape.setMap();
+        delete items[id];
+      }
+      update_geometry();
+    }});
+  }
+
   // The key initialization should probably happen here: we just need a query
   // that yields an ordered id list and a bbox as union of all bboxes or at
   // least a center to point the map to.
   list("bbox-size", {}, {success:function(data) {
-    var bbox=data[doc_id].GeoJSON.bbox;
-    map.setCenter(new LatLng((bbox[3]+bbox[1])/2,(bbox[2]+bbox[0])/2));
-    var keys=[];
     for (var id in data) {
       items[id]=data[id];
       keys.push(id);
     }
-    update_geometry(10e-5);
+    update_items();
   }});
 
   // update GeoJSON according to viewport here.
-  Maps.event.addListener(map, 'zoom_changed', function() {call.this_one_next(update_geometry);} );
-//Maps.event.addListener(map, 'zoom_changed', update_geometry );
+  Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
 
 });
 </script>
