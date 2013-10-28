@@ -46,7 +46,18 @@ $(document).ready(function() {
   // anymore. It should be smarter than that; It should wait a couple of
   // seconds, then wait for the last ajax to complete, then do the next thing
   // that needs to be done. 
-  var do_me_next=null;
+  var call={
+    now:null, next:null,
+    this_one_next:function(what) {
+      if (this.now!==null) this.next=what;
+      else (this.now=what)();
+    },
+    that_last_one:function() {
+      this.now=this.next;
+      this.next=null;
+      if (this.now!==null) this.now();
+    }
+  };
   // All items that are displayed on the map are in here as "id":{etc.}.
   var items={};
   // This contains a partially ordered list of GeoJSON ids for list().
@@ -66,7 +77,10 @@ $(document).ready(function() {
       if (last_error==null||error>2*last_error||last_error>2*error)
         keys.push(id);
     }
-    if (!keys.length) return;
+    if (!keys.length) {
+      call.that_last_one();
+      return;
+    }
     list("geojson", {keys:keys, error:error}, {success:function(data) {
       for (var id in data) {
         var GeoJSON=data[id].GeoJSON;
@@ -88,10 +102,10 @@ $(document).ready(function() {
         // there is no need to keep all the polygons
         items[id]={
           GeoJSON: { error: data[id].GeoJSON.error },
-          docs: items[id].docs,
-          shape: shape
+          docs: data[id].docs, shape: shape
         }
       }
+      call.that_last_one();
     }});
   }
 
@@ -110,7 +124,8 @@ $(document).ready(function() {
   }});
 
   // update GeoJSON according to viewport here.
-  Maps.event.addListener(map, 'zoom_changed', update_geometry);
+  Maps.event.addListener(map, 'zoom_changed', function() {call.this_one_next(update_geometry);} );
+//Maps.event.addListener(map, 'zoom_changed', update_geometry );
 
 });
 </script>
