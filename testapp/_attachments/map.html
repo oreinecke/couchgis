@@ -23,7 +23,7 @@ $(document).ready(function() {
   var LatLngBounds=Maps.LatLngBounds;
 
   var map = new Maps.Map(document.getElementById('map'), {
-    zoom: 14,
+    zoom: 11,
     mapTypeId: Maps.MapTypeId.SATELLITE,
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
@@ -62,7 +62,10 @@ $(document).ready(function() {
   // All items that are displayed on the map are in here as "id":{etc.}.
   var items={};
   // This contains a partially ordered list of GeoJSON ids for list().
-  var keys=[];
+  var keys={
+    prefix:[],
+    sorted:[] 
+  };
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
@@ -122,19 +125,35 @@ $(document).ready(function() {
     var NE=map.getBounds().getNorthEast();
     var SW=map.getBounds().getSouthWest();
     var options={
-      keys:keys,
-      limit:50, unsorted:0,
+      keys:keys.prefix.concat(keys.sorted),
+      unsorted:keys.prefix.length,
+      limit:10,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     list("bbox-size", options, {success:function(data) {
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
+      var new_prefix=[];
       for (var id in data) {
         if (items[id]==null)
           items[id]=data[id];
         delete old_items[id];
+        // update prefix and sorted 'keys' component
+        new_prefix.push(id);
+        var j=keys.prefix.indexOf(id);
+        if (j>=0) keys.prefix.splice(j,1);
+        else keys.sorted.splice(keys.sorted.indexOf(id),1);
       }
+      keys.prefix=new_prefix.concat(keys.prefix);
+      function indexOf(keys) {
+        var indexes=[];
+        for (k=0;k<keys.length;k++)
+          indexes.push(KEYS.indexOf(keys[k]));
+        return indexes;
+      }
+      console.log(JSON.stringify({prefix:indexOf(keys.prefix)}));
+      console.log(JSON.stringify({sorted:indexOf(keys.sorted)}));
       for (var id in old_items) {
         if (items[id].shape)
           items[id].shape.setMap();
@@ -152,8 +171,9 @@ $(document).ready(function() {
     list("bbox-size", {}, {success:function(data) {
       for (var id in data) {
         items[id]=data[id];
-        keys.push(id);
+        keys.sorted.push(id);
       }
+      KEYS=JSON.parse(JSON.stringify(keys.sorted)); // remove-me!! I AM JUST FOR DIAGNOSIC console.logs
       update_items();
       // update GeoJSON according to viewport here.
       Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
