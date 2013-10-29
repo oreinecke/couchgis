@@ -12,10 +12,6 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  // let's try with only one document for now!!!
-  var parts=window.location.pathname.match(/[^/]+/g);
-  var db=$.couch.db(parts[0]);
-  var app=parts[2];
 
   // stash frequently used objects here
   var Maps=google.maps;
@@ -69,18 +65,10 @@ $(document).ready(function() {
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
-    if (error==null) {
-      var NE=map.getBounds().getNorthEast();
-      var SW=map.getBounds().getSouthWest();
-      // estimate error from screen height
-      error=(NE.lat()-SW.lat())/100;
-    }
     var keys=[];
-    for (var id in items) {
-      var last_error=items[id].GeoJSON.error;
-      if (last_error==null||error>2*last_error||last_error>2*error)
+    for (var id in items)
+      if (!items[id].keep)
         keys.push(id);
-    }
     if (!keys.length) {
       call.that_last_one();
       return;
@@ -91,16 +79,14 @@ $(document).ready(function() {
           var item=data[id];
           var GeoJSON=item.GeoJSON;
           delete data[id];
-          if (items[id].GeoJSON.error===GeoJSON.error) continue;
           var paths=[];
           // remind myself that this needs work!!!
           if (GeoJSON.type!="Polygon") { alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!"); return; }
           for (var path=0;path<GeoJSON.coordinates.length;path++) {
             paths.push([]);
             var coords=GeoJSON.coordinates[path];
-            for (var coord=0;coord<coords.length;coord++) {
+            for (var coord=0;coord<coords.length;coord++)
               paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
-            }
           }
           var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
           shape.setMap(map);
@@ -128,6 +114,7 @@ $(document).ready(function() {
       keys:keys.prefix.concat(keys.sorted),
       unsorted:keys.prefix.length,
       limit:50,
+      error:(NE.lat()-SW.lat())/100,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     list("bbox-size", options, {success:function(data) {
@@ -135,14 +122,18 @@ $(document).ready(function() {
       var old_items={};
       for (var id in items) old_items[id]=null;
       var new_prefix=[];
+      var new_geometry=[];
       for (var id in data) {
-        if (items[id]==null)
-          items[id]=data[id];
+        if (items[id]==null) items[id]=data[id];
+        else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error)
         delete old_items[id];
-        // update prefix and sorted 'keys' component
+        // update prefix and sorted 'keys' component:
+        // i) new ids are placed in front 
         new_prefix.push(id);
         var j=keys.prefix.indexOf(id);
+        // ii) and removed from keys.prefix
         if (j>=0) keys.prefix.splice(j,1);
+        // iii) or from the sorted tail
         else keys.sorted.splice(keys.sorted.indexOf(id),1);
       }
       keys.prefix=new_prefix.concat(keys.prefix);
@@ -151,7 +142,7 @@ $(document).ready(function() {
           items[id].shape.setMap();
         delete items[id];
       }
-      update_geometry();
+      update_geometry(options.error);
     }});
   }
 
