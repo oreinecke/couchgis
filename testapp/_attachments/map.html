@@ -144,19 +144,21 @@ $(document).ready(function() {
     }});
   }
 
-  // The key initialization should probably happen here: we just need a query
-  // that yields an ordered id list and a bbox as union of all bboxes or at
-  // least a center to point the map to.
-  list("bbox-size", {}, {success:function(data) {
-    for (var id in data) {
-      items[id]=data[id];
-      keys.push(id);
-    }
-    update_items();
-  }});
-
-  // update GeoJSON according to viewport here.
-  Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
+  // initialize map position and geometry as soon as map has finished loading.
+  Maps.event.addListenerOnce(map, 'tilesloaded', function() {
+    // The key initialization should probably happen here: we just need a query
+    // that yields an ordered id list and a bbox as union of all bboxes or at
+    // least a center to point the map to.
+    list("bbox-size", {}, {success:function(data) {
+      for (var id in data) {
+        items[id]=data[id];
+        keys.push(id);
+      }
+      update_items();
+      // update GeoJSON according to viewport here.
+      Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
+    }});
+  });
 
 });
 </script>
