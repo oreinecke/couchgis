@@ -142,6 +142,9 @@ exports.simplify=function(GeoJSON, error) {
         if (e2>J.error*J.error) {
           J.error=Math.sqrt(e2);
           if (J.error>error) J.index=j;
+          // avoid di-angles in a non-elegant fashion
+          if (i==0 && k==coords.length-1 && dot(d,d)==0)
+            J.index=j;
         }
       }
       if (J.index==null) {
