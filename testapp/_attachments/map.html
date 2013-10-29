@@ -23,7 +23,7 @@ $(document).ready(function() {
   var LatLngBounds=Maps.LatLngBounds;
 
   var map = new Maps.Map(document.getElementById('map'), {
-    zoom: 11,
+    zoom: 14,
     mapTypeId: Maps.MapTypeId.SATELLITE,
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
@@ -127,7 +127,7 @@ $(document).ready(function() {
     var options={
       keys:keys.prefix.concat(keys.sorted),
       unsorted:keys.prefix.length,
-      limit:10,
+      limit:50,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     list("bbox-size", options, {success:function(data) {
@@ -146,14 +146,6 @@ $(document).ready(function() {
         else keys.sorted.splice(keys.sorted.indexOf(id),1);
       }
       keys.prefix=new_prefix.concat(keys.prefix);
-      function indexOf(keys) {
-        var indexes=[];
-        for (k=0;k<keys.length;k++)
-          indexes.push(KEYS.indexOf(keys[k]));
-        return indexes;
-      }
-      console.log(JSON.stringify({prefix:indexOf(keys.prefix)}));
-      console.log(JSON.stringify({sorted:indexOf(keys.sorted)}));
       for (var id in old_items) {
         if (items[id].shape)
           items[id].shape.setMap();
@@ -173,7 +165,6 @@ $(document).ready(function() {
         items[id]=data[id];
         keys.sorted.push(id);
       }
-      KEYS=JSON.parse(JSON.stringify(keys.sorted)); // remove-me!! I AM JUST FOR DIAGNOSIC console.logs
       update_items();
       // update GeoJSON according to viewport here.
       Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
