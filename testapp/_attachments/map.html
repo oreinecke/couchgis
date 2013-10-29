@@ -48,13 +48,15 @@ $(document).ready(function() {
   var call={
     now:null, next:null,
     this_one_next:function(what) {
-      if (this.now!==null) this.next=what;
-      else (this.now=what)();
+      if (call.now!==null) call.next=what;
+      else (call.now=what)();
     },
     that_last_one:function() {
-      this.now=this.next;
-      this.next=null;
-      if (this.now!==null) this.now();
+      window.setTimeout(function() {
+        call.now=call.next;
+        call.next=null;
+        if (call.now!==null) call.now();
+      }, 500);
     }
   };
   // All items that are displayed on the map are in here as "id":{etc.}.
@@ -81,30 +83,37 @@ $(document).ready(function() {
       return;
     }
     list("geojson", {keys:keys, error:error}, {success:function(data) {
-      for (var id in data) {
-        var GeoJSON=data[id].GeoJSON;
-        if (items[id].GeoJSON.error===GeoJSON.error) continue;
-        var paths=[];
-        // remind myself that this needs work!!!
-        if (GeoJSON.type!="Polygon") { alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!"); return; }
-        for (var path=0;path<GeoJSON.coordinates.length;path++) {
-          paths.push([]);
-          var coords=GeoJSON.coordinates[path];
-          for (var coord=0;coord<coords.length;coord++) {
-            paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
+      function update_one_geometry() {
+        for (var id in data) {
+          var item=data[id];
+          var GeoJSON=item.GeoJSON;
+          delete data[id];
+          if (items[id].GeoJSON.error===GeoJSON.error) continue;
+          var paths=[];
+          // remind myself that this needs work!!!
+          if (GeoJSON.type!="Polygon") { alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!"); return; }
+          for (var path=0;path<GeoJSON.coordinates.length;path++) {
+            paths.push([]);
+            var coords=GeoJSON.coordinates[path];
+            for (var coord=0;coord<coords.length;coord++) {
+              paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
+            }
           }
+          var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
+          shape.setMap(map);
+          if (items[id].shape)
+            items[id].shape.setMap();
+          // there is no need to keep all the polygons
+          items[id]={
+            GeoJSON: { error: item.GeoJSON.error },
+            docs: item.docs, shape: shape
+          }
+          window.setTimeout(update_one_geometry, 50);
+          return;
         }
-        var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0 });
-        shape.setMap(map);
-        if (items[id].shape)
-          items[id].shape.setMap();
-        // there is no need to keep all the polygons
-        items[id]={
-          GeoJSON: { error: data[id].GeoJSON.error },
-          docs: data[id].docs, shape: shape
-        }
+        call.that_last_one();
       }
-      call.that_last_one();
+      update_one_geometry();
     }});
   }
 
@@ -114,7 +123,7 @@ $(document).ready(function() {
     var SW=map.getBounds().getSouthWest();
     var options={
       keys:keys,
-      limit:50, // unsorted:0,
+      limit:50, unsorted:0,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     list("bbox-size", options, {success:function(data) {
