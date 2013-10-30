@@ -67,7 +67,7 @@ $(document).ready(function() {
   function update_geometry(error) {
     var keys=[];
     for (var id in items)
-      if (!items[id].keep)
+      if (!items[id].keep || items[id].GeoJSON.error<=error)
         keys.push(id);
     if (!keys.length) {
       call.that_last_one();
@@ -159,6 +159,12 @@ $(document).ready(function() {
       update_items();
       // update GeoJSON according to viewport here.
       Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
+      $("#settings [name='refine']").click(function() {
+        console.log("!!!");
+        call.this_one_next(function() {
+          update_geometry(0);
+        })
+      });
     }});
   });
 
@@ -171,6 +177,10 @@ $(document).ready(function() {
   <iframe src="login_bar.htm" style="width:100%; height:1.4em; border:0;"></iframe>
 
   <h1> Karte </h1>
+  <form id="settings">
+    Darstellung:
+    <input type="button" name="refine" value="verfeinern">
+  </form>
   <div id="map" style="height:90%"></div>
 
   </body>
