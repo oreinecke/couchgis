@@ -89,7 +89,7 @@ $(document).ready(function() {
           for (var path=0;path<GeoJSON.coordinates.length;path++) {
             paths.push([]);
             var coords=GeoJSON.coordinates[path];
-            for (var coord=0;coord<coords.length;coord++)
+            for (var coord=0;coord<coords.length-1;coord++)
               paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
           }
           var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
