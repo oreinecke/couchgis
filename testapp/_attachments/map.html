@@ -69,13 +69,15 @@ $(document).ready(function() {
   function update_geometry(error) {
     var keys=[];
     for (var id in items)
-      if (!items[id].keep || items[id].GeoJSON.error<=error)
+      if (!items[id].keep || error<=items[id].GeoJSON.error)
         keys.push(id);
     if (!keys.length) {
       call.that_last_one();
       return;
     }
     list("geojson", {keys:keys, error:error}, {success:function(data) {
+      // timeout is 50ms or instantaneous
+      var timeout = 50 * $("#settings [name='delayed']").prop('checked');
       function update_one_geometry() {
         for (var id in data) {
           var item=data[id];
@@ -99,7 +101,8 @@ $(document).ready(function() {
             GeoJSON: { error: item.GeoJSON.error },
             docs: item.docs, shape: shape
           }
-          window.setTimeout(update_one_geometry, 50);
+          if (!timeout) continue
+          window.setTimeout(update_one_geometry, timeout);
           return;
         }
         call.that_last_one();
@@ -177,6 +180,7 @@ $(document).ready(function() {
   <form id="settings">
     Darstellung:
     <input type="button" name="refine" value="verfeinern">
+    <input type="checkbox" name="delayed" checked>verzögert
   </form>
   <div id="map" style="height:90%"></div>
 
