@@ -26,9 +26,12 @@ $(document).ready(function() {
 
   MAP=map; // remove me!! I am just for the FF js shell
 
+  var dbname; // ok this looks faintly ridiculous
+
   var list=function() {
     var parts=window.location.pathname.match(/[^/]+/g);
-    var db=$.couch.db(parts[0]);
+    dbname=parts[0];
+    var db=$.couch.db(dbname);
     var app=parts[2];
     return function(view, data, options) {
       return db.list(app+"/bbox-filter", view, data, options);
@@ -44,6 +47,8 @@ $(document).ready(function() {
   var call={
     now:null, next:null,
     this_one_next:function(what) {
+      // We might as well do the closure here, because this
+      // is used only for event handler registration anyway.
       return function() {
         if (call.now!==null) call.next=what;
         else (call.now=what)();
@@ -97,10 +102,9 @@ $(document).ready(function() {
           if (items[id].shape)
             items[id].shape.setMap();
           // there is no need to keep all the polygons
-          items[id]={
-            GeoJSON: { error: item.GeoJSON.error },
-            docs: item.docs, shape: shape
-          }
+          items[id].GeoJSON={error:GeoJSON.error};
+          items[id].docs=item.docs;
+          items[id].shape=shape;
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
           return;
@@ -129,7 +133,19 @@ $(document).ready(function() {
       var new_prefix=[];
       var new_geometry=[];
       for (var id in data) {
-        if (items[id]==null) items[id]=data[id];
+        if (items[id]==null) {
+          items[id]=data[id];
+          var link=$(document.createElement("li"));
+          for (doc=0;doc<items[id].docs.length;doc++) {
+            // Group docs with identical GIS into one <li>.
+            if (doc) link.append("<br>");
+            // Link to Futon for the lack of a better interface.
+            link.append('<a href="/_utils/document.html?'+dbname+'/'
+                         +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
+          }
+          $("#details").append(link);
+          items[id].link=link;
+        }
         else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error)
         delete old_items[id];
         // update prefix and sorted 'keys' component:
@@ -143,8 +159,8 @@ $(document).ready(function() {
       }
       keys.prefix=new_prefix.concat(keys.prefix);
       for (var id in old_items) {
-        if (items[id].shape)
-          items[id].shape.setMap();
+        items[id].link.remove();
+        items[id].shape.setMap();
         delete items[id];
       }
       update_geometry(options.error);
@@ -157,10 +173,8 @@ $(document).ready(function() {
     // that yields an ordered id list and a bbox as union of all bboxes or at
     // least a center to point the map to.
     list("bbox-size", {}, {success:function(data) {
-      for (var id in data) {
-        items[id]=data[id];
+      for (var id in data)
         keys.sorted.push(id);
-      }
       update_items();
       // update GeoJSON according to viewport here.
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
@@ -183,6 +197,7 @@ $(document).ready(function() {
     <input type="checkbox" name="delayed" checked>verzögert
   </form>
   <div id="map" style="height:90%"></div>
+  <ul id="details"></ul>
 
   </body>
 </html>
