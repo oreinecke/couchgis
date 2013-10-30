@@ -44,8 +44,10 @@ $(document).ready(function() {
   var call={
     now:null, next:null,
     this_one_next:function(what) {
-      if (call.now!==null) call.next=what;
-      else (call.now=what)();
+      return function() {
+        if (call.now!==null) call.next=what;
+        else (call.now=what)();
+      }
     },
     that_last_one:function() {
       window.setTimeout(function() {
@@ -158,13 +160,8 @@ $(document).ready(function() {
       }
       update_items();
       // update GeoJSON according to viewport here.
-      Maps.event.addListener(map, 'bounds_changed', function() {call.this_one_next(update_items);} );
-      $("#settings [name='refine']").click(function() {
-        console.log("!!!");
-        call.this_one_next(function() {
-          update_geometry(0);
-        })
-      });
+      Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+      $("#settings [name='refine']").click( call.this_one_next(function() {update_geometry(0);}) );
     }});
   });
 
