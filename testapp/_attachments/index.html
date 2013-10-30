@@ -13,7 +13,7 @@ $(document).ready(function() {
   var parts=window.location.pathname.match(/[^/]+/g);
   var db=parts[0];
   var app=parts[1]+'/'+parts[2];
-  $.couch.db(db).openDoc(app, {success:{
+  $.couch.db(db).openDoc(app, {success:function(doc) {
     var pages=$("#pages");
     // list top level html pages
     for (var a in doc._attachments)
