@@ -26,17 +26,13 @@ $(document).ready(function() {
 
   MAP=map; // remove me!! I am just for the FF js shell
 
-  var dbname; // ok this looks faintly ridiculous
-
-  var list=function() {
-    var parts=window.location.pathname.match(/[^/]+/g);
-    dbname=parts[0];
-    var db=$.couch.db(dbname);
-    var app=parts[2];
-    return function(view, data, options) {
-      return db.list(app+"/bbox-filter", view, data, options);
-    }
-  }();
+  // ok this also looks retarded but it keeps my stuff in one place at least
+  function list(view, data, options) {
+    return list.db.list(list.app+"/bbox-filter", view, data, options);
+  }
+  list.parts=window.location.pathname.match(/[^/]+/g);
+  list.db=$.couch.db(list.parts[0]);
+  list.app=list.parts[2];
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
@@ -137,10 +133,10 @@ $(document).ready(function() {
           items[id]=data[id];
           var link=$(document.createElement("li"));
           for (doc=0;doc<items[id].docs.length;doc++) {
-            // Group docs with identical GIS into one <li>.
+            // Group docs with identical GIS into one /<li>.
             if (doc) link.append("<br>");
             // Link to Futon for the lack of a better interface.
-            link.append('<a href="/_utils/document.html?'+dbname+'/'
+            link.append('<a href="/_utils/document.html?'+list.db.name+'/'
                          +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
           }
           $("#details").append(link);
