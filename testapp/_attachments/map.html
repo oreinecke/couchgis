@@ -18,7 +18,7 @@ $(document).ready(function() {
   var LatLng=Maps.LatLng;
   var LatLngBounds=Maps.LatLngBounds;
 
-  var map = new Maps.Map(document.getElementById('map'), {
+  var map = new Maps.Map($('#map')[0], {
     zoom: 14,
     mapTypeId: Maps.MapTypeId.SATELLITE,
     center: new LatLng(50.83730534254573, 13.938310197234163)
@@ -76,9 +76,9 @@ $(document).ready(function() {
       call.that_last_one();
       return;
     }
+    var timeout = 50 * $("#settings [name='delayed']").prop('checked');
     list("geojson", {keys:keys, error:error}, {success:function(data) {
       // timeout is 50ms or instantaneous
-      var timeout = 50 * $("#settings [name='delayed']").prop('checked');
       function update_one_geometry() {
         for (var id in data) {
           var item=data[id];
@@ -95,6 +95,10 @@ $(document).ready(function() {
           }
           var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
           shape.setMap(map);
+          // select link if user clicks on shape
+          Maps.event.addListener(shape, 'click', function(href) {
+            return function() {href.focus();};
+          }(items[id].link.find('a')));
           if (items[id].shape)
             items[id].shape.setMap();
           // there is no need to keep all the polygons
@@ -122,6 +126,7 @@ $(document).ready(function() {
       error:(NE.lat()-SW.lat())/100,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
+    var details = $("#settings [name='details']").prop('checked')?$("#details"):null;
     list("bbox-size", options, {success:function(data) {
       // lists items to be removed as {id:null}
       var old_items={};
@@ -131,19 +136,21 @@ $(document).ready(function() {
       for (var id in data) {
         if (items[id]==null) {
           items[id]=data[id];
+        }
+        else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error)
+        delete old_items[id];
+        if (items[id].link==null) {
           var link=$(document.createElement("li"));
           for (doc=0;doc<items[id].docs.length;doc++) {
-            // Group docs with identical GIS into one /<li>.
+            // Group docs with identical GIS into one <li>.
             if (doc) link.append("<br>");
             // Link to Futon for the lack of a better interface.
             link.append('<a href="/_utils/document.html?'+list.db.name+'/'
                          +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
           }
-          $("#details").append(link);
+          details.append(link);
           items[id].link=link;
         }
-        else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error)
-        delete old_items[id];
         // update prefix and sorted 'keys' component:
         // i) new ids are placed in front 
         new_prefix.push(id);
@@ -172,9 +179,9 @@ $(document).ready(function() {
       for (var id in data)
         keys.sorted.push(id);
       update_items();
-      // update GeoJSON according to viewport here.
+      // update GeoJSON according to viewport here
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-      $("#settings [name='refine']").click( call.this_one_next(function() {update_geometry(0);}) );
+      $("#settings [name='refine']").click( call.this_one_next(function() {update_geometry(0);}));
     }});
   });
 
@@ -191,6 +198,8 @@ $(document).ready(function() {
     Darstellung:
     <input type="button" name="refine" value="verfeinern">
     <input type="checkbox" name="delayed" checked>verzögert
+    <input type="checkbox" name="details" checked disabled>Details
+    <input type="text" name="limit" size=1>
   </form>
   <div id="map" style="height:90%"></div>
   <ul id="details"></ul>
