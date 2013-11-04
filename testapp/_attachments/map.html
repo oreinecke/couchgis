@@ -122,7 +122,7 @@ $(document).ready(function() {
     var options={
       keys:keys.prefix.concat(keys.sorted),
       unsorted:keys.prefix.length,
-      limit:50,
+      limit:parseFloat($("#settings [name='limit']").val()),
       error:(NE.lat()-SW.lat())/100,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
@@ -182,6 +182,26 @@ $(document).ready(function() {
       // update GeoJSON according to viewport here
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
       $("#settings [name='refine']").click( call.this_one_next(function() {update_geometry(0);}));
+      // increase limit to next higher [1,2,5,10,20,50,etc]
+      $("#settings [name='more']").click( function() {
+        var limit=parseFloat($("#settings [name='limit']").val());
+        var new_limit=10;
+        while (new_limit<=limit) new_limit*=10;
+        if (new_limit>5*limit) new_limit/=5;
+        if (new_limit>2*limit) new_limit/=2;
+        $("#settings [name='limit']").val(new_limit);
+        call.this_one_next(update_items)();
+      });
+      // decrease limit to next lower [1,2,5,10,20,50,etc]
+      $("#settings [name='less']").click( function() {
+        var limit=parseFloat($("#settings [name='limit']").val());
+        var new_limit=1;
+        while (new_limit*10<limit) new_limit*=10;
+        if (new_limit*5<limit) new_limit*=5;
+        if (new_limit*2<limit) new_limit*=2;
+        $("#settings [name='limit']").val(new_limit);
+        call.this_one_next(update_items)();
+      });
     }});
   });
 
@@ -203,7 +223,9 @@ $(document).ready(function() {
     <input type="button" name="refine" value="verfeinern">
     <input type="checkbox" name="delayed" checked>verzögert
     <input type="checkbox" name="details" checked disabled>Details
-    <input type="text" name="limit" size=1>
+    <input type="text" name="limit" size=2 value="50"> Polygone
+    <input type="button" value="weniger" name="less">
+    <input type="button" value="mehr" name="more">
   </form>
   <div id="map" style="height:90%"></div>
   <ul id="details"></ul>
