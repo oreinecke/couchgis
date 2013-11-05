@@ -70,7 +70,7 @@ $(document).ready(function() {
   function update_geometry(error) {
     var keys=[];
     for (var id in items)
-      if (!items[id].keep || error<=items[id].GeoJSON.error)
+      if (!items[id].keep || error<items[id].GeoJSON.error)
         keys.push(id);
     if (!keys.length) {
       call.that_last_one();
