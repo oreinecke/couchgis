@@ -68,18 +68,38 @@ $(document).ready(function() {
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
-    var keys=[];
+    var refine = $("#settings [name='refine']");
+    // cycle through geometric detail mode:
+    // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
+    //        iv   iii        ii              i 
+    if (error==0) {
+      // i) if button says 'simplified' switch to 'refine'
+      if (refine.val()=="vereinfacht") {
+        refine.val("verfeinern");
+        // ib) and continue query with standard viewport error
+        var NE=map.getBounds().getNorthEast();
+        var SW=map.getBounds().getSouthWest();
+        error=(NE.lat()-SW.lat())/100;
+      }
+      // ii) if button says 'precise' switch to 'simplified'
+      if (refine.val()=="exakt") refine.val("vereinfacht");
+    }
+    var options={ keys:[], error:error*(refine.val()!="vereinfacht") };
     for (var id in items)
       if (!items[id].keep || error<=items[id].GeoJSON.error)
-        keys.push(id);
-    if (!keys.length) {
+        options.keys.push(id);
+    if (!options.keys.length) {
       call.that_last_one();
       return;
     }
+    // timeout is 50ms or instantaneous
     var timeout = 50 * $("#settings [name='delayed']").prop('checked');
-    list("geojson", {keys:keys, error:error}, {success:function(data) {
-      // timeout is 50ms or instantaneous
+    list("geojson", options, {success:function(data) {
       function update_one_geometry() {
+        // iv) if button says 'precise' reset to 'refine' if viewport has changed
+        if (refine.val()=="exakt" && error!=0) refine.val("verfeinern");
+        // iii) if button says 'refine' switch to 'precise' 
+        if (refine.val()=="verfeinern" && error==0) refine.val("exakt");
         for (var id in data) {
           var item=data[id];
           var GeoJSON=item.GeoJSON;
@@ -126,7 +146,7 @@ $(document).ready(function() {
       error:(NE.lat()-SW.lat())/100,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
-    var details = $("#settings [name='details']").prop('checked')?$("#details"):null;
+    var details = $("#details")
     list("bbox-size", options, {success:function(data) {
       // lists items to be removed as {id:null}
       var old_items={};
@@ -181,6 +201,7 @@ $(document).ready(function() {
       update_items();
       // update GeoJSON according to viewport here
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+      // cycle through geometric detail mode
       $("#settings [name='refine']").click( call.this_one_next(function() {update_geometry(0);}));
       // increase limit to next higher [1,2,5,10,20,50,etc]
       $("#settings [name='more']").click( function() {
@@ -222,7 +243,6 @@ $(document).ready(function() {
     Darstellung:
     <input type="button" name="refine" value="verfeinern">
     <input type="checkbox" name="delayed" checked>verzögert
-    <input type="checkbox" name="details" checked disabled>Details
     <input type="text" name="limit" size=2 value="50"> Polygone
     <input type="button" value="weniger" name="less">
     <input type="button" value="mehr" name="more">
