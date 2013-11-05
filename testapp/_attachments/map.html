@@ -68,38 +68,18 @@ $(document).ready(function() {
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
-    var refine = $("#settings [name='refine']");
-    // cycle through geometric detail mode:
-    // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
-    //        iv   iii        ii              i 
-    if (error==0) {
-      // i) if button says 'simplified' switch to 'refine'
-      if (refine.val()=="vereinfacht") {
-        refine.val("verfeinern");
-        // ib) and continue query with standard viewport error
-        var NE=map.getBounds().getNorthEast();
-        var SW=map.getBounds().getSouthWest();
-        error=(NE.lat()-SW.lat())/100;
-      }
-      // ii) if button says 'precise' switch to 'simplified'
-      if (refine.val()=="exakt") refine.val("vereinfacht");
-    }
-    var options={ keys:[], error:error*(refine.val()!="vereinfacht") };
+    var keys=[];
     for (var id in items)
       if (!items[id].keep || error<=items[id].GeoJSON.error)
-        options.keys.push(id);
-    if (!options.keys.length) {
+        keys.push(id);
+    if (!keys.length) {
       call.that_last_one();
       return;
     }
     // timeout is 50ms or instantaneous
     var timeout = 50 * $("#settings [name='delayed']").prop('checked');
-    list("geojson", options, {success:function(data) {
+    list("geojson", {keys:keys, error:error}, {success:function(data) {
       function update_one_geometry() {
-        // iv) if button says 'precise' reset to 'refine' if viewport has changed
-        if (refine.val()=="exakt" && error!=0) refine.val("verfeinern");
-        // iii) if button says 'refine' switch to 'precise' 
-        if (refine.val()=="verfeinern" && error==0) refine.val("exakt");
         for (var id in data) {
           var item=data[id];
           var GeoJSON=item.GeoJSON;
@@ -136,14 +116,14 @@ $(document).ready(function() {
   }
 
   // diff-updates items inside viewport
-  function update_items() {
+  function update_items(error) {
     var NE=map.getBounds().getNorthEast();
     var SW=map.getBounds().getSouthWest();
     var options={
       keys:keys.prefix.concat(keys.sorted),
       unsorted:keys.prefix.length,
       limit:parseFloat($("#settings [name='limit']").val()),
-      error:(NE.lat()-SW.lat())/100,
+      error:error==null?(NE.lat()-SW.lat())/100:error,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     var details = $("#details")
@@ -201,8 +181,31 @@ $(document).ready(function() {
       update_items();
       // update GeoJSON according to viewport here
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-      // cycle through geometric detail mode
-      $("#settings [name='refine']").click( call.this_one_next(function() {update_geometry(0);}));
+      // cycle through geometric detail mode:
+      // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
+      $("#settings [name='refine']").click( function() {
+        $("#settings [name='refine']").hide();
+        $("#settings [name='precise']").show();
+        call.this_one_next(function() {update_geometry(0);})();
+        // if viewport is moved, reset button
+        Maps.event.addListenerOnce(map, 'bounds_changed', function() {
+          $("#settings [name='precise']").hide();
+          $("#settings [name='refine']").show();
+        });
+      });
+      $("#settings [name='precise']").click( function() {
+        $("#settings [name='precise']").hide();
+        $("#settings [name='simplified']").show();
+        Maps.event.clearListeners(map, 'bounds_changed');
+        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
+      });
+      $("#settings [name='simplified']").click( function() {
+        $("#settings [name='simplified']").hide();
+        $("#settings [name='refine']").show();
+        Maps.event.clearListeners(map, 'bounds_changed');
+        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+        Maps.event.trigger(map, 'bounds_changed');
+      });
       // increase limit to next higher [1,2,5,10,20,50,etc]
       $("#settings [name='more']").click( function() {
         var limit=parseFloat($("#settings [name='limit']").val());
@@ -242,6 +245,8 @@ $(document).ready(function() {
   <form id="settings">
     Darstellung:
     <input type="button" name="refine" value="verfeinern">
+    <input type="button" style="display:none" name="precise" value="exakt">
+    <input type="button" style="display:none" name="simplified" value="vereinfacht">
     <input type="checkbox" name="delayed" checked>verzögert
     <input type="text" name="limit" size=2 value="50"> Polygone
     <input type="button" value="weniger" name="less">
