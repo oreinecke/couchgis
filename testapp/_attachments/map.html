@@ -214,7 +214,7 @@ $(document).ready(function() {
         if (new_limit>5*limit) new_limit/=5;
         if (new_limit>2*limit) new_limit/=2;
         $("#settings [name='limit']").val(new_limit);
-        call.this_one_next(update_items)();
+        Maps.event.trigger(map, 'bounds_changed');
       });
       // decrease limit to next lower [1,2,5,10,20,50,etc]
       $("#settings [name='less']").click( function() {
@@ -224,7 +224,7 @@ $(document).ready(function() {
         if (new_limit*5<limit) new_limit*=5;
         if (new_limit*2<limit) new_limit*=2;
         $("#settings [name='limit']").val(new_limit);
-        call.this_one_next(update_items)();
+        Maps.event.trigger(map, 'bounds_changed');
       });
     }});
   });
