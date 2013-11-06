@@ -6,7 +6,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
     <script src="script/jquery-1.10.2.js"></script>
-    <script src="script/jquery.couch.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
 <script type="text/javascript">
@@ -23,14 +22,19 @@ $(document).ready(function() {
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
-  // abbreviates _list/bbox-filter/<view>
+  // call _list/bbox-filter/<view> with some useful options
   function list(view, data, options) {
-    return list.db.list(list.app+"/bbox-filter", view, data, options);
+    options.complete=list.complete;
+    options.data=JSON.stringify(data);
+    options.type="POST";
+    $.ajax("_list/bbox-filter/"+view, options);
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.match(/[^/]+/g);
-  list.db=$.couch.db(list.parts[0]);
+  list.db=list.parts[0];
   list.app=list.parts[2];
+  // discontinue function calls if something unexpected happened
+  list.complete=function(jqXHR, result) { if (result!="success") call.no_one(); }
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
@@ -54,6 +58,10 @@ $(document).ready(function() {
         call.next=null;
         if (call.now!==null) call.now();
       }, 500);
+    },
+    no_one:function() {
+      call.now=null;
+      call.next=null;
     }
   };
   // All items that are displayed on the map are in here as "id":{etc.}.
@@ -140,7 +148,7 @@ $(document).ready(function() {
             // Group docs with identical GIS into one <li>.
             if (doc) link.append("<br>");
             // Link to Futon for the lack of a better interface.
-            link.append('<a href="/_utils/document.html?'+list.db.name+'/'
+            link.append('<a href="/_utils/document.html?'+list.db+'/'
                          +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
           }
           details.append(link);
@@ -243,7 +251,7 @@ $(document).ready(function() {
     <input type="button" name="refine" value="verfeinern">
     <input type="button" style="display:none" name="precise" value="exakt">
     <input type="button" style="display:none" name="simplified" value="vereinfacht">
-    <input type="checkbox" name="delayed" checked>verzögert
+    <input type="checkbox" name="delayed">verzögert
     <input type="text" name="limit" size=2 value="50"> Polygone
     <input type="button" value="weniger" name="less">
     <input type="button" value="mehr" name="more">
