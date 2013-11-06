@@ -7,7 +7,6 @@
 
     <script src="script/jquery-1.10.2.js"></script>
     <script src="script/jquery.couch.js"></script>
-    <script src="script/login_bar.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
 <script type="text/javascript">
@@ -24,12 +23,11 @@ $(document).ready(function() {
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
-  MAP=map; // remove me!! I am just for the FF js shell
-
-  // ok this also looks retarded but it keeps my stuff in one place at least
+  // abbreviates _list/bbox-filter/<view>
   function list(view, data, options) {
     return list.db.list(list.app+"/bbox-filter", view, data, options);
   }
+  // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.match(/[^/]+/g);
   list.db=$.couch.db(list.parts[0]);
   list.app=list.parts[2];
@@ -61,10 +59,7 @@ $(document).ready(function() {
   // All items that are displayed on the map are in here as "id":{etc.}.
   var items={};
   // This contains a partially ordered list of GeoJSON ids for list().
-  var keys={
-    prefix:[],
-    sorted:[] 
-  };
+  var keys={ prefix:[], sorted:[] };
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
@@ -98,7 +93,7 @@ $(document).ready(function() {
           // select link if user clicks on shape
           Maps.event.addListener(shape, 'click', function(href) {
             return function() {href.focus();};
-          }(items[id].link.find('a')));
+          }(items[id].link.find('a').last()));
           if (items[id].shape)
             items[id].shape.setMap();
           // there is no need to keep all the polygons
@@ -179,15 +174,16 @@ $(document).ready(function() {
       for (var id in data)
         keys.sorted.push(id);
       update_items();
-      // update GeoJSON according to viewport here
+      // update GeoJSON according to viewport
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
       // cycle through geometric detail mode:
       // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
       $("#settings [name='refine']").click( function() {
         $("#settings [name='refine']").hide();
         $("#settings [name='precise']").show();
+        // show refined geometry once, and
         call.this_one_next(function() {update_geometry(0);})();
-        // if viewport is moved, reset button
+        // revert to 'refine', if viewport was moved
         Maps.event.addListenerOnce(map, 'bounds_changed', function() {
           $("#settings [name='precise']").hide();
           $("#settings [name='refine']").show();
