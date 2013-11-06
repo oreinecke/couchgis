@@ -73,7 +73,8 @@ function(head, req) {
     send('"'+item.id+'":'+JSON.stringify({GeoJSON:item.GeoJSON,docs:item.docs}));
   }
   send('}\n');
-  // Remove this next line as soon as a new CouchDB release is published: for
-  // some reason, the list crashes if rows are left after the function returned. 
-  while (getRow());
+  // some reason, the list crashes if rows are left after the function
+  // returned. This happens only if keys are specified in the request body.
+  if (body.keys) while (getRow());
 }
+
