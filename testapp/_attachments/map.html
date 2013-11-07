@@ -23,11 +23,13 @@ $(document).ready(function() {
   });
 
   // call _list/bbox-filter/<view> with some useful options
-  function list(view, data, options) {
-    options.complete=list.complete;
-    options.data=JSON.stringify(data);
-    options.type="POST";
-    $.ajax("_list/bbox-filter/"+view, options);
+  function list(view, data, success) {
+    $.ajax("_list/bbox-filter/"+view, {
+      type:"POST",
+      success:success,
+      complete:list.complete,
+      data:JSON.stringify(data)
+    });
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.match(/[^/]+/g);
@@ -81,7 +83,7 @@ $(document).ready(function() {
     }
     // timeout is 50ms or instantaneous
     var timeout = 50 * $("#settings [name='delayed']").prop('checked');
-    list("geojson", {keys:keys, error:error}, {success:function(data) {
+    list("geojson", {keys:keys, error:error}, function(data) {
       function update_one_geometry() {
         for (var id in data) {
           var item=data[id];
@@ -115,7 +117,7 @@ $(document).ready(function() {
         call.that_last_one();
       }
       update_one_geometry();
-    }});
+    });
   }
 
   // diff-updates items inside viewport
@@ -130,7 +132,7 @@ $(document).ready(function() {
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     var details = $("#details")
-    list("bbox-size", options, {success:function(data) {
+    list("bbox-size", options, function(data) {
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
@@ -170,7 +172,7 @@ $(document).ready(function() {
         delete items[id];
       }
       update_geometry(options.error);
-    }});
+    });
   }
 
   // initialize map position and geometry as soon as map has finished loading.
@@ -178,7 +180,7 @@ $(document).ready(function() {
     // The key initialization should probably happen here: we just need a query
     // that yields an ordered id list and a bbox as union of all bboxes or at
     // least a center to point the map to.
-    list("bbox-size", {}, {success:function(data) {
+    list("bbox-size", {}, function(data) {
       for (var id in data)
         keys.sorted.push(id);
       update_items();
@@ -230,7 +232,7 @@ $(document).ready(function() {
         $("#settings [name='limit']").val(new_limit);
         Maps.event.trigger(map, 'bounds_changed');
       });
-    }});
+    });
   });
 
 });
