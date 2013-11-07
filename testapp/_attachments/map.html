@@ -26,17 +26,15 @@ $(document).ready(function() {
   function list(view, data, success) {
     $.ajax("_list/bbox-filter/"+view, {
       type:"POST",
+      data:JSON.stringify(data),
       success:success,
-      complete:list.complete,
-      data:JSON.stringify(data)
+      error:call.that_last_one
     });
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.match(/[^/]+/g);
   list.db=list.parts[0];
   list.app=list.parts[2];
-  // discontinue function calls if something unexpected happened
-  list.complete=function(jqXHR, result) { if (result!="success") call.no_one(); }
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
@@ -104,8 +102,7 @@ $(document).ready(function() {
           Maps.event.addListener(shape, 'click', function(href) {
             return function() {href.focus();};
           }(items[id].link.find('a').last()));
-          if (items[id].shape)
-            items[id].shape.setMap();
+          if (items[id].shape) items[id].shape.setMap();
           // there is no need to keep all the polygons
           items[id].GeoJSON={error:GeoJSON.error};
           items[id].docs=item.docs;
@@ -139,15 +136,13 @@ $(document).ready(function() {
       var new_prefix=[];
       var new_geometry=[];
       for (var id in data) {
-        if (items[id]==null) {
-          items[id]=data[id];
-        }
+        if (items[id]==null) items[id]=data[id];
         else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error)
         delete old_items[id];
         if (items[id].link==null) {
           var link=$(document.createElement("li"));
           for (doc=0;doc<items[id].docs.length;doc++) {
-            // Group docs with identical GIS into one <li>.
+            // Group docs with identical GIS into one li.
             if (doc) link.append("<br>");
             // Link to Futon for the lack of a better interface.
             link.append('<a href="/_utils/document.html?'+list.db+'/'
@@ -167,8 +162,10 @@ $(document).ready(function() {
       }
       keys.prefix=new_prefix.concat(keys.prefix);
       for (var id in old_items) {
+        // shape is not guaranteed to be set because
+        // _list/bbox-filter/geojson might be unsuccessful
+        if (items[id].shape) items[id].shape.setMap();
         items[id].link.remove();
-        items[id].shape.setMap();
         delete items[id];
       }
       update_geometry(options.error);
