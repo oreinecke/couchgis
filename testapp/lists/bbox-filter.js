@@ -54,10 +54,6 @@ function(head, req) {
     var GeoJSON=row.value.GeoJSON;
     // evaluation of geomeric properties follows:
     if (GeoJSON==null) continue;
-    // skip if outside bbox
-    if ('bbox' in GeoJSON && (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
-                              bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]))
-      continue;
     // skip if geomtry is too small
     if ('size' in GeoJSON && items.length==limit &&
         GeoJSON.size<=items[items.length-1].GeoJSON.size) {
@@ -65,6 +61,10 @@ function(head, req) {
       if (!unsorted) break;
       continue;
     }
+    // skip if outside bbox
+    if ('bbox' in GeoJSON && (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
+                              bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]))
+      continue;
     if ('error' in GeoJSON) {
       // skip if geometry has too few details
       if (GeoJSON.error>error) continue;
