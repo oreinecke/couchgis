@@ -168,7 +168,9 @@ $(document).ready(function() {
         items[id].link.remove();
         delete items[id];
       }
-      update_geometry(options.error);
+      // Put a small delay between both lists to
+      // let CouchDB recover from its previous crash.
+      window.setTimeout(function() {update_geometry(options.error);}, 10);
     });
   }
 
