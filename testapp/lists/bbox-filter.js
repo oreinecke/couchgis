@@ -20,7 +20,7 @@ function(head, req) {
     types=null;
   // We expect keys have random items first (that have been returned at the
   // last query and are likely to be returned again) followed by remaining
-  // items by decreasing size. If the client provides this 'sort threshold, we
+  // items by decreasing size. If the client provides this 'sort threshold', we
   // may safely break out of the loop!
   var unsorted=body.unsorted;
   if (typeof(unsorted)!="number") unsorted=Infinity;
@@ -30,11 +30,18 @@ function(head, req) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
-        var i=items.length;
-        if (last_GeoJSON.size!=null)
-          while (i && items[i-1].GeoJSON.size<last_GeoJSON.size) i--;
-        items.splice(i,0,{id:last_key,GeoJSON:last_GeoJSON,docs:docs});
-        items=items.slice(0,limit);
+        // employ either binary search or put new item at the end
+        items.splice( function() {
+          if (last_GeoJSON.size==null) return items.length;
+          var j=items.length>>1;
+          // This tests at pivot index j between [i,k],
+          // and reiterates with either [i,j] or [j,k].
+          for (var i=-1, k=items.length; i+1!=k; j=(k+i+1)>>1)
+            if (last_GeoJSON.size>items[j].GeoJSON.size) k=j;
+            else i=j;
+          return j;
+        }(), 0, {id:last_key,GeoJSON:last_GeoJSON,docs:docs});
+        if (items.length==limit+1) items.pop();
       }
       if (unsorted) unsorted--;
       docs=[];
@@ -44,9 +51,9 @@ function(head, req) {
     last_key=row.key;
     if ('doc' in row.value && (!types||types.indexOf(row.value.doc.type)!==-1))
       docs.push(row.value.doc);
-    if (row.value.GeoJSON==null) continue;
-    // evaluation of geomeric properties follows:
     var GeoJSON=row.value.GeoJSON;
+    // evaluation of geomeric properties follows:
+    if (GeoJSON==null) continue;
     // skip if outside bbox
     if ('bbox' in GeoJSON && (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
                               bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]))
@@ -59,7 +66,7 @@ function(head, req) {
       continue;
     }
     if ('error' in GeoJSON) {
-      // skip if geometry is too detailed
+      // skip if geometry has too few details
       if (GeoJSON.error>error) continue;
       // skip if we already have a more detailed version
       if (last_GeoJSON && last_GeoJSON.error>=GeoJSON.error) continue;
