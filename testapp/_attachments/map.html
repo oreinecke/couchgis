@@ -17,7 +17,7 @@ $(document).ready(function() {
   var LatLngBounds=Maps.LatLngBounds;
 
   var map = new Maps.Map($('#map')[0], {
-    zoom: 14,
+    zoom: 12,
     mapTypeId: Maps.MapTypeId.SATELLITE,
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
@@ -176,61 +176,65 @@ $(document).ready(function() {
 
   // initialize map position and geometry as soon as map has finished loading.
   Maps.event.addListenerOnce(map, 'tilesloaded', function() {
-    // The key initialization should probably happen here: we just need a query
-    // that yields an ordered id list and a bbox as union of all bboxes or at
-    // least a center to point the map to.
-    list("bbox-size", {}, function(data) {
-      for (var id in data)
-        keys.sorted.push(id);
+    // set viewport and zoom level
+    $.getJSON("_view/dimensions", function(data) {
+      var bbox=data.rows[0].value.bbox;
+      map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
+      //map.panToBounds(new LatLngBounds(new LatLng(bbox[1],bbox[0]),new LatLng(bbox[3],bbox[2])));
+    });
+    // get list of GeoJSON keys, largest to smallest item
+    $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
+      for (var row=0;row<data.rows.length;row++)
+        keys.sorted.push(data.rows[row].id);
       update_items();
       // update GeoJSON according to viewport
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-      // cycle through geometric detail mode:
-      // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
-      $("#settings [name='refine']").click( function() {
-        $("#settings [name='refine']").hide();
-        $("#settings [name='precise']").show();
-        // show refined geometry once, and
-        call.this_one_next(function() {update_geometry(0);})();
-        // revert to 'refine', if viewport was moved
-        Maps.event.addListenerOnce(map, 'bounds_changed', function() {
-          $("#settings [name='precise']").hide();
-          $("#settings [name='refine']").show();
-        });
-      });
-      $("#settings [name='precise']").click( function() {
+    });
+    // cycle through geometric detail mode:
+    // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
+    $("#settings [name='refine']").click( function() {
+      $("#settings [name='refine']").hide();
+      $("#settings [name='precise']").show();
+      // show refined geometry once, and
+      call.this_one_next(function() {update_geometry(0);})();
+      // revert to 'refine', if viewport was moved
+      Maps.event.addListenerOnce(map, 'bounds_changed', function() {
         $("#settings [name='precise']").hide();
-        $("#settings [name='simplified']").show();
-        Maps.event.clearListeners(map, 'bounds_changed');
-        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
-      });
-      $("#settings [name='simplified']").click( function() {
-        $("#settings [name='simplified']").hide();
         $("#settings [name='refine']").show();
-        Maps.event.clearListeners(map, 'bounds_changed');
-        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-        Maps.event.trigger(map, 'bounds_changed');
       });
-      // increase limit to next higher [1,2,5,10,20,50,etc]
-      $("#settings [name='more']").click( function() {
-        var limit=parseFloat($("#settings [name='limit']").val());
-        var new_limit=10;
-        while (new_limit<=limit) new_limit*=10;
-        if (new_limit>5*limit) new_limit/=5;
-        if (new_limit>2*limit) new_limit/=2;
-        $("#settings [name='limit']").val(new_limit);
-        Maps.event.trigger(map, 'bounds_changed');
-      });
-      // decrease limit to next lower [1,2,5,10,20,50,etc]
-      $("#settings [name='less']").click( function() {
-        var limit=parseFloat($("#settings [name='limit']").val());
-        var new_limit=1;
-        while (new_limit*10<limit) new_limit*=10;
-        if (new_limit*5<limit) new_limit*=5;
-        if (new_limit*2<limit) new_limit*=2;
-        $("#settings [name='limit']").val(new_limit);
-        Maps.event.trigger(map, 'bounds_changed');
-      });
+    });
+    $("#settings [name='precise']").click( function() {
+      $("#settings [name='precise']").hide();
+      $("#settings [name='simplified']").show();
+      Maps.event.clearListeners(map, 'bounds_changed');
+      Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
+    });
+    $("#settings [name='simplified']").click( function() {
+      $("#settings [name='simplified']").hide();
+      $("#settings [name='refine']").show();
+      Maps.event.clearListeners(map, 'bounds_changed');
+      Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+      Maps.event.trigger(map, 'bounds_changed');
+    });
+    // increase limit to next higher [1,2,5,10,20,50,etc]
+    $("#settings [name='more']").click( function() {
+      var limit=parseFloat($("#settings [name='limit']").val());
+      var new_limit=10;
+      while (new_limit<=limit) new_limit*=10;
+      if (new_limit>5*limit) new_limit/=5;
+      if (new_limit>2*limit) new_limit/=2;
+      $("#settings [name='limit']").val(new_limit);
+      Maps.event.trigger(map, 'bounds_changed');
+    });
+    // decrease limit to next lower [1,2,5,10,20,50,etc]
+    $("#settings [name='less']").click( function() {
+      var limit=parseFloat($("#settings [name='limit']").val());
+      var new_limit=1;
+      while (new_limit*10<limit) new_limit*=10;
+      if (new_limit*5<limit) new_limit*=5;
+      if (new_limit*2<limit) new_limit*=2;
+      $("#settings [name='limit']").val(new_limit);
+      Maps.event.trigger(map, 'bounds_changed');
     });
   });
 
