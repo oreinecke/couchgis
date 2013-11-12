@@ -3,6 +3,7 @@
 
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
+  send('{');
   var body=(req.body=="undefined"?{}:JSON.parse(req.body));
   var bbox=body.bbox;
   // initialize to infinite bbox if none provided
@@ -18,32 +19,17 @@ function(head, req) {
   var types=body.types;
   if (typeof(types)!="object" || typeof(types.indexOf)!="function")
     types=null;
-  // We expect keys have random items first (that have been returned at the
-  // last query and are likely to be returned again) followed by remaining
-  // items by decreasing size. If the client provides this 'sort threshold', we
-  // may safely break out of the loop!
-  var unsorted=body.unsorted;
-  if (typeof(unsorted)!="number") unsorted=Infinity;
-  var items=[];
   var row={}, last_key, last_GeoJSON, docs=[];
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
         // employ either binary search or put new item at the end
-        items.splice( function() {
-          if (last_GeoJSON.size==null) return items.length;
-          var j=items.length>>1;
-          // This tests at pivot index j between [i,k],
-          // and reiterates with either [i,j] or [j,k].
-          for (var i=-1, k=items.length; i+1!=k; j=(k+i+1)>>1)
-            if (last_GeoJSON.size>items[j].GeoJSON.size) k=j;
-            else i=j;
-          return j;
-        }(), 0, {id:last_key,GeoJSON:last_GeoJSON,docs:docs});
-        if (items.length==limit+1) items.pop();
+        send('"'+last_key+'":'+JSON.stringify({GeoJSON:last_GeoJSON,docs:docs}));
+        limit--;
+        // don't look further if list is complete
+        if (limit) send(',\n') else break;
       }
-      if (unsorted) unsorted--;
       docs=[];
       last_GeoJSON=null;
     }
@@ -54,13 +40,6 @@ function(head, req) {
     var GeoJSON=row.value.GeoJSON;
     // evaluation of geomeric properties follows:
     if (GeoJSON==null) continue;
-    // skip if geomtry is too small
-    if ('size' in GeoJSON && items.length==limit &&
-        GeoJSON.size<=items[items.length-1].GeoJSON.size) {
-      // no need to look further if only smaller items are expected
-      if (!unsorted) break;
-      continue;
-    }
     // skip if outside bbox
     if ('bbox' in GeoJSON && (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
                               bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]))
@@ -73,13 +52,7 @@ function(head, req) {
     }
     last_GeoJSON=GeoJSON;
   }
-  send('{');
-  for (var i=0;i<items.length;i++) {
-    if (i) send(',\n');
-    var item=items[i];
-    send('"'+item.id+'":'+JSON.stringify({GeoJSON:item.GeoJSON,docs:item.docs}));
-  }
-  send('}\n');
+  send('}');
   // Uncomment this next line as soon as any(more) trouble arises: for some
   // reason, the list crashes if rows are left after the function returned.
   // This happens only if keys are specified in the request body.
