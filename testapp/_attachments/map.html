@@ -144,7 +144,7 @@ $(document).ready(function() {
     // ignore items that were already dropped by previous viewport
     options.keys=vp.prefix.join(keys.slice(vp.position)),
     var details = $("#details")
-    list("bbox-size", options, function(data) {
+    list("bbox", options, function(data) {
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
