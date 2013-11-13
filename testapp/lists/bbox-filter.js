@@ -28,11 +28,11 @@ function(head, req) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
-        // employ either binary search or put new item at the end
         send('"'+last_key+'":'+JSON.stringify({GeoJSON:last_GeoJSON,docs:docs}));
         limit--;
+        if (limit || row==null) send(',\n');
         // don't look further if list is complete
-        if (limit) send(',\n') else break;
+        if (!limit) break;
       }
       docs=[];
       last_GeoJSON=null;
