@@ -3,7 +3,6 @@
 
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
-  send('{');
   var body=(req.body=="undefined"?{}:JSON.parse(req.body));
   var bbox=body.bbox;
   // initialize to infinite bbox if none provided
@@ -20,6 +19,11 @@ function(head, req) {
   if (typeof(types)!="object" || typeof(types.indexOf)!="function")
     types=null;
   var row={}, last_key, last_GeoJSON, docs=[];
+  send('{');
+  if (!limit) {
+    send('}');
+    return;
+  }
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
