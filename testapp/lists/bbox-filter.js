@@ -30,9 +30,9 @@ function(head, req) {
       if (last_GeoJSON && docs.length) {
         send('"'+last_key+'":'+JSON.stringify({GeoJSON:last_GeoJSON,docs:docs}));
         limit--;
-        if (limit || row==null) send(',\n');
         // don't look further if list is complete
         if (!limit) break;
+        else if (row!=null) send(',\n');
       }
       docs=[];
       last_GeoJSON=null;

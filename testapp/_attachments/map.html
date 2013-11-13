@@ -68,7 +68,7 @@ $(document).ready(function() {
   var items={};
   // This contains an ordered list of ALL GeoJSON keys.
   var keys=[];
-  // This contains a descending viewport array,
+  // This contains a cascading viewport array,
   // initialized to one default element.
   var viewports=[{
     bbox: [-Infinity,-Infinity,Infinity,Infinity],
@@ -78,17 +78,17 @@ $(document).ready(function() {
 
   // check if accuracy is justified and replace GeoJSON if not
   function update_geometry(error) {
-    var keys=[];
+    var options={keys:[], error:error};
     for (var id in items)
       if (!items[id].keep || error<items[id].GeoJSON.error)
-        keys.push(id);
-    if (!keys.length) {
+        options.keys.push(id);
+    if (!options.keys.length) {
       call.that_last_one();
       return;
     }
     // timeout is 50ms or instantaneous
     var timeout = 50 * $("#settings [name='delayed']").prop('checked');
-    list("geojson", {keys:keys, error:error}, function(data) {
+    list("geojson", options, function(data) {
       function update_one_geometry() {
         for (var id in data) {
           var item=data[id];
@@ -131,18 +131,17 @@ $(document).ready(function() {
     var options={
       limit:parseFloat($("#settings [name='limit']").val()),
       error:error==null?(NE.lat()-SW.lat())/100:error,
-      unsorted:0,
       bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()]
     };
     var vp;
-    // remove viewports until 
+    // pop viewports until one is found that surrounds bbox
     do vp=viewports.pop();
     while (options.bbox[0]<vp.bbox[0]||options.bbox[1]<vp.bbox[1]||
            options.bbox[2]>vp.bbox[2]||options.bbox[3]>vp.bbox[3]);
     // the last viewport is valid, so it needs to be re-stacked
     viewports.push(vp);
     // ignore items that were already dropped by previous viewport
-    options.keys=vp.prefix.join(keys.slice(vp.position)),
+    options.keys=vp.prefix.concat(keys.slice(vp.position));
     var details = $("#details")
     list("bbox", options, function(data) {
       // lists items to be removed as {id:null}
@@ -152,7 +151,7 @@ $(document).ready(function() {
       // exceptional case where no 'var' is found in a for-statement.
       var id; for (id in data) {
         if (items[id]==null) items[id]=data[id];
-        else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error)
+        else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
         delete old_items[id];
         if (items[id].link==null) {
           var link=$(document.createElement("li"));
@@ -168,14 +167,14 @@ $(document).ready(function() {
         }
       }
       // prepare new viewport
-      var new_vp={ position:keys.indexOf(id,vp.position)+1 };
+      var new_vp={ position:keys.indexOf(id)+1 };
       // Set-up and add new_vp to viewport stack,
       // but only if it is indeed more restrictive.
       if (new_vp.position!=vp.position) {
         new_vp.prefix=[];
         for (var id in data) 
           new_vp.prefix.push(id);
-        new_vp.bbox=bbox;
+        new_vp.bbox=options.bbox;
         viewports.push(new_vp);
       }
       // remove out-of-viewport shapes and links
