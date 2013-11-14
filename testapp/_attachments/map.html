@@ -169,7 +169,13 @@ $(document).ready(function() {
         details.append(link);
         items[id].link=link;
       }
-      new_vp.position=keys.indexOf(id)+1;
+      // If the query returned less than the required items, then these must
+      // be the only items within the viewport. In this case the index may be
+      // set to the end of the list, and no keys are appended.
+      if (new_vp.prefix<options.limit) new_vp.position=keys.length;
+      // In any other case it is safe to assume that any key before the
+      // last one is either outside the viewport or already in prefix.
+      else new_vp.position=keys.indexOf(id)+1;
       // Add new_vp to viewport stack, but only if it is indeed more restrictive.
       if (new_vp.position>vp.position || new_vp.prefix.length<vp.prefix.length)
         viewports.push(new_vp);
