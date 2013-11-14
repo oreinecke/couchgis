@@ -158,6 +158,7 @@ $(document).ready(function() {
           delete old_items[id];
           continue;
         }
+        items[id]=data[id];
         var link=$(document.createElement("li"));
         for (doc=0;doc<items[id].docs.length;doc++) {
           // Group docs with identical GIS into one li.
@@ -172,7 +173,7 @@ $(document).ready(function() {
       // If the query returned less than the required items, then these must
       // be the only items within the viewport. In this case the index may be
       // set to the end of the list, and no keys are appended.
-      if (new_vp.prefix<options.limit) new_vp.position=keys.length;
+      if (new_vp.prefix.length<options.limit) new_vp.position=keys.length;
       // In any other case it is safe to assume that any key before the
       // last one is either outside the viewport or already in prefix.
       else new_vp.position=keys.indexOf(id)+1;
@@ -205,7 +206,7 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
       for (var row=0;row<data.rows.length;row++)
         keys.push(data.rows[row].id);
-      call.this_one_next(update_items())();
+      call.this_one_next(update_items)();
       // update GeoJSON according to viewport
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
     });
