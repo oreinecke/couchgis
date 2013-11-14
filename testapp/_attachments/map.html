@@ -147,6 +147,8 @@ $(document).ready(function() {
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
+      // prepare new viewport
+      var new_vp={ bbox:options.bbox, prefix:[] };
       // I need the last prop of data after the loop again. This is one
       // exceptional case where no 'var' is found in a for-statement.
       var id; for (id in data) {
@@ -165,18 +167,12 @@ $(document).ready(function() {
           details.append(link);
           items[id].link=link;
         }
+        new_vp.prefix.push(id);
       }
-      // prepare new viewport
-      var new_vp={ position:keys.indexOf(id)+1 };
-      // Set-up and add new_vp to viewport stack,
-      // but only if it is indeed more restrictive.
-      if (new_vp.position!=vp.position) {
-        new_vp.prefix=[];
-        for (var id in data) 
-          new_vp.prefix.push(id);
-        new_vp.bbox=options.bbox;
+      new_vp.position=keys.indexOf(id)+1;
+      // Add new_vp to viewport stack, but only if it is indeed more restrictive.
+      if (new_vp.position>vp.position || new_vp.prefix.length<vp.prefix.length)
         viewports.push(new_vp);
-      }
       // remove out-of-viewport shapes and links
       for (var id in old_items) {
         // shape is not guaranteed to be set because
