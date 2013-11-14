@@ -152,22 +152,22 @@ $(document).ready(function() {
       // I need the last prop of data after the loop again. This is one
       // exceptional case where no 'var' is found in a for-statement.
       var id; for (id in data) {
-        if (items[id]==null) items[id]=data[id];
-        else items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
-        delete old_items[id];
-        if (items[id].link==null) {
-          var link=$(document.createElement("li"));
-          for (doc=0;doc<items[id].docs.length;doc++) {
-            // Group docs with identical GIS into one li.
-            if (doc) link.append("<br>");
-            // Link to Futon for the lack of a better interface.
-            link.append('<a href="/_utils/document.html?'+list.db+'/'
-                         +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
-          }
-          details.append(link);
-          items[id].link=link;
-        }
         new_vp.prefix.push(id);
+        if (items[id]) {
+          items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
+          delete old_items[id];
+          continue;
+        }
+        var link=$(document.createElement("li"));
+        for (doc=0;doc<items[id].docs.length;doc++) {
+          // Group docs with identical GIS into one li.
+          if (doc) link.append("<br>");
+          // Link to Futon for the lack of a better interface.
+          link.append('<a href="/_utils/document.html?'+list.db+'/'
+                       +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
+        }
+        details.append(link);
+        items[id].link=link;
       }
       new_vp.position=keys.indexOf(id)+1;
       // Add new_vp to viewport stack, but only if it is indeed more restrictive.
