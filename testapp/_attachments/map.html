@@ -86,8 +86,8 @@ $(document).ready(function() {
       call.that_last_one();
       return;
     }
-    // timeout is 50ms or instantaneous
-    var timeout = 50 * $("#settings [name='delayed']").prop('checked');
+    // timeout is 5ms or instantaneous
+    var timeout = 5 * $("#settings [name='delayed']").prop('checked');
     list("geojson", options, function(data) {
       function update_one_geometry() {
         for (var id in data) {
@@ -234,6 +234,11 @@ $(document).ready(function() {
       $("#settings [name='refine']").show();
       Maps.event.clearListeners(map, 'bounds_changed');
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+      Maps.event.trigger(map, 'bounds_changed');
+    });
+    // update map if limit was typed in by hand
+    $("#settings").submit( function(e) {
+      e.preventDefault();
       Maps.event.trigger(map, 'bounds_changed');
     });
     // increase limit to next higher [1,2,5,10,20,50,etc]
