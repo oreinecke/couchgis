@@ -199,7 +199,7 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
       for (var row=0;row<data.rows.length;row++)
         keys.push(data.rows[row].id);
-      update_items();
+      call.this_one_next(update_items())();
       // update GeoJSON according to viewport
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
     });
