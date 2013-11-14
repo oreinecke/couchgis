@@ -19,20 +19,19 @@ function(head, req) {
   if (typeof(types)!="object" || typeof(types.indexOf)!="function")
     types=null;
   var row={}, last_key, last_GeoJSON, docs=[];
-  send('{');
+  var items={};
   if (!limit) {
-    send('}');
+    send(JSON.stringify(items));
     return;
   }
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
-        send('"'+last_key+'":'+JSON.stringify({GeoJSON:last_GeoJSON,docs:docs}));
+        items[last_key]={GeoJSON:last_GeoJSON,docs:docs};
         limit--;
         // don't look further if list is complete
         if (!limit) break;
-        else if (row!=null) send(',\n');
       }
       docs=[];
       last_GeoJSON=null;
@@ -56,7 +55,7 @@ function(head, req) {
     }
     last_GeoJSON=GeoJSON;
   }
-  send('}');
+  send(JSON.stringify(items));
   // Uncomment this next line as soon as any(more) trouble arises: for some
   // reason, the list crashes if rows are left after the function returned.
   // This happens only if keys are specified in the request body.
