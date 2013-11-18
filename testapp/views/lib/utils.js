@@ -86,7 +86,10 @@ exports.size=function(GeoJSON) {
 
 exports.toWGS84=function(GeoJSON) {
   try {
-    var EPSG=GeoJSON.crs.properties.name.match(/EPSG::([0-9]+)/);
+    var target="urn:ogc:def:crs:OGC:1.3:CRS84";
+    var source=GeoJSON.crs.properties.name;
+    if (source==target) return GeoJSON;
+    var EPSG=source.match(/EPSG::([0-9]+)/);
     var projector=require('./proj4js/core')("EPSG:"+EPSG[1]);
     exports.eachPoint(GeoJSON, function(coord) {
       var newCoord=projector.inverse(coord);
@@ -94,7 +97,7 @@ exports.toWGS84=function(GeoJSON) {
       coord[1]=newCoord[1];
     });
     // write crs according to GeoJSON spec
-    GeoJSON.crs.properties.name="urn:ogc:def:crs:OGC:1.3:CRS84";
+    GeoJSON.crs.properties.name=target;
   } catch(e) {
     GeoJSON.crs=e;
   }
