@@ -7,6 +7,7 @@ function(head, req) {
   var bbox=body.bbox;
   // initialize to false if none provided
   if (bbox==null || typeof(bbox)!="object") bbox=false;
+  else bbox=[body.bbox[0], body.bbox[1], body.bbox[2], body.bbox[3]];
   // we need to limit output and server load
   var limit=body.limit;
   if (typeof(limit)!="number") limit=Infinity;
@@ -21,6 +22,11 @@ function(head, req) {
   var types=body.types;
   if (typeof(types)!="object" || typeof(types.indexOf)!="function")
     types=null;
+  // expect and return shifted coordinates
+  var offset=body.offset;
+  if (offset==null || typeof(offset)!="object") offset=false;
+  // because bbox also has wrong coordinates
+  else for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
   var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
   var items={};
   // Use function variables to work around useless repetition:
@@ -31,14 +37,14 @@ function(head, req) {
     }; else proceed=function() { return true; };
     return proceed();
   };
-  // i) Check if document type matches selection.
+  // ii) Check if document type matches selection.
   var type_matches=function() {
     if (types) type_matches=function() {
       return (types.indexOf(row.value.doc.type!==-1));
     }; else type_matches=function() { return true; };
     return type_matches();
   };
-  // ii) Check if geometry bbox is outside bbox.
+  // iii) Check if geometry bbox is outside bbox.
   var outside_bbox=function() {
     if ('bbox' in GeoJSON && bbox) outside_bbox=function() {
       return (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
@@ -46,19 +52,33 @@ function(head, req) {
     }; else outside_bbox=function() { return false; };
     return outside_bbox();
   };
-  // iii) Send comma and newline as we reach the 2nd item.
+  // iv) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
     send_separator=function() {send(',\n');};
+  };
+  // v) shift viewport and coordinates by offset
+  var shift_geometry=function() {
+    if (offset && last_GeoJSON.type) {
+      var utils=require('views/lib/utils');
+      shift_geometry=function() {
+        utils.eachPoint(last_GeoJSON, function(coord) {
+          coord[0]+=offset[0];
+          coord[1]+=offset[1];
+        });
+      };
+    } else shift_geometry=function() {};
+    shift_geometry();
   };
   send('{');
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
+        shift_geometry();
         items[last_key]={GeoJSON:last_GeoJSON,docs:docs};
         send_separator();
         send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)
-                             +',"docs":'+JSON.stringify(docs)+'}');
+                              +',"docs":'+JSON.stringify(docs)+'}');
         if (!proceed()) break;
       }
       docs=[];

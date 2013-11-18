@@ -24,6 +24,7 @@ $(document).ready(function() {
 
   // call _list/bbox-filter/<view> with some useful options
   function list(view, data, success) {
+    data.offset=[-0.00178,-0.00121];
     $.ajax("_list/bbox-filter/"+view, {
       type:"POST",
       data:JSON.stringify(data),
