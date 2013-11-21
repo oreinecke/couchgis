@@ -1,29 +1,29 @@
 // Yields docs that have an associated GeoJSON bbox
-// intersecting with the one specified in req.body.
+// intersecting with the one specified in req.query.
 
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
-  var body=(req.body=="undefined"?{}:JSON.parse(req.body));
-  var bbox=body.bbox;
+  var query=req.query;
+  var bbox=query.bbox;
   // initialize to false if none provided
   if (bbox==null || typeof(bbox)!="object") bbox=false;
-  else bbox=[body.bbox[0], body.bbox[1], body.bbox[2], body.bbox[3]];
+  else bbox=[query.bbox[0], query.bbox[1], query.bbox[2], query.bbox[3]];
   // we need to limit output and server load
-  var limit=body.limit;
+  var limit=query.limit;
   if (typeof(limit)!="number") limit=Infinity;
   if (!limit) {
     send('{}\n');
     return;
   }
-  var error=body.error;
+  var error=query.error;
   // allow reduced polygons to deviate up to this amount
   if (typeof(error)!="number") error=0.0;
   // and allow to filter types
-  var types=body.types;
+  var types=query.types;
   if (typeof(types)!="object" || typeof(types.indexOf)!="function")
     types=null;
   // expect and return shifted coordinates
-  var offset=body.offset;
+  var offset=query.offset;
   if (offset==null || typeof(offset)!="object") offset=false;
   // because bbox also has wrong coordinates
   else for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
@@ -103,6 +103,6 @@ function(head, req) {
   // Uncomment this next line as soon as any(more) trouble arises: for some
   // reason, the list crashes if rows are left after the function returned.
   // This happens only if keys are specified in the request body.
-  // if (body.keys) while (getRow());
+  // if (req.body.indexOf(/"keys"/)!=-1) while (getRow());
 }
 
