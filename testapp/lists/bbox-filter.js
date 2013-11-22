@@ -4,29 +4,28 @@
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
   var query=req.query;
-  var bbox=query.bbox;
   // initialize to false if none provided
-  if (bbox==null || typeof(bbox)!="object") bbox=false;
-  else bbox=[query.bbox[0], query.bbox[1], query.bbox[2], query.bbox[3]];
+  var bbox=false;
+  if (query.bbox) bbox=JSON.parse(query.bbox);
   // we need to limit output and server load
-  var limit=query.limit;
-  if (typeof(limit)!="number") limit=Infinity;
+  var limit=Infinity;
+  if ('limit' in query) limit=JSON.parse(query.limit);
   if (!limit) {
     send('{}\n');
     return;
   }
-  var error=query.error;
   // allow reduced polygons to deviate up to this amount
-  if (typeof(error)!="number") error=0.0;
-  // and allow to filter types
-  var types=query.types;
-  if (typeof(types)!="object" || typeof(types.indexOf)!="function")
-    types=null;
+  var error=0.0;
+  if ('error' in query) error=JSON.parse(query.error);
+  var types=false;
+  if ('types' in query) types=JSON.parse(query.types);
   // expect and return shifted coordinates
-  var offset=query.offset;
-  if (offset==null || typeof(offset)!="object") offset=false;
-  // because bbox also has wrong coordinates
-  else for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
+  var offset=false;
+  if ('offset' in query) {
+    offset=JSON.parse(query.offset);
+    // because bbox also has wrong coordinates
+    for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
+  }
   var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
   var items={};
   // Use function variables to work around useless repetition:
