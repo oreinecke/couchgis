@@ -6,13 +6,19 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script src="script/jquery-1.10.2.js"></script>
     <script src="script/jquery.couch.js"></script>
-    <script src="script/login_bar.js"></script>
 
 <script>
 $(document).ready(function() {
-  var GeoJSON, crs, features;
-  // write key and value in bold real quick
+  var GeoJSON, crs, features=[];
   var submit=$("#upload :submit");
+  var fields={};
+  var values={};
+  function show_feature(f) {
+    $("#modify a").html(f+1);
+    var properties=features[f].properties;
+    for (var prop in properties)
+      values[prop].val(properties[prop]);
+  }
   $("#upload :file").change(function(e) {
     submit.attr({disabled:true});
     $("#upload b").html("");
@@ -25,24 +31,81 @@ $(document).ready(function() {
         else throw{message:"Useless GeoJSON type!"};
         crs=GeoJSON.crs;
         if (!crs) throw{message:"No top-level CRS defined!"};
-        submit.attr({disabled:false});
-        submit.val("Los!");
       } catch(err) {
+        throw(err);
         $("#upload b").html(err.message+"<br>");
+        return;
       }
+      submit.attr({disabled:false});
+      submit.val("Los!");
+      var div=$("#modify div");
+      fields={};
+      values={};
+      div.html("");
+      // expect all property sets to be identical to the first one
+      for (var prop in features[0].properties) {
+        var row=$(document.createElement("tr"));
+        // render field: value input pair
+        row.html('<input type="checkbox" name="include" checked>'+
+                 '<input type="text" name="field">: '+
+                 '<input type="text" name="value"><br>');
+        var value=row.find("[name='value']");
+        // write new value to selected data set
+        value.change(function(input, prop) {
+          return function() {
+            var v=input.val();
+            // try to parse new value as number
+            try {
+              v=JSON.parse(v);
+              input.val(v);
+            // if that fails just write it as a string
+            } catch(e) {}
+            features[parseInt($("#modify a").html())-1].properties[prop]=v;
+          }
+        }(value, prop));
+        values[prop]=value;
+        var field=row.find("[name='field']");
+        field.val(prop);
+        fields[prop]=field;
+        div.append(row);
+      }
+      show_feature(0);
     };
     reader.readAsText(e.target.files[0]);
   });
+  $("#modify").submit(function(e) {e.preventDefault();});
+  // check/uncheck all
+  $("#modify [name='all']").change(function() {
+    $("#modify [name='include']").prop('checked', $("#modify [name='all']").prop('checked'));
+  });
+  $("#modify [name='prev']").click(function() {
+    var f=parseInt($("#modify a").html());
+    if (--f<1) f=features.length;
+    show_feature(f-1);
+  });
+  $("#modify [name='next']").click(function() {
+    var f=parseInt($("#modify a").html());
+    if (++f>features.length) f=1;
+    show_feature(f-1);
+  });
   $("#upload").submit(function(e) {
     submit.attr({disabled:true});
+    var type=$("#modify [name='type']").val();
     var docs=[];
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
-      // place properties on top-level
-      var doc=feature.properties;
-      // and remove useless undefined 
-      for (var prop in doc)
-        if (doc[prop]==null) doc[prop]=undefined;
+      var doc={};
+      // set doc-type
+      doc.type=type;
+      // write properties with adjusted labels
+      for (var prop in feature.properties) {
+        if (labels[prop]=="") continue;
+        // and ignore useless undefined fields
+        if (feature.properties[prop]==null) continue;
+        if (feature.properties[prop]=="null") continue;
+        if (feature.properties[prop]=="") continue;
+        doc[labels[prop]]=feature.properties[prop];
+      }
       // store geometry as GeoJSON
       doc.GeoJSON=feature.geometry;
       doc.GeoJSON.crs=crs;
@@ -59,12 +122,23 @@ $(document).ready(function() {
   </head>
   <body>
 
-  <iframe src="login_bar.htm" style="width:100%; height:1.6em; border:0;"></iframe>
+  <iframe src="login_bar.htm" style="width:101%; height:1.6em; border:0;"></iframe>
 
   <h1> GeoJSON Upload </h1>
   <form id="upload" action="">
     <input type="file"> <input type="submit" value="Los!" disabled><br>
     <b></b>
+  </form>
+  <form id="modify" action="">
+    Datensatz-Typ: <input type="text" name="type" size="10" value="Feldblock"><br>
+    <input type="checkbox" name="all" checked> Alle Felder auswählen
+    <input type="button" name="prev" value="<">
+    Datensatz <a>1</a>
+    <input type="button" name="next" value=">">
+    <div></div>
+    <input type="button" name="prev" value="<">
+    Datensatz <a>1</a>
+    <input type="button" name="next" value=">">
   </form>
   </body>
 </html>
