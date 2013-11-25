@@ -27,7 +27,6 @@ function(head, req) {
     for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
   }
   var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
-  var items={};
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=function() {
@@ -74,7 +73,6 @@ function(head, req) {
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
         shift_geometry();
-        items[last_key]={GeoJSON:last_GeoJSON,docs:docs};
         send_separator();
         send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)
                               +',"docs":'+JSON.stringify(docs)+'}');
