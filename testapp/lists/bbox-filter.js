@@ -3,26 +3,26 @@
 
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
-  var query=req.query;
+  var options=JSON.parse(req.query.options);
   // initialize to false if none provided
   var bbox=false;
-  if (query.bbox) bbox=JSON.parse(query.bbox);
+  if ('bbox' in options) bbox=options.bbox;
   // we need to limit output and server load
   var limit=Infinity;
-  if ('limit' in query) limit=JSON.parse(query.limit);
+  if ('limit' in options) limit=options.limit;
   if (!limit) {
     send('{}\n');
     return;
   }
   // allow reduced polygons to deviate up to this amount
   var error=0.0;
-  if ('error' in query) error=JSON.parse(query.error);
+  if ('error' in options) error=options.error;
   var types=false;
-  if ('types' in query) types=JSON.parse(query.types);
+  if ('types' in options) types=options.types;
   // expect and return shifted coordinates
   var offset=false;
-  if ('offset' in query) {
-    offset=JSON.parse(query.offset);
+  if ('offset' in options) {
+    offset=options.offset;
     // because bbox also has wrong coordinates
     for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
   }

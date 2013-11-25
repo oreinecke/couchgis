@@ -23,15 +23,14 @@ $(document).ready(function() {
   });
 
   // call _list/bbox-filter/<view> with some useful options
-  function list(view, data, success) {
-    view+=list.offsetURLComponent;
-    for (prop in data) {
-      if (prop=="keys") continue;
-      view+="&"+prop+'='+encodeURIComponent(JSON.stringify(data[prop]));
-    }
+  function list(view, options, success) {
+    var keys=(options.keys?'{"keys":["'+options.keys.join('","')+'"]}':"{}");
+    options.keys=undefined;
+    options.offset=list.offset;
+    view+="?options="+encodeURIComponent(JSON.stringify(options));
     $.ajax("_list/bbox-filter/"+view, {
       type:"POST",
-      data:(data.keys?'{"keys":'+JSON.stringify(data.keys)+'}':"{}"),
+      data:keys,
       success:success,
       error:call.that_last_one
     });
@@ -41,7 +40,7 @@ $(document).ready(function() {
   list.db=list.parts[0];
   list.app=list.parts[2];
   // correct for small shift in Google Maps aerials of unknown reason
-  list.offsetURLComponent="?offset="+encodeURIComponent(JSON.stringify([-0.00178,-0.00121]));
+  list.offset=[-0.00178,-0.00121];
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
