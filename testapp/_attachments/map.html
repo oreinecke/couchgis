@@ -170,7 +170,7 @@ $(document).ready(function() {
           // Group docs with identical GIS into one li.
           if (doc) link.append("<br>");
           // Link to Futon for the lack of a better interface.
-          link.append('<a href="/_utils/document.html?'+list.db+'/'
+          link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'
                        +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
         }
         details.append(link);
