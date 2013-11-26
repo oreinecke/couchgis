@@ -17,7 +17,7 @@ $(document).ready(function() {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
     for (var prop in properties)
-      values[prop].val(properties[prop]);
+      values[prop].attr({value:properties[prop],title:properties[prop]});
   }
   $("#upload :file").change(function(e) {
     submit.attr({disabled:true});
@@ -67,6 +67,14 @@ $(document).ready(function() {
         var field=row.find("[name='field']");
         field.val(prop);
         fields[prop]=field;
+        var checkbox=row.find(":checkbox");
+        checkbox.change(function(checkbox, field, value) {
+          return function() {
+            var disabled=!checkbox.prop('checked');
+            field.attr({disabled:disabled});
+            value.attr({disabled:disabled});
+          }
+        }(checkbox, field, value));
         div.append(row);
       }
       show_feature(0);
@@ -77,6 +85,7 @@ $(document).ready(function() {
   // check/uncheck all
   $("#modify [name='all']").change(function() {
     $("#modify [name='include']").prop('checked', $("#modify [name='all']").prop('checked'));
+    $("#modify [name='include']").change();
   });
   $("#modify [name='prev']").click(function() {
     var f=parseInt($("#modify a").html());
