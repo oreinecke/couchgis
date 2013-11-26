@@ -20,7 +20,7 @@ $(document).ready(function() {
       values[prop].attr({value:properties[prop],title:properties[prop]});
   }
   $("#upload :file").change(function(e) {
-    submit.attr({disabled:true});
+    submit.prop('disabled', true);
     $("#upload b").html("");
     var reader=new FileReader();
     reader.onload=function(evt) {
@@ -36,7 +36,7 @@ $(document).ready(function() {
         $("#upload b").html(err.message+"<br>");
         return;
       }
-      submit.attr({disabled:false});
+      submit.prop('disabled', false);
       submit.val("Los!");
       var div=$("#modify div");
       fields={};
@@ -72,8 +72,8 @@ $(document).ready(function() {
         checkbox.change(function(checkbox, field, value, prop) {
           return function() {
             var disabled=!checkbox.prop('checked');
-            field.attr({disabled:disabled});
-            value.attr({disabled:disabled});
+            field.prop('disabled', disabled);
+            value.prop('disabled', disabled);
             // set a nice and helpful tooltip
             var title=prop+' '
             if (disabled) title+='ignorieren';
@@ -111,7 +111,7 @@ $(document).ready(function() {
     show_feature(f-1);
   });
   $("#upload").submit(function(e) {
-    submit.attr({disabled:true});
+    submit.prop('disabled', true);
     var type=$("#modify [name='type']").val();
     var docs=[];
     for (var f=0;f<features.length;f++) {

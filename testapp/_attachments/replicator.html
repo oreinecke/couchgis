@@ -36,7 +36,7 @@ $(document).ready(function() {
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
       var settings={
         success:function(data) { 
-          $("#replicate :submit").attr({disabled:false});
+          $("#replicate :submit").prop('disabled', false);
           // display some replication results
           r=$("#response");
           r.html("")
@@ -54,21 +54,21 @@ $(document).ready(function() {
             "docs_written", "doc_write_failures"]);
         },
         error:function(jqXHR, error) { 
-          $("#replicate :submit").attr({disabled:false});
+          $("#replicate :submit").prop('disabled', false);
           $("#response").html("Fehler: <b>"+error+"</b>");
         }
       }
       $.couch.replicate(addr[source], addr[target], settings,
        { continuous: $("#replicate :checkbox").prop('checked') } );
-      $("#replicate :submit").attr({disabled:true});
+      $("#replicate :submit").prop('disabled', true);
       e.preventDefault();
     });
   } else $("div").show();
   // enable login if 2nd option is checked
   function enable_log() {
     var pull=$("#pull").prop('checked');
-    $("#replicate :text").attr({disabled:pull});
-    $("#replicate :password").attr({disabled:pull});
+    $("#replicate :text").prop('disabled', pull);
+    $("#replicate :password").prop('disabled', pull);
   }
   $("#push").change(enable_log);
   $("#pull").change(enable_log);
