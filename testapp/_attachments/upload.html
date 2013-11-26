@@ -75,7 +75,7 @@ $(document).ready(function() {
             field.attr({disabled:disabled});
             value.attr({disabled:disabled});
             // set a nice and helpful tooltip
-            var title='Feld '+prop+' '
+            var title=prop+' '
             if (disabled) title+='ignorieren';
             else {
               if (field.val()!=prop) title+='als "'+field.val()+'" ';
@@ -121,12 +121,13 @@ $(document).ready(function() {
       doc.type=type;
       // write properties with adjusted labels
       for (var prop in feature.properties) {
-        if (labels[prop]=="") continue;
+        if (fields[prop].prop('disabled')) continue;
+        if (fields[prop].val()=="") continue;
         // and ignore useless undefined fields
         if (feature.properties[prop]==null) continue;
         if (feature.properties[prop]=="null") continue;
         if (feature.properties[prop]=="") continue;
-        doc[labels[prop]]=feature.properties[prop];
+        doc[fields[prop].val()]=feature.properties[prop];
       }
       // store geometry as GeoJSON
       doc.GeoJSON=feature.geometry;
