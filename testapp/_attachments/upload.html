@@ -61,20 +61,33 @@ $(document).ready(function() {
             // if that fails just write it as a string
             } catch(e) {}
             features[parseInt($("#modify a").html())-1].properties[prop]=v;
-          }
+          };
         }(value, prop));
         values[prop]=value;
         var field=row.find("[name='field']");
         field.val(prop);
         fields[prop]=field;
         var checkbox=row.find(":checkbox");
-        checkbox.change(function(checkbox, field, value) {
+        // disable input fields on row if unchecked
+        checkbox.change(function(checkbox, field, value, prop) {
           return function() {
             var disabled=!checkbox.prop('checked');
             field.attr({disabled:disabled});
             value.attr({disabled:disabled});
-          }
-        }(checkbox, field, value));
+            // set a nice and helpful tooltip
+            var title='Feld '+prop+' '
+            if (disabled) title+='ignorieren';
+            else {
+              if (field.val()!=prop) title+='als "'+field.val()+'" ';
+              title+='übernehmen';
+            }
+            checkbox.attr({title:title});
+          };
+        }(checkbox, field, value, prop));
+        checkbox.change();
+        field.change(function(checkbox) {
+          return function() { checkbox.change(); };
+        }(checkbox));
         div.append(row);
       }
       show_feature(0);
