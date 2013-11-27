@@ -20,6 +20,7 @@ $(document).ready(function() {
       values[prop].attr({value:properties[prop],title:properties[prop]});
   }
   $("#upload :file").change(function(e) {
+    $("#modify").hide();
     submit.prop('disabled', true);
     $("#upload b").html("");
     var reader=new FileReader();
@@ -32,7 +33,6 @@ $(document).ready(function() {
         crs=GeoJSON.crs;
         if (!crs) throw{message:"No top-level CRS defined!"};
       } catch(err) {
-        throw(err);
         $("#upload b").html(err.message+"<br>");
         return;
       }
@@ -91,6 +91,7 @@ $(document).ready(function() {
         div.append(row);
       }
       show_feature(0);
+      $("#modify").show();
     };
     reader.readAsText(e.target.files[0]);
   });
@@ -152,7 +153,7 @@ $(document).ready(function() {
     <input type="file"> <input type="submit" value="Los!" disabled><br>
     <b></b>
   </form>
-  <form id="modify" action="">
+  <form id="modify" action="" style="display:none">
     Datensatz-Typ: <input type="text" name="type" size="10" value="Feldblock"><br>
     <input type="checkbox" name="all" checked> Alle Felder auswählen
     <input type="button" name="prev" value="<">
