@@ -8,14 +8,14 @@ exports.eachCoords=function(GeoJSON, action) {
     if (obj.coordinates) {
       var c=obj.coordinates;
       // LineString
-      if (typeof(c[0][0])=="number") action(c);
+      if (typeof(c[0][0])=="number") action(c, obj.type);
       // Polygon/MultiLineString
       else if (typeof(c[0][0][0])=="number")
-        for (var i=0;i<c.length;i++) action(c[i]);
+        for (var i=0;i<c.length;i++) action(c[i], obj.type);
       // MultiPolygon
       else if (typeof(c[0][0][0][0])=="number")
         for (var i=0;i<c.length;i++)
-        for (var j=0;j<c[i].length;j++) action(c[i][j]);
+        for (var j=0;j<c[i].length;j++) action(c[i][j], obj.type);
     } else for (var field in obj) {
       if (["geometries", "features", "geometry"].indexOf(field)!=-1)
         apply_action(obj[field]);
