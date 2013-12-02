@@ -104,6 +104,15 @@ exports.toWGS84=function(GeoJSON) {
   return GeoJSON;
 };
 
+// Strip last coord from each Polygon/MultiPolygon.
+
+exports.stripLastCoord=function(GeoJSON) {
+  exports.eachCoords(GeoJSON, function(coords, type) {
+    if (type=="Polygon" || type=="MultiPolygon")
+      coords.pop();
+  });
+}
+
 // Simplify LineStrings and Polygons for a given maximum
 // deviation and store the actual error as GeoJSON.error.
 

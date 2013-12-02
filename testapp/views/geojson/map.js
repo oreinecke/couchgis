@@ -20,7 +20,7 @@ function(doc) {
       // anyone complains, I shall stack the unabreviated geometry on top of
       // the list.
       error*=(error>=5e-6);
-      var simplified_GeoJSON=utils.simplify(utils.clone(GeoJSON),error);
+      var simplified_GeoJSON=utils.stripLastCoord(utils.simplify(utils.clone(GeoJSON),error));
       if (error<Infinity || simplified_GeoJSON.error==0)
         emit(id, {GeoJSON:simplified_GeoJSON});
       error=simplified_GeoJSON.error;
