@@ -101,15 +101,21 @@ $(document).ready(function() {
           var GeoJSON=item.GeoJSON;
           delete data[id];
           var paths=[];
-          // remind myself that this needs work!!!
-          if (GeoJSON.type!="Polygon") { alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!"); return; }
           for (var path=0;path<GeoJSON.coordinates.length;path++) {
             paths.push([]);
             var coords=GeoJSON.coordinates[path];
+            var length=coords.length;
+            if (GeoJSON.type=="Polygon"); length--;
             for (var coord=0;coord<coords.length-1;coord++)
               paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
           }
-          var shape=new Maps.Polygon({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
+          // yes this is the new switch
+          var shape=new (function(type) {
+            if (type=="Polygon") return Maps.Polygon;
+            if (type=="LineString") return Maps.Linestring;
+            // remind myself that this needs work!!!
+            alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+          }(GeoJSON.type))({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
           shape.setMap(map);
           // select link if user clicks on shape
           Maps.event.addListener(shape, 'click', function(href) {
