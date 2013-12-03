@@ -104,26 +104,33 @@ $(document).ready(function() {
           // LatLngs; This is written with extra-ugly comma operators and
           // multiple vars inside the for loop to increase performance. 
           var c=GeoJSON.coordinates;
-          if (typeof(c[0][0])=="number") GeoJSON.coordinates=new LatLng(c[1],c[0]);
-          else if (typeof(c[0][0][0])=="number")
+          if (typeof(c[0])=="number") GeoJSON.coordinates=new LatLng(c[1],c[0]);
+          else if (typeof(c[0][0])=="number")
             for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1],ci[0]);
-          else if (typeof(c[0][0][0][0])=="number")
+          else if (typeof(c[0][0][0])=="number")
             for (var i=0, ci; ci=c[i], i<c.length; i++)
             for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1],cij[0]);
-          var shape=new function(type) {
+          else if (typeof(c[0][0][0][0])=="number")
+            for (var i=0, ci; ci=c[i], i<c.length; i++)
+            for (var j=0, cij; cij=ci[j], j<ci.length; j++)
+            for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1],cijk[0]);
+          var options={
+            map:map,
+            position:GeoJSON.coordinates,
+            path:GeoJSON.coordinates,
+            paths:GeoJSON.coordinates,
+            strokecolor: '#FF0000',
+            fillColor: '#00FF80',
+            fillOpacity: 0.25
+          };
+          var shape=function(type) {
             // yes this is the new switch
-            if (type=="Point") return Maps.Marker;
-            if (type=="Polygon") return Maps.Polygon;
-            if (type=="LineString") return Maps.Polyline;
+            if (type=="Point") return new Maps.Marker(options);
+            if (type=="Polygon") return new Maps.Polygon(options);
+            if (type=="LineString") return new Maps.Polyline(options);
             // remind myself that this needs work!!!
             alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
-          }(GeoJSON.type)({
-            paths:GeoJSON.coordinates,
-            fillOpacity: 0.25,
-            fillColor: '#00FF80',
-            strokecolor: '#FF0000'
-          });
-          shape.setMap(map);
+          }(GeoJSON.type);
           // select link if user clicks on shape
           Maps.event.addListener(shape, 'click', function(href) {
             return function() {href.focus();};
