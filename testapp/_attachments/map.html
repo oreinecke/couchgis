@@ -100,22 +100,29 @@ $(document).ready(function() {
           var item=data[id];
           var GeoJSON=item.GeoJSON;
           delete data[id];
-          var paths=[];
-          for (var path=0;path<GeoJSON.coordinates.length;path++) {
-            paths.push([]);
-            var coords=GeoJSON.coordinates[path];
-            var length=coords.length;
-            if (GeoJSON.type=="Polygon"); length--;
-            for (var coord=0;coord<coords.length-1;coord++)
-              paths[path].push(new LatLng(coords[coord][1], coords[coord][0]));
-          }
-          // yes this is the new switch
-          var shape=new (function(type) {
+          // Replace all 2-element arrays inside GeoJSON.coordinates with
+          // LatLngs; This is written with extra-ugly comma operators and
+          // multiple vars inside the for loop to increase performance. 
+          var c=GeoJSON.coordinates;
+          if (typeof(c[0][0])=="number") GeoJSON.coordinates=new LatLng(c[1],c[0]);
+          else if (typeof(c[0][0][0])=="number")
+            for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1],ci[0]);
+          else if (typeof(c[0][0][0][0])=="number")
+            for (var i=0, ci; ci=c[i], i<c.length; i++)
+            for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1],cij[0]);
+          var shape=new function(type) {
+            // yes this is the new switch
+            if (type=="Point") return Maps.Marker;
             if (type=="Polygon") return Maps.Polygon;
-            if (type=="LineString") return Maps.Linestring;
+            if (type=="LineString") return Maps.Polyline;
             // remind myself that this needs work!!!
             alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
-          }(GeoJSON.type))({ paths:paths, fillOpacity: 0.25, fillColor: '#00FF80' });
+          }(GeoJSON.type)({
+            paths:GeoJSON.coordinates,
+            fillOpacity: 0.25,
+            fillColor: '#00FF80',
+            strokecolor: '#FF0000'
+          });
           shape.setMap(map);
           // select link if user clicks on shape
           Maps.event.addListener(shape, 'click', function(href) {
