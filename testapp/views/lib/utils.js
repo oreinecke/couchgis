@@ -111,6 +111,7 @@ exports.stripLastCoord=function(GeoJSON) {
     if (type=="Polygon" || type=="MultiPolygon")
       coords.pop();
   });
+  return GeoJSON;
 }
 
 // Simplify LineStrings and Polygons for a given maximum
