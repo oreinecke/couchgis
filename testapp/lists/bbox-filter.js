@@ -10,10 +10,7 @@ function(head, req) {
   // we need to limit output and server load
   var limit=Infinity;
   if ('limit' in options) limit=options.limit;
-  if (!limit) {
-    send('{}\n');
-    return;
-  }
+  if (!limit) return '{}\n';
   // allow reduced polygons to deviate up to this amount
   var error=0.0;
   if ('error' in options) error=options.error;
@@ -96,7 +93,7 @@ function(head, req) {
     if (last_GeoJSON && last_GeoJSON.error>=GeoJSON.error) continue;
     last_GeoJSON=GeoJSON;
   }
-  send('}\n');
+  return '}\n';
   // Uncomment this next line as soon as any(more) trouble arises: for some
   // reason, the list crashes if rows are left after the function returned.
   // This happens only if keys are specified in the request body.
