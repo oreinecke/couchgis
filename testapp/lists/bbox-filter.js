@@ -35,7 +35,7 @@ function(head, req) {
   // ii) Check if document type matches selection.
   var type_matches=function() {
     if (types) type_matches=function() {
-      return (types.indexOf(row.value.doc.type!==-1));
+      return (types.indexOf(row.value.doc.type)!==-1);
     }; else type_matches=function() { return true; };
     return type_matches();
   };
