@@ -22,6 +22,9 @@ $(document).ready(function() {
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
+  // some nice colors for different types
+  var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
+
   // call _list/bbox-filter/<view> with some useful options
   function list(view, options, success) {
     var keys=(options.keys?'{"keys":["'+options.keys.join('","')+'"]}':"{}");
@@ -120,7 +123,7 @@ $(document).ready(function() {
             path:GeoJSON.coordinates,
             paths:GeoJSON.coordinates,
             strokecolor: '#FF0000',
-            fillColor: '#00FF80',
+            fillColor: fillColors[item.docs[0].type],
             fillOpacity: 0.25
           };
           var shape=function(type) {
@@ -241,6 +244,14 @@ $(document).ready(function() {
       call.this_one_next(update_items)();
       // update GeoJSON according to viewport
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+    });
+    // get doc types and set colors
+    $.getJSON("_view/types-fields?group_level=1", function(data) {
+      // This is one rare advantage of javascripts 'phony' arrays:
+      // I can use fillColors first as a set and then assign keys
+      // to each element!! How nice!!!
+      for (var row=0;row<data.rows.length;row++)
+        fillColors[data.rows[row].key[0]]=fillColors.shift();
     });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
