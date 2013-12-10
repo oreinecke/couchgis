@@ -272,6 +272,27 @@ $(document).ready(function() {
         span.append('<input type="checkbox" checked>');
         span.append(type);
       }
+      // update items if filters have changed
+      $("#filter").change( function() {
+        // Check if the new filter setting is more restrictive than the old
+        // one. I am doing this kind-a handwavingly by just counting the
+        // allowed doc types and comparing my new count to the old one. Anyone
+        // capable of un-checking and checking checkboxes really fast will find
+        // this quirky to use.
+        var last_number_of_types=types.length;
+        return function() {
+          var number_of_types=0;
+          span.find(":checkbox").each(function() {
+            number_of_types+=$(this).prop('checked');
+          });
+          // If new filters aren't more restrictive, my viewport
+          // array is rendered invalid and needs to be rebuilt.
+          if (number_of_types>last_number_of_types)
+            viewports=[viewports[0]];
+          last_number_of_types=number_of_types;
+          Maps.event.trigger(map, 'bounds_changed');
+        }
+      }());
     });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
