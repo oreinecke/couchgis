@@ -134,9 +134,13 @@ $(document).ready(function() {
             // remind myself that this needs work!!!
             alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
           }(GeoJSON.type);
-          // select link if user clicks on shape
+          // Select link if user clicks on shape and decrease
+          // zIndex to give access to obstructed shapes.
           Maps.event.addListener(shape, 'click', function(href) {
-            return function() {href.focus();};
+            return function() {
+              this.setOptions({zIndex:-new Date().getTime()});
+              href.focus();
+            };
           }(items[id].link.find('a').last()));
           // update link text to a meaningful title
           var hrefs=items[id].link.find('a');
