@@ -7,5 +7,5 @@ function(doc) {
   utils.toWGS84(GeoJSON);
   utils.bbox(GeoJSON);
   utils.size(GeoJSON);
-  emit(GeoJSON.size, {bbox:GeoJSON.bbox});
+  emit(GeoJSON.size, {bbox:GeoJSON.bbox, time:doc.time});
 }
