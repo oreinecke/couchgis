@@ -11,7 +11,7 @@ function toDate(date) {
 // Convert range or date string to range object.
 
 function toRange(range) {
-  if (!range) return;
+  if (!range) return { begin:[], end:[] };
   range=String(range).split('-');
   return {
     begin:toDate(range[0]),
