@@ -2,7 +2,9 @@
 
 function(doc) {
   var utils=require('views/lib/utils');
+  var range=require('views/lib/range');
   var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
+  emit(id, {doc:{_id:doc._id, type:doc.type, time:range.toRange(doc.time)}});
   if (id==null) return;
   if (id===doc._id) {
     var GeoJSON=utils.clone(doc.GeoJSON);
@@ -17,5 +19,4 @@ function(doc) {
       error=simplified_GeoJSON.error;
     }
   };
-  emit(id, {doc:{_id:doc._id, type:doc.type}});
 }
