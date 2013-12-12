@@ -285,16 +285,23 @@ $(document).ready(function() {
         // capable of un-checking and checking checkboxes really fast will find
         // this quirky to use.
         var last_number_of_types=types.length;
+        var range=require('views/lib/range');
+        var last_range=range.toRange($("#filter [name='time']").val());
         return function() {
-          var number_of_types=0;
+          var this_number_of_types=0;
           span.find(":checkbox").each(function() {
-            number_of_types+=$(this).prop('checked');
+            this_number_of_types+=$(this).prop('checked');
           });
           // If new filters aren't more restrictive, my viewport
           // array is rendered invalid and needs to be rebuilt.
-          if (number_of_types>last_number_of_types)
+          if (this_number_of_types>last_number_of_types)
             viewports=[viewports[0]];
-          last_number_of_types=number_of_types;
+          last_number_of_types=this_number_of_types;
+          // Same holds for time range.
+          var this_range=range.toRange($("#filter [name='time']").val());
+          if (!range.contains(last_range, this_range));
+            viewports=[viewports[0]];
+          last_range=this_range;
           Maps.event.trigger(map, 'bounds_changed');
         }
       }());
@@ -345,11 +352,12 @@ $(document).ready(function() {
       $("#settings [name='limit']").val(new_limit);
       Maps.event.trigger(map, 'bounds_changed');
     });
-    // update map if enter was pressed in forms
-    $("form").submit( function(e) {
-      e.preventDefault();
+    // Suppress page load if user presses enter in any
+    // text input and update map if anything changed.
+    $("#settings").change( function(e) {
       Maps.event.trigger(map, 'bounds_changed');
     });
+    $("form").submit( e.preventDefault );
   });
 
 });
