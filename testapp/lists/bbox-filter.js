@@ -23,6 +23,8 @@ function(head, req) {
     // because bbox also has wrong coordinates
     for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
   }
+  var time=false;
+  if ('time' in options) time=options.time;
   var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
@@ -39,6 +41,16 @@ function(head, req) {
     }; else type_matches=function() { return true; };
     return type_matches();
   };
+  // iib) Check if document time intersects with range
+  var time_matches=function() {
+    if (time) {
+      var range=require('views/lib/range');
+      time=range.toRange(time);
+      var intersects=range.intersects;
+      time_matches=function() { return intersects(time, row.value.doc.time); };
+    } else time_matches=function() { return true; };
+    return time_matches();
+  }
   // iii) Check if geometry bbox is outside bbox.
   var outside_bbox=function() {
     if ('bbox' in GeoJSON && bbox) outside_bbox=function() {
@@ -55,8 +67,9 @@ function(head, req) {
   var shift_geometry=function() {
     if (offset && last_GeoJSON.type) {
       var utils=require('views/lib/utils');
+      var eachPoint=utils.eachPoint;
       shift_geometry=function() {
-        utils.eachPoint(last_GeoJSON, function(coord) {
+        eachPoint(last_GeoJSON, function(coord) {
           coord[0]+=offset[0];
           coord[1]+=offset[1];
         });
@@ -81,7 +94,7 @@ function(head, req) {
     if (!row) continue;
     last_key=row.key;
     var doc=row.value.doc;
-    if (row.value.doc && type_matches()) docs.push(row.value.doc);
+    if (row.value.doc && type_matches() && time_matches()) docs.push(row.value.doc);
     GeoJSON=row.value.GeoJSON;
     // evaluation of geomeric properties follows:
     if (GeoJSON==null) continue;
