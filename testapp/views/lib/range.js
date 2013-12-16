@@ -23,8 +23,8 @@ exports.toRange=toRange;
 // Convert range to string.
 
 exports.toString=function(range) {
-  var begin=range.begin.reverse().join(',');
-  var end=range.end.reverse().join(',');
+  var begin=range.begin.reverse().join('.');
+  var end=range.end.reverse().join('.');
   if (begin==end) return begin;
   else return begin+'-'+end;
 };
