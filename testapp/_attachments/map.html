@@ -23,6 +23,8 @@ $(document).ready(function() {
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
+  var range=require('views/lib/range');
+
   // some nice colors for different types
   var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
   var types=[];
@@ -148,7 +150,7 @@ $(document).ready(function() {
           var hrefs=items[id].link.find('a');
           for (var d=0;d<item.docs.length;d++) {
             var doc=item.docs[d];
-            $(hrefs[d]).html(doc.type+' '+doc[doc.type]);
+            $(hrefs[d]).html(doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')');
           }
           if (items[id].shape) items[id].shape.setMap();
           // there is no need to keep all the polygons
@@ -248,7 +250,7 @@ $(document).ready(function() {
     });
   }
 
-  // initialize map position and geometry as soon as map has finished loading.
+  // Initialize map position and geometry as soon as map has finished loading.
   Maps.event.addListenerOnce(map, 'tilesloaded', function() {
     // set viewport and zoom level
     $.getJSON("_view/dimensions", function(data) {
@@ -285,7 +287,6 @@ $(document).ready(function() {
         // capable of un-checking and checking checkboxes really fast will find
         // this quirky to use.
         var last_number_of_types=types.length;
-        var range=require('views/lib/range');
         var last_range=range.toRange($("#filter [name='time']").val());
         return function() {
           var this_number_of_types=0;

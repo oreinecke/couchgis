@@ -3,6 +3,7 @@
 
 function(doc) {
   var utils=require('views/lib/utils');
+  var range=require('views/lib/range');
   var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
   // abort if no GeoJSON is set at all
   if (id==null) return;
@@ -26,7 +27,7 @@ function(doc) {
       error=simplified_GeoJSON.error;
     }
   };
-  var val={doc:{_id:doc._id, type:doc.type}};
+  var val={doc:{_id:doc._id, type:doc.type, time:range.toRange(doc.time)}};
   for (var field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
     if (field.search(/^[A-Z]/)==-1) continue;
