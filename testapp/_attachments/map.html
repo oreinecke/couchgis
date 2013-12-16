@@ -357,7 +357,7 @@ $(document).ready(function() {
     $("#settings").change( function(e) {
       Maps.event.trigger(map, 'bounds_changed');
     });
-    $("form").submit( e.preventDefault );
+    $("form").submit( function(e) {e.preventDefault();} );
   });
 
 });

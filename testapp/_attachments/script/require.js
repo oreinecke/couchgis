@@ -1,7 +1,7 @@
 // Loads CommonJS libraries nested in CouchDB design docs using an identical
 // syntax. Requires inside libraries are evaluated and relative paths are
 // supported. Critical variables have been shadowed but the library would still
-// able to manipulate other globals i.e. window, document, $ etc.
+// be able to manipulate other globals i.e. window, document, $ etc.
 
 var require;
 
@@ -29,13 +29,13 @@ $(document).ready(function() {
       };
       // hide vars from lib compilation
       (function() {
-        var ddoc, root parts, result;
+        var ddoc, root, parts, result;
         eval(lib);
       }());
       return exports;
     };
     return function(lib) {
-      result(lib, ddoc);
+      return result(lib, ddoc);
     };
   }();
 });
