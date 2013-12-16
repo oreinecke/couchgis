@@ -39,7 +39,10 @@ $(document).ready(function() {
       type:"POST",
       data:keys,
       success:success,
-      error:call.that_last_one
+      error:function() {
+        call.that_last_one();
+        console.log("AT LEAST WE NOTICED SOMETHING??");
+      }
     });
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
@@ -127,9 +130,20 @@ $(document).ready(function() {
             path:GeoJSON.coordinates,
             paths:GeoJSON.coordinates,
             strokecolor: '#FF0000',
-            fillColor: fillColors[item.docs[0].type],
             fillOpacity: 0.25
           };
+          var link=items[id].link;
+          link.html('');
+          for (var d in items[id].docs) {
+            // Group docs with identical GIS into one li.
+            var doc=item.docs[d];
+            if (options.fillColor) link.append('<br>');
+            else options.fillColor=fillColors[doc.type];
+            // Link to Futon for the lack of a better interface
+            // and set link text to a useful item explanation.
+            link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+d+'">'
+                                     +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
+          }
           var shape=function(type) {
             // yes this is the new switch
             if (type=="Point") return new Maps.Marker(options);
@@ -146,16 +160,9 @@ $(document).ready(function() {
               href.focus();
             };
           }(items[id].link.find('a').last()));
-          // update link text to a meaningful title
-          var hrefs=items[id].link.find('a');
-          for (var d=0;d<item.docs.length;d++) {
-            var doc=item.docs[d];
-            $(hrefs[d]).html(doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')');
-          }
           if (items[id].shape) items[id].shape.setMap();
           // there is no need to keep all the polygons
           items[id].GeoJSON={error:GeoJSON.error};
-          items[id].docs=item.docs;
           items[id].shape=shape;
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
@@ -216,13 +223,6 @@ $(document).ready(function() {
         }
         items[id]=data[id];
         var link=$(document.createElement("li"));
-        for (doc=0;doc<items[id].docs.length;doc++) {
-          // Group docs with identical GIS into one li.
-          if (doc) link.append("<br>");
-          // Link to Futon for the lack of a better interface.
-          link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'
-                       +items[id].docs[doc]._id+'">'+items[id].docs[doc]._id+'</a>');
-        }
         details.append(link);
         items[id].link=link;
       }
