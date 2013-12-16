@@ -25,7 +25,7 @@ function(head, req) {
   }
   var time=false;
   if ('time' in options) time=options.time;
-  var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
+  var row={}, GeoJSON, last_GeoJSON, last_key, docs={};
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=function() {
@@ -35,29 +35,29 @@ function(head, req) {
     return proceed();
   };
   // ii) Check if document type matches selection.
-  var type_matches=function() {
-    if (types) type_matches=function() {
-      return (types.indexOf(row.value.doc.type)!==-1);
+  var type_matches=function(doc) {
+    if (types) type_matches=function(doc) {
+      return (types.indexOf(doc.type)!==-1);
     }; else type_matches=function() { return true; };
-    return type_matches();
+    return type_matches(doc);
   };
   // iib) Check if document time intersects with range
-  var time_matches=function() {
+  var time_matches=function(doc) {
     if (time) {
       var range=require('views/lib/range');
       time=range.toRange(time);
       var intersects=range.intersects;
-      time_matches=function() { return intersects(time, row.value.doc.time); };
+      time_matches=function() { return intersects(time, doc.time); };
     } else time_matches=function() { return true; };
-    return time_matches();
+    return time_matches(doc);
   }
   // iii) Check if geometry bbox is outside bbox.
-  var outside_bbox=function() {
-    if ('bbox' in GeoJSON && bbox) outside_bbox=function() {
-      return (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]|| 
-              bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]);
+  var outside_bbox=function(bbox2) {
+    if ('bbox' in GeoJSON && bbox) outside_bbox=function(bbox2) {
+      return (bbox[0]>bbox2[2]||bbox2[0]>bbox[2]||
+              bbox[1]>bbox2[3]||bbox2[1]>bbox[3]);
     }; else outside_bbox=function() { return false; };
-    return outside_bbox();
+    return outside_bbox(bbox2);
   };
   // iv) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
@@ -81,25 +81,29 @@ function(head, req) {
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
-      if (last_GeoJSON && docs.length) {
+      docs=JSON.stringify(docs);
+      if (last_GeoJSON && docs!="{}") {
         shift_geometry();
         send_separator();
         send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)
-                              +',"docs":'+JSON.stringify(docs)+'}');
+                              +',"docs":'+docs+'}');
         if (!proceed()) break;
       }
-      docs=[];
+      docs={};
       last_GeoJSON=null;
     }
     if (!row) continue;
     last_key=row.key;
     var doc=row.value.doc;
-    if (row.value.doc && type_matches() && time_matches()) docs.push(row.value.doc);
+    if (doc && type_matches(doc) && time_matches(doc)) {
+      docs[doc._id]=doc;
+      delete doc._id;
+    }
     GeoJSON=row.value.GeoJSON;
     // evaluation of geomeric properties follows:
     if (GeoJSON==null) continue;
     // skip if outside bbox
-    if (outside_bbox()) continue;
+    if (outside_bbox(GeoJSON.bbox)) continue;
     // skip if geometry has too few details
     if (GeoJSON.error>error) continue;
     // skip if we already have a more detailed version
