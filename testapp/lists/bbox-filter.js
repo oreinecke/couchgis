@@ -35,29 +35,29 @@ function(head, req) {
     return proceed();
   };
   // ii) Check if document type matches selection.
-  var type_matches=function(doc) {
-    if (types) type_matches=function(doc) {
-      return (types.indexOf(doc.type)!==-1);
+  var type_matches=function() {
+    if (types) type_matches=function() {
+      return (types.indexOf(row.value.doc.type)!==-1);
     }; else type_matches=function() { return true; };
-    return type_matches(doc);
+    return type_matches();
   };
   // iib) Check if document time intersects with range
-  var time_matches=function(doc) {
+  var time_matches=function() {
     if (time) {
       var range=require('views/lib/range');
       time=range.toRange(time);
       var intersects=range.intersects;
-      time_matches=function() { return intersects(time, doc.time); };
+      time_matches=function() { return intersects(time, row.value.doc.time); };
     } else time_matches=function() { return true; };
-    return time_matches(doc);
+    return time_matches();
   }
   // iii) Check if geometry bbox is outside bbox.
-  var outside_bbox=function(bbox2) {
-    if ('bbox' in GeoJSON && bbox) outside_bbox=function(bbox2) {
-      return (bbox[0]>bbox2[2]||bbox2[0]>bbox[2]||
-              bbox[1]>bbox2[3]||bbox2[1]>bbox[3]);
+  var outside_bbox=function() {
+    if ('bbox' in GeoJSON && bbox) outside_bbox=function() {
+      return (bbox[0]>GeoJSON.bbox[2]||GeoJSON.bbox[0]>bbox[2]||
+              bbox[1]>GeoJSON.bbox[3]||GeoJSON.bbox[1]>bbox[3]);
     }; else outside_bbox=function() { return false; };
-    return outside_bbox(bbox2);
+    return outside_bbox();
   };
   // iv) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
@@ -95,7 +95,7 @@ function(head, req) {
     if (!row) continue;
     last_key=row.key;
     var doc=row.value.doc;
-    if (doc && type_matches(doc) && time_matches(doc)) {
+    if (doc && type_matches() && time_matches()) {
       docs[doc._id]=doc;
       delete doc._id;
     }
