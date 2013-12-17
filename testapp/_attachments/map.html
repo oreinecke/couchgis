@@ -39,10 +39,7 @@ $(document).ready(function() {
       type:"POST",
       data:keys,
       success:success,
-      error:function() {
-        call.that_last_one();
-        console.log("AT LEAST WE NOTICED SOMETHING??");
-      }
+      error:call.that_last_one
     });
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
@@ -217,8 +214,25 @@ $(document).ready(function() {
       var id; for (id in data) {
         new_vp.prefix.push(id);
         if (items[id]) {
-          items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
           delete old_items[id];
+          items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
+          if (!items[id].keep) continue;
+          // Check if set of documents has changed:
+          var old_docs=items[id].docs, docs=data[id].docs;
+          // i) New docs have been added.
+          for (var d in docs)
+            if (old_docs[d]==null) {
+              items[id].keep=false;
+              break;
+            } else delete old_docs[d];
+          // ii) Docs have been removed.
+          if (items[id].keep)
+            for (var d in old_docs) {
+              items[id].keep=false;
+              break;
+            }
+          // iii) Restore old_docs.
+          items[id].docs=docs;
           continue;
         }
         items[id]=data[id];
@@ -388,7 +402,7 @@ $(document).ready(function() {
   <div id="map" style="height:90%"></div>
   <form id="filter"> Filter:
     <span class="types"></span>
-    <input type="text" size=8 value="2004-2013" name="time">
+    <input type="text" size=8 value="2004-2013" name="time" title="Zeit">
   </form>
   <ul id="details"></ul>
   </body>
