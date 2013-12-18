@@ -35,12 +35,20 @@ $(document).ready(function() {
     options.keys=undefined;
     options.offset=list.offset;
     view+="?options="+encodeURIComponent(JSON.stringify(options));
-    $.ajax("_list/bbox-filter/"+view, {
-      type:"POST",
-      data:keys,
-      success:success,
-      error:call.that_last_one
-    });
+    function ajax() {
+      $.ajax("_list/bbox-filter/"+view, {
+        type:"POST",
+        data:keys,
+        success: function(data) {
+          success(data);
+          window.clearTimeout(t);
+        },
+        error:call.that_last_one
+      });
+    };
+    // try that again in three seconds
+    var t=window.setTimeout(ajax, 3000);
+    ajax();
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.match(/[^/]+/g);
