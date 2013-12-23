@@ -23,7 +23,7 @@ function(doc) {
       error*=(error>=5e-6);
       var simplified_GeoJSON=utils.stripLastCoord(utils.simplify(utils.clone(GeoJSON),error));
       if (error<Infinity || simplified_GeoJSON.error==0)
-        emit(id, {GeoJSON:simplified_GeoJSON});
+        emit([id,simplified_GeoJSON.error], {GeoJSON:simplified_GeoJSON});
       error=simplified_GeoJSON.error;
     }
   };
@@ -34,5 +34,5 @@ function(doc) {
     if (field.search("GeoJSON")!=-1) continue;
     val.doc[field]=doc[field];
   }
-  emit(id, val);
+  emit([id,doc._id], val);
 }
