@@ -35,20 +35,13 @@ $(document).ready(function() {
     options.keys=undefined;
     options.offset=list.offset;
     view+="?options="+encodeURIComponent(JSON.stringify(options));
-    function ajax() {
-      $.ajax("_list/bbox-filter/"+view, {
-        type:"POST",
-        dataType:"json",
-        data:keys,
-        success: function(data) {
-          success(data);
-          window.clearTimeout(t);
-        }
-      });
-    };
-    // try that again in three seconds
-    var t=window.setTimeout(ajax, 3000);
-    ajax();
+    $.ajax("_list/bbox-filter/"+view, {
+      type:"POST",
+      dataType:"json",
+      data:keys,
+      success:success,
+      error:call.that_last_one
+    });
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.match(/[^/]+/g);
@@ -111,16 +104,24 @@ $(document).ready(function() {
       call.that_last_one();
       return;
     }
+    var successful=false;
     function ajax() {
       $.ajax("_view/geojson", {
         type:"POST",
         data:'{"keys":'+JSON.stringify(keys)+'}',
         dataType:"json",
-        success:success
+        success:success,
+        complete:function() {
+          // Sadly, this seems to be the only way to catch
+          // CouchDB's internal server error or whatever this is.
+          if (!successful)
+            window.setTimeout(ajax, 50);
+        }
       });
     }
     ajax();
     function success(data) {
+      successful=true;
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name='delayed']").prop('checked');
       var offset = list.offset;
@@ -270,7 +271,7 @@ $(document).ready(function() {
       }
       // Put a small delay between both lists to
       // let CouchDB recover from its previous crash.
-      window.setTimeout(update_geometry, 10);
+      update_geometry();
     });
   }
 
