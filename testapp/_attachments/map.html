@@ -24,6 +24,8 @@ $(document).ready(function() {
   });
 
   var range=require('views/lib/range');
+  // correct for small shift in Google Maps aerials of unknown reason
+  var offset=[-0.00178,-0.00121];
 
   // some nice colors for different types
   var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
@@ -33,7 +35,6 @@ $(document).ready(function() {
   function list(view, options, success) {
     var keys=(options.keys?'{"keys":["'+options.keys.join('","')+'"]}':"{}");
     options.keys=undefined;
-    options.offset=list.offset;
     view+="?options="+encodeURIComponent(JSON.stringify(options));
     $.ajax("_list/bbox-filter/"+view, {
       type:"POST",
@@ -47,8 +48,6 @@ $(document).ready(function() {
   list.parts=window.location.pathname.match(/[^/]+/g);
   list.db=list.parts[0];
   list.app=list.parts[2];
-  // correct for small shift in Google Maps aerials of unknown reason
-  list.offset=[-0.00178,-0.00121];
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
@@ -124,7 +123,6 @@ $(document).ready(function() {
       successful=true;
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name='delayed']").prop('checked');
-      var offset = list.offset;
       function update_one_geometry() {
         while (data.rows.length) {
           var row=data.rows.shift();
@@ -199,7 +197,12 @@ $(document).ready(function() {
     var options={
       limit:parseFloat($("#settings [name='limit']").val()),
       error:error==null?(NE.lat()-SW.lat())/100:error,
-      bbox:[SW.lng(),SW.lat(),NE.lng(),NE.lat()],
+      bbox:[
+        SW.lng()-offset[1],
+        SW.lat()-offset[0],
+        NE.lng()-offset[1],
+        NE.lat()-offset[0]
+      ],
       types:[]
     };
     // read checked types off the filter form

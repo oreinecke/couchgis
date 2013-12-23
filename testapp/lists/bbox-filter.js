@@ -16,13 +16,6 @@ function(head, req) {
   if ('error' in options) error=options.error;
   var types=false;
   if ('types' in options) types=options.types;
-  // expect and return shifted coordinates
-  var offset=false;
-  if ('offset' in options) {
-    offset=options.offset;
-    // because bbox also has wrong coordinates
-    for (var i=0;i<4;i++) bbox[i]-=offset[i%2];
-  }
   var time=false;
   if ('time' in options) time=options.time;
   var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
@@ -63,26 +56,11 @@ function(head, req) {
   var send_separator=function() {
     send_separator=function() {send(',\n');};
   };
-  // v) shift viewport and coordinates by offset
-  var shift_geometry=function() {
-    if (offset && last_GeoJSON.type) {
-      var utils=require('views/lib/utils');
-      var eachPoint=utils.eachPoint;
-      shift_geometry=function() {
-        eachPoint(last_GeoJSON, function(coord) {
-          coord[0]+=offset[0];
-          coord[1]+=offset[1];
-        });
-      };
-    } else shift_geometry=function() {};
-    shift_geometry();
-  };
   send('{');
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
       if (last_GeoJSON && docs.length) {
-        shift_geometry();
         send_separator();
         send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)
                               +',"docs":'+JSON.stringify(docs)+'}');
