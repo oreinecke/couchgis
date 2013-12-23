@@ -38,12 +38,12 @@ $(document).ready(function() {
     function ajax() {
       $.ajax("_list/bbox-filter/"+view, {
         type:"POST",
+        dataType:"json",
         data:keys,
         success: function(data) {
           success(data);
           window.clearTimeout(t);
-        },
-        error:call.that_last_one
+        }
       });
     };
     // try that again in three seconds
@@ -97,38 +97,52 @@ $(document).ready(function() {
     position: 0 // index from which to append remaining keys
   }];
 
-  // check if accuracy is justified and replace GeoJSON if not
-  function update_geometry(error) {
-    var options={keys:[], error:error};
-    for (var id in items)
-      if (!items[id].keep || error<items[id].GeoJSON.error)
-        options.keys.push(id);
-    if (!options.keys.length) {
+  // query for GeoJSON and full documents
+  function update_geometry() {
+    var keys=[];
+    for (var id in items) {
+      if (items[id].keep) continue;
+      keys.push([id,items[id].GeoJSON.error]);
+      var docs=items[id].docs;
+      for (var d=0;d<docs.length;d++)
+        keys.push([id,docs[d]._id]);
+    }
+    if (!keys.length) {
       call.that_last_one();
       return;
     }
-    // timeout is 5ms or instantaneous
-    var timeout = 5 * $("#settings [name='delayed']").prop('checked');
-    list("geojson", options, function(data) {
+    function ajax() {
+      $.ajax("_view/geojson", {
+        type:"POST",
+        data:'{"keys":'+JSON.stringify(keys)+'}',
+        dataType:"json",
+        success:success
+      });
+    }
+    ajax();
+    function success(data) {
+      // timeout is 5ms or instantaneous
+      var timeout = 5 * $("#settings [name='delayed']").prop('checked');
+      var offset = list.offset;
       function update_one_geometry() {
-        for (var id in data) {
-          var item=data[id];
-          var GeoJSON=item.GeoJSON;
-          delete data[id];
+        while (data.rows.length) {
+          var row=data.rows.shift();
+          var item=items[row.key[0]];
+          var GeoJSON=row.value.GeoJSON;
           // Replace all 2-element arrays inside GeoJSON.coordinates with
           // LatLngs; This is written with extra-ugly comma operators and
           // multiple vars inside the for loop to increase performance.
           var c=GeoJSON.coordinates;
-          if (typeof(c[0])=="number") GeoJSON.coordinates=new LatLng(c[1],c[0]);
+          if (typeof(c[0])=="number") GeoJSON.coordinates=new LatLng(c[1]+offset[1],c[0]+offset[0]);
           else if (typeof(c[0][0])=="number")
-            for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1],ci[0]);
+            for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1]+offset[1],ci[0]+offset[0]);
           else if (typeof(c[0][0][0])=="number")
             for (var i=0, ci; ci=c[i], i<c.length; i++)
-            for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1],cij[0]);
+            for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1]+offset[1],cij[0]+offset[0]);
           else if (typeof(c[0][0][0][0])=="number")
             for (var i=0, ci; ci=c[i], i<c.length; i++)
             for (var j=0, cij; cij=ci[j], j<ci.length; j++)
-            for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1],cijk[0]);
+            for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+offset[1],cijk[0]+offset[0]);
           var options={
             map:map,
             position:GeoJSON.coordinates,
@@ -137,11 +151,11 @@ $(document).ready(function() {
             strokecolor: '#FF0000',
             fillOpacity: 0.25
           };
-          var link=items[id].link;
+          var link=item.link;
           link.html('');
-          for (var d in items[id].docs) {
+          for (var d=0;d<item.docs.length;d++) {
             // Group docs with identical GIS into one li.
-            var doc=item.docs[d];
+            var doc=data.rows.shift().value.doc;
             if (options.fillColor) link.append('<br>');
             else options.fillColor=fillColors[doc.type];
             // Link to Futon for the lack of a better interface
@@ -164,11 +178,9 @@ $(document).ready(function() {
               this.setOptions({zIndex:-new Date().getTime()});
               href.focus();
             };
-          }(items[id].link.find('a').last()));
-          if (items[id].shape) items[id].shape.setMap();
-          // there is no need to keep all the polygons
-          items[id].GeoJSON={error:GeoJSON.error};
-          items[id].shape=shape;
+          }(item.link.find('a').last()));
+          if (item.shape) item.shape.setMap();
+          item.shape=shape;
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
           return;
@@ -176,7 +188,7 @@ $(document).ready(function() {
         call.that_last_one();
       }
       update_one_geometry();
-    });
+    }
   }
 
   // diff-updates items inside viewport
@@ -223,23 +235,13 @@ $(document).ready(function() {
         new_vp.prefix.push(id);
         if (items[id]) {
           delete old_items[id];
-          items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
-          if (!items[id].keep) continue;
-          // Check if set of documents has changed:
+          var keep=( items[id].GeoJSON.error===data[id].GeoJSON.error
+                    && items[id].docs.length===data[id].docs.length );
           var old_docs=items[id].docs, docs=data[id].docs;
-          // i) New docs have been added.
-          for (var d in docs)
-            if (old_docs[d]==null) {
-              items[id].keep=false;
-              break;
-            } else delete old_docs[d];
-          // ii) Docs have been removed.
-          if (items[id].keep)
-            for (var d in old_docs) {
-              items[id].keep=false;
-              break;
-            }
-          // iii) Restore old_docs.
+          for (var d=0; keep && d<docs.length; d++)
+            keep &= (old_docs[d]._id===docs[d]._id);
+          items[id].keep=keep;
+          items[id].GeoJSON=data[id].GeoJSON;
           items[id].docs=docs;
           continue;
         }
@@ -268,7 +270,7 @@ $(document).ready(function() {
       }
       // Put a small delay between both lists to
       // let CouchDB recover from its previous crash.
-      window.setTimeout(function() {update_geometry(options.error);}, 10);
+      window.setTimeout(update_geometry, 10);
     });
   }
 
@@ -335,7 +337,9 @@ $(document).ready(function() {
       $("#settings [name='refine']").hide();
       $("#settings [name='precise']").show();
       // show refined geometry once, and
-      call.this_one_next(function() {update_geometry(0);})();
+      for (var id in items)
+        items[id].GeoJSON.error=items[id].keep=0;
+      call.this_one_next(update_geometry)();
       // revert to 'refine', if viewport was moved
       Maps.event.addListenerOnce(map, 'bounds_changed', function() {
         $("#settings [name='precise']").hide();
@@ -410,7 +414,7 @@ $(document).ready(function() {
   <div id="map" style="height:90%"></div>
   <form id="filter"> Filter:
     <span class="types"></span>
-    <input type="text" size=8 value="2004-2013" name="time" title="Zeit">
+    <input type="text" size=8 value="2004-2013" name="time" title="Zeit"><br>
   </form>
   <ul id="details"></ul>
   </body>
