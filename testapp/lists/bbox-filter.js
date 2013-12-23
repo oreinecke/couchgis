@@ -25,7 +25,7 @@ function(head, req) {
   }
   var time=false;
   if ('time' in options) time=options.time;
-  var row={}, GeoJSON, last_GeoJSON, last_key, docs={};
+  var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=function() {
@@ -81,24 +81,20 @@ function(head, req) {
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
-      docs=JSON.stringify(docs);
-      if (last_GeoJSON && docs!="{}") {
+      if (last_GeoJSON && docs.length) {
         shift_geometry();
         send_separator();
         send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)
-                              +',"docs":'+docs+'}');
+                              +',"docs":'+JSON.stringify(docs)+'}');
         if (!proceed()) break;
       }
-      docs={};
+      docs=[];
       last_GeoJSON=null;
     }
     if (!row) continue;
     last_key=row.key;
     var doc=row.value.doc;
-    if (doc && type_matches() && time_matches()) {
-      docs[doc._id]=doc;
-      delete doc._id;
-    }
+    if (row.value.doc && type_matches() && time_matches()) docs.push(row.value.doc);
     GeoJSON=row.value.GeoJSON;
     // evaluation of geomeric properties follows:
     if (GeoJSON==null) continue;
