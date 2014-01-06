@@ -119,6 +119,9 @@ $(document).ready(function() {
       });
     }
     ajax();
+    // Even more sadly, I need to add this because
+    // Chrome does not use the 'complete' callback.
+    window.setTimeout(function() { if (!successful) ajax(); }, 3000);
     function success(data) {
       successful=true;
       // timeout is 5ms or instantaneous
