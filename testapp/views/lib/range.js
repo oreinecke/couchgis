@@ -12,6 +12,7 @@ function toDate(date) {
 
 function toRange(range) {
   if (!range) return { begin:[], end:[] };
+  if (typeof(range)=="object") return range;
   range=String(range).split('-');
   return {
     begin:toDate(range[0]),
@@ -56,9 +57,9 @@ function greater_or_equal(a, b) {
 // Returns true if range a contains range b.
 
 exports.contains=function(a, b) {
-  if (typeof(a)=="string") a=toRange(a);
+  a=toRange(a);
   var a1=a.begin, a2=a.end;
-  if (typeof(b)=="string") b=toRange(b);
+  b=toRange(b);
   var b1=b.begin, b2=b.end;
   return less_or_equal(a1,b1) && greater_or_equal(a2,b2);
 };
@@ -66,9 +67,9 @@ exports.contains=function(a, b) {
 // Returns true if range a overlaps with range b.
 
 exports.intersects=function(a, b) {
-  if (typeof(a)=="string") a=toRange(a);
+  a=toRange(a);
   var a1=a.begin, a2=a.end;
-  if (typeof(b)=="string") b=toRange(b);
+  b=toRange(b);
   var b1=b.begin, b2=b.end;
   for (var d=0;d<3;d++) {
     if (d==a1.length || d==b2.length) break;
@@ -86,9 +87,9 @@ exports.intersects=function(a, b) {
 // Return minimum range that includes a and b.
 
 exports.expand=function(a, b) {
-  if (typeof(a)=="string") a=toRange(a);
+  a=toRange(a);
   var a1=a.begin, a2=a.end;
-  if (typeof(b)=="string") b=toRange(b);
+  b=toRange(b);
   var b1=b.begin, b2=b.end;
   return {
     begin:(less_or_equal(a1,b1)?a1:b1),
