@@ -5,9 +5,15 @@
 
 var require=function() {
   var ddoc;
-  // get design document and save an abreviated copy
-  $.getJSON("./", function(data) {
-    ddoc={views:{lib:data.views.lib}};
+  // Get design document and save an abreviated copy; Unfortunately this is a
+  // synchronous request because the design doc needs to be loaded before
+  // require is called.
+  $.ajax("./", {
+    async:false,
+    dataType:"json",
+    success:function(data) {
+      ddoc={views:{lib:data.views.lib}};
+    }
   });
   var result=function(lib, root) {
     var parts=lib.split('/');
