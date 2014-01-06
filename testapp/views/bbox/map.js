@@ -18,5 +18,5 @@ function(doc) {
         emit(id, {GeoJSON:{bbox:GeoJSON.bbox, error:simplified_GeoJSON.error}});
       error=simplified_GeoJSON.error;
     }
-  };
+  }
 }

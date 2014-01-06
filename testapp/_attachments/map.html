@@ -162,7 +162,7 @@ $(document).ready(function() {
             else options.fillColor=fillColors[doc.type];
             // Link to Futon for the lack of a better interface
             // and set link text to a useful item explanation.
-            link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+d+'">'
+            link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
                                      +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
           }
           var shape=function(type) {
