@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.2" width="3.2mm" height="3.2mm" viewBox="0 0 740 740" preserveAspectRatio="xMidYMid" fill-rule="evenodd" clip-path="url(#presentation_clip_path)" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <defs class="ClipPathGroup">
+  <clipPath id="presentation_clip_path" clipPathUnits="userSpaceOnUse">
+   <rect x="0" y="0" width="740" height="740"/>
+  </clipPath>
+ </defs>
+     <g class="com.sun.star.drawing.CustomShape" clip-path="url(#presentation_clip_path)">
+       <path fill="rgb(255,0,0)" stroke="none" d="M 371,24 C 569,24 721,176 721,374 721,572 569,724 371,724 173,724 21,572 21,374 21,176 173,24 371,24 Z M 21,24 L 21,24 Z M 722,725 L 722,725 Z"/>
+       <path fill="none" stroke="rgb(128,0,0)" d="M 371,24 C 569,24 721,176 721,374 721,572 569,724 371,724 173,724 21,572 21,374 21,176 173,24 371,24 Z"/>
+       <path fill="rgb(0,0,0)" stroke="none" d="M 371,224 C 456,224 521,289 521,374 521,459 456,524 371,524 286,524 221,459 221,374 221,289 286,224 371,224 Z M 221,224 L 221,224 Z M 522,525 L 522,525 Z"/>
+     </g>
+</svg>
