@@ -198,10 +198,10 @@ $(document).ready(function() {
       limit:parseFloat($("#settings [name='limit']").val()),
       error:error==null?(NE.lat()-SW.lat())/100:error,
       bbox:[
-        SW.lng()-offset[1],
-        SW.lat()-offset[0],
-        NE.lng()-offset[1],
-        NE.lat()-offset[0]
+        SW.lng()-offset[0],
+        SW.lat()-offset[1],
+        NE.lng()-offset[0],
+        NE.lat()-offset[1]
       ],
       types:[]
     };
