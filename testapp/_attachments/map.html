@@ -81,7 +81,7 @@ $(document).ready(function() {
   var items={};
   // This contains an ordered list of ALL GeoJSON keys.
   var keys=[];
-  // This contains an ordered full list of document ids.
+  // This contains a full ordered list of document ids.
   var documents=[];
   // This contains a cascading viewport array,
   // initialized to one default element.
@@ -96,13 +96,20 @@ $(document).ready(function() {
 
   // query for GeoJSON and full documents
   function update_geometry() {
-    var keys=[];
+    var keys=[], position=0;
     for (var id in items) {
       if (items[id].keep) continue;
       keys.push([id,items[id].GeoJSON.error]);
-      var docs=items[id].docs;
-      for (var d=0;d<docs.length;d++)
-        keys.push([id,docs[d]._id]);
+      // skip to matching document id
+      items[id].docs=0;
+      while (documents[position][0]!==id)
+        position=(position+1)%documents.length;
+      // add all associated documents
+      while (documents[position][0]===id) {
+        keys.push(documents[position]);
+        position=(position+1)%documents.length;
+        items[id].docs++;
+      }
     }
     if (!keys.length) {
       call.that_last_one();
@@ -161,7 +168,7 @@ $(document).ready(function() {
           };
           var link=item.link;
           link.html('');
-          for (var d=0;d<item.docs.length;d++) {
+          for (var d=0;d<item.docs;d++) {
             // Group docs with identical GIS into one li.
             var doc=data.rows.shift().value.doc;
             if (options.fillColor) link.append('<br>');
@@ -207,10 +214,8 @@ $(document).ready(function() {
       limit:parseFloat($("#settings [name='limit']").val()),
       error:error==null?(NE.lat()-SW.lat())/100:error,
       bbox:[
-        SW.lng()-offset[0],
-        SW.lat()-offset[1],
-        NE.lng()-offset[0],
-        NE.lat()-offset[1]
+        SW.lng()-offset[0], SW.lat()-offset[1],
+        NE.lng()-offset[0], NE.lat()-offset[1]
       ],
     };
     var vp;
@@ -235,14 +240,9 @@ $(document).ready(function() {
         new_vp.prefix.push(id);
         if (items[id]) {
           delete old_items[id];
-          var keep=( items[id].GeoJSON.error===data[id].GeoJSON.error
-                    && items[id].docs.length===data[id].docs.length );
+          items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
           var old_docs=items[id].docs, docs=data[id].docs;
-          for (var d=0; keep && d<docs.length; d++)
-            keep &= (old_docs[d]._id===docs[d]._id);
-          items[id].keep=keep;
           items[id].GeoJSON=data[id].GeoJSON;
-          items[id].docs=docs;
           continue;
         }
         items[id]=data[id];
@@ -284,15 +284,14 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
       for (var row=0;row<data.rows.length;row++)
         keys.push(data.rows[row].id);
-      call.this_one_next(update_items)();
       // update GeoJSON according to viewport
-      Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
       // get associated document ids
       $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
         while (data.rows.length) {
           var row=data.rows.shift();
-          documents.push([row.id, row.key]);
+          documents.push([row.key, row.id]);
         }
+        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
       }, "json");
     });
     // get doc types and set colors
