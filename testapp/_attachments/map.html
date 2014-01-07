@@ -316,7 +316,7 @@ $(document).ready(function() {
       $("#settings [name='precise']").show();
       // show refined geometry once, and
       for (var id in items)
-        items[id].GeoJSON.error=items[id].keep=0;
+        items[id].keys[0][1]=0;
       call.this_one_next(update_geometry)();
       // revert to 'refine', if viewport was moved
       Maps.event.addListenerOnce(map, 'bounds_changed', function() {
