@@ -81,12 +81,17 @@ $(document).ready(function() {
   var items={};
   // This contains an ordered list of ALL GeoJSON keys.
   var keys=[];
+  // This contains an ordered full list of document ids.
+  var documents=[];
   // This contains a cascading viewport array,
   // initialized to one default element.
   var viewports=[{
     bbox: [-Infinity,-Infinity,Infinity,Infinity],
     prefix: [], // (limited) items returned by this viewport
     position: 0 // index from which to append remaining keys
+  }];
+  // Same as viewports for content-based filters.
+  var filters=[{
   }];
 
   // query for GeoJSON and full documents
@@ -207,20 +212,7 @@ $(document).ready(function() {
         NE.lng()-offset[0],
         NE.lat()-offset[1]
       ],
-      types:[]
     };
-    // read checked types off the filter form
-    var checkboxes=$("#filter .types").find(':checkbox');
-    for (var c=0;c<checkboxes.length;c++)
-      if ($(checkboxes[c]).prop('checked'))
-        options.types.push(types[c]);
-    // remove type check if all are allowed
-    if (options.types.length==types.length)
-      delete options.types;
-    // add time constraint if specified
-    options.time=$("#filter [name='time']").val();
-    if (options.time=="")
-      delete options.time;
     var vp;
     // pop viewports until one is found that surrounds bbox
     do vp=viewports.pop();
@@ -276,8 +268,7 @@ $(document).ready(function() {
         items[id].link.remove();
         delete items[id];
       }
-      // Put a small delay between both lists to
-      // let CouchDB recover from its previous crash.
+      // fetch changed geometries
       update_geometry();
     });
   }
@@ -288,7 +279,6 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions", function(data) {
       var bbox=data.rows[0].value.bbox;
       map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
-      //map.panToBounds(new LatLngBounds(new LatLng(bbox[1],bbox[0]),new LatLng(bbox[3],bbox[2])));
     });
     // get list of GeoJSON keys, largest to smallest item
     $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
@@ -297,6 +287,13 @@ $(document).ready(function() {
       call.this_one_next(update_items)();
       // update GeoJSON according to viewport
       Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+      // get associated document ids
+      $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
+        while (data.rows.length) {
+          var row=data.rows.shift();
+          documents.push([row.id, row.key]);
+        }
+      }, "json");
     });
     // get doc types and set colors
     $.getJSON("_view/types-fields?group_level=1", function(data) {
@@ -311,33 +308,6 @@ $(document).ready(function() {
         span.append('<input type="checkbox" checked>');
         span.append(type);
       }
-      // update items if filters have changed
-      $("#filter").change( function() {
-        // Check if the new filter setting is more restrictive than the old
-        // one. I am doing this kind-a handwavingly by just counting the
-        // allowed doc types and comparing my new count to the old one. Anyone
-        // capable of un-checking and checking checkboxes really fast will find
-        // this quirky to use.
-        var last_number_of_types=types.length;
-        var last_range=range.toRange($("#filter [name='time']").val());
-        return function() {
-          var this_number_of_types=0;
-          span.find(":checkbox").each(function() {
-            this_number_of_types+=$(this).prop('checked');
-          });
-          // If new filters aren't more restrictive, my viewport
-          // array is rendered invalid and needs to be rebuilt.
-          if (this_number_of_types>last_number_of_types)
-            viewports=[viewports[0]];
-          last_number_of_types=this_number_of_types;
-          // Same holds for time range.
-          var this_range=range.toRange($("#filter [name='time']").val());
-          if (!range.contains(last_range, this_range));
-            viewports=[viewports[0]];
-          last_range=this_range;
-          Maps.event.trigger(map, 'bounds_changed');
-        }
-      }());
     });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
