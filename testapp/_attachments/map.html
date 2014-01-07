@@ -96,21 +96,10 @@ $(document).ready(function() {
 
   // query for GeoJSON and full documents
   function update_geometry() {
-    var keys=[], position=0;
-    for (var id in items) {
-      if (items[id].keep) continue;
-      keys.push([id,items[id].GeoJSON.error]);
-      // skip to matching document id
-      items[id].docs=0;
-      while (documents[position][0]!==id)
-        position=(position+1)%documents.length;
-      // add all associated documents
-      while (documents[position][0]===id) {
-        keys.push(documents[position]);
-        position=(position+1)%documents.length;
-        items[id].docs++;
-      }
-    }
+    var keys=[];
+    for (var id in items)
+      if (!items[id].keep)
+        keys=keys.concat(items[id].keys);
     if (!keys.length) {
       call.that_last_one();
       return;
@@ -168,7 +157,7 @@ $(document).ready(function() {
           };
           var link=item.link;
           link.html('');
-          for (var d=0;d<item.docs;d++) {
+          for (var d=1;d<item.keys.length;d++) {
             // Group docs with identical GIS into one li.
             var doc=data.rows.shift().value.doc;
             if (options.fillColor) link.append('<br>');
@@ -229,6 +218,7 @@ $(document).ready(function() {
     options.keys=vp.prefix.concat(keys.slice(vp.position));
     var details = $("#details")
     list("bbox", options, function(data) {
+      var position=0;
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
@@ -240,15 +230,25 @@ $(document).ready(function() {
         new_vp.prefix.push(id);
         if (items[id]) {
           delete old_items[id];
-          items[id].keep=(items[id].GeoJSON.error===data[id].GeoJSON.error);
-          var old_docs=items[id].docs, docs=data[id].docs;
-          items[id].GeoJSON=data[id].GeoJSON;
+          var keys=items[id].keys;
+          items[id].keep=(keys[0][1]===data[id].GeoJSON.error);
+          keys[0][1]=data[id].GeoJSON.error;
           continue;
         }
         items[id]=data[id];
         var link=$(document.createElement("li"));
         details.append(link);
         items[id].link=link;
+        // skip to matching document id
+        var keys=[[id, data[id].GeoJSON.error]];
+        while (documents[position][0]!==id)
+          position=(position+1)%documents.length;
+        // add all associated documents
+        while (documents[position][0]===id) {
+          keys.push(documents[position]);
+          position=(position+1)%documents.length;
+        }
+        items[id].keys=keys;
       }
       // If the query returned less than the required items, then these must
       // be the only items within the viewport. In this case the index may be
@@ -292,6 +292,7 @@ $(document).ready(function() {
           documents.push([row.key, row.id]);
         }
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+        Maps.event.trigger(map, 'bounds_changed');
       }, "json");
     });
     // get doc types and set colors
