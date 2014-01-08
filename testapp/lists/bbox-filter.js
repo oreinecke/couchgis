@@ -14,11 +14,7 @@ function(head, req) {
   // allow reduced polygons to deviate up to this amount
   var error=0.0;
   if ('error' in options) error=options.error;
-  var types=false;
-  if ('types' in options) types=options.types;
-  var time=false;
-  if ('time' in options) time=options.time;
-  var row={}, GeoJSON, last_GeoJSON, last_key, docs=[];
+  var row={}, GeoJSON, last_GeoJSON, last_key;
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=function() {
@@ -27,23 +23,6 @@ function(head, req) {
     }; else proceed=function() { return true; };
     return proceed();
   };
-  // ii) Check if document type matches selection.
-  var type_matches=function() {
-    if (types) type_matches=function() {
-      return (types.indexOf(row.value.doc.type)!==-1);
-    }; else type_matches=function() { return true; };
-    return type_matches();
-  };
-  // iib) Check if document time intersects with range
-  var time_matches=function() {
-    if (time) {
-      var range=require('views/lib/range');
-      time=range.toRange(time);
-      var intersects=range.intersects;
-      time_matches=function() { return intersects(time, row.value.doc.time); };
-    } else time_matches=function() { return true; };
-    return time_matches();
-  }
   // iii) Check if geometry bbox is outside bbox.
   var outside_bbox=function() {
     if ('bbox' in GeoJSON && bbox) outside_bbox=function() {
@@ -60,25 +39,22 @@ function(head, req) {
   while (row) {
     if (row) row=getRow();
     if (last_key && (row==null || last_key!=row.key)) {
-      if (last_GeoJSON && docs.length) {
+      if (last_GeoJSON) {
         send_separator();
-        send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)
-                              +',"docs":'+JSON.stringify(docs)+'}');
+        send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)+'}');
         if (!proceed()) break;
       }
-      docs=[];
       last_GeoJSON=null;
     }
     if (!row) continue;
     last_key=row.key;
-    var doc=row.value.doc;
-    if (row.value.doc && type_matches() && time_matches()) docs.push(row.value.doc);
     GeoJSON=row.value.GeoJSON;
     // evaluation of geomeric properties follows:
     if (GeoJSON==null) continue;
     // skip if outside bbox
-    if (outside_bbox(GeoJSON.bbox)) continue;
-    // skip if geometry has too few details
+    if (outside_bbox()) continue;
+    // skip if geometry has too few details; this also
+    // works if no error is defined because !(null>0.0)
     if (GeoJSON.error>error) continue;
     // skip if we already have a more detailed version
     if (last_GeoJSON && last_GeoJSON.error>=GeoJSON.error) continue;
