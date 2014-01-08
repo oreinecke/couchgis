@@ -2,11 +2,7 @@
 
 function(doc) {
   var utils=require('views/lib/utils');
-  var range=require('views/lib/range');
-  var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
-  emit(id, {doc:{_id:doc._id, type:doc.type, time:range.toRange(doc.time)}});
-  if (id==null) return;
-  if (id===doc._id) {
+  if ("GeoJSON" in doc) {
     var GeoJSON=utils.clone(doc.GeoJSON);
     utils.toWGS84(GeoJSON);
     utils.bbox(GeoJSON);
@@ -15,7 +11,7 @@ function(doc) {
       error*=(error>=5e-6);
       var simplified_GeoJSON=utils.simplify(utils.clone(GeoJSON),error);
       if (error<Infinity || simplified_GeoJSON.error==0)
-        emit(id, {GeoJSON:{bbox:GeoJSON.bbox, error:simplified_GeoJSON.error}});
+        emit(doc._id, {GeoJSON:{bbox:GeoJSON.bbox, error:simplified_GeoJSON.error}});
       error=simplified_GeoJSON.error;
     }
   }
