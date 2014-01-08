@@ -214,6 +214,11 @@ $(document).ready(function() {
            options.bbox[2]>vp.bbox[2]||options.bbox[3]>vp.bbox[3]);
     // the last viewport is valid, so it needs to be re-stacked
     viewports.push(vp);
+    // abort if we already see less items than requested
+    if (vp.populated) {
+      call.that_last_one();
+      return;
+    }
     // ignore items that were already dropped by previous viewport
     options.keys=vp.prefix.concat(keys.slice(vp.position));
     var details = $("#details")
@@ -230,9 +235,9 @@ $(document).ready(function() {
         new_vp.prefix.push(id);
         if (items[id]) {
           delete old_items[id];
-          var keys=items[id].keys;
-          items[id].keep=(keys[0][1]===data[id].GeoJSON.error);
-          keys[0][1]=data[id].GeoJSON.error;
+          var KEYS=items[id].keys;
+          items[id].keep=(KEYS[0][1]===data[id].GeoJSON.error);
+          KEYS[0][1]=data[id].GeoJSON.error;
           continue;
         }
         items[id]=data[id];
@@ -240,15 +245,24 @@ $(document).ready(function() {
         details.append(link);
         items[id].link=link;
         // skip to matching document id
-        var keys=[[id, data[id].GeoJSON.error]];
+        var KEYS=[[id, data[id].GeoJSON.error]];
         while (documents[position][0]!==id)
           position=(position+1)%documents.length;
         // add all associated documents
         while (documents[position][0]===id) {
-          keys.push(documents[position]);
+          KEYS.push(documents[position]);
           position=(position+1)%documents.length;
         }
-        items[id].keys=keys;
+        items[id].keys=KEYS;
+      }
+      if (new_vp.prefix.length<options.limit) {
+        // note that we've retrieved all items with this viewport
+        new_vp.populated=true;
+        // set full detail level automatically in this case
+        if (error!==0) for (var id in items) {
+          items[id].keep=!items[id].keys[0][1];
+          items[id].keys[0][1]=0;
+        }
       }
       // If the query returned less than the required items, then these must
       // be the only items within the viewport. In this case the index may be
@@ -315,8 +329,10 @@ $(document).ready(function() {
       $("#settings [name='refine']").hide();
       $("#settings [name='precise']").show();
       // show refined geometry once, and
-      for (var id in items)
+      for (var id in items) {
         items[id].keys[0][1]=0;
+        items[id].keep=false;
+      }
       call.this_one_next(update_geometry)();
       // revert to 'refine', if viewport was moved
       Maps.event.addListenerOnce(map, 'bounds_changed', function() {
@@ -355,6 +371,8 @@ $(document).ready(function() {
       if (new_limit*5<limit) new_limit*=5;
       if (new_limit*2<limit) new_limit*=2;
       $("#settings [name='limit']").val(new_limit);
+      // remove populated-viewport-notification
+      viewports[viewports.length-1].populated=false;
       Maps.event.trigger(map, 'bounds_changed');
     });
     // Suppress page load if user presses enter in any
