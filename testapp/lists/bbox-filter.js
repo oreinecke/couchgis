@@ -14,7 +14,7 @@ function(head, req) {
   // allow reduced polygons to deviate up to this amount
   var error=0.0;
   if ('error' in options) error=options.error;
-  var row={}, GeoJSON, last_GeoJSON, last_key;
+  var row=getRow(), GeoJSON, last_GeoJSON, last_key;
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=function() {
@@ -37,28 +37,27 @@ function(head, req) {
   };
   send('{');
   while (row) {
-    if (row) row=getRow();
-    if (last_key && (row==null || last_key!=row.key)) {
-      if (last_GeoJSON) {
-        send_separator();
-        send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)+'}');
-        if (!proceed()) break;
-      }
-      last_GeoJSON=null;
-    }
-    if (!row) continue;
-    last_key=row.key;
     GeoJSON=row.value.GeoJSON;
-    // evaluation of geomeric properties follows:
-    if (GeoJSON==null) continue;
-    // skip if outside bbox
-    if (outside_bbox()) continue;
-    // skip if geometry has too few details; this also
-    // works if no error is defined because !(null>0.0)
-    if (GeoJSON.error>error) continue;
-    // skip if we already have a more detailed version
-    if (last_GeoJSON && last_GeoJSON.error>=GeoJSON.error) continue;
-    last_GeoJSON=GeoJSON;
+    if (outside_bbox()) {
+      // skip to next key if outside bbox
+      last_key=row.key;
+      do row=getRow();
+      while (row && row.key==last_key);
+    } else {
+      // scan rows for matching detail level
+      last_GeoJSON=row.value.GeoJSON;
+      last_key=row.key;
+      row=getRow();
+      while (row && row.key==last_key) {
+        GeoJSON=row.value.GeoJSON;
+        if (last_GeoJSON.error<GeoJSON.error && GeoJSON.error<error)
+          last_GeoJSON=GeoJSON;
+        row=getRow();
+      }
+      send_separator();
+      send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)+'}');
+      if (!proceed()) break;
+    }
   }
   return '}\n';
   // Uncomment this next line as soon as any(more) trouble arises: for some
