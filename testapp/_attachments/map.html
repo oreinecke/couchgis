@@ -294,6 +294,8 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions", function(data) {
       var bbox=data.rows[0].value.bbox;
       map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
+      // also initialize the time text field
+      $("#filter [name='time']").val(range.toString(data.rows[0].value.range));
     });
     // get list of GeoJSON keys, largest to smallest item
     $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
@@ -411,7 +413,7 @@ $(document).ready(function() {
   <div id="map" style="height:90%"></div>
   <form id="filter"> Filter:
     <span class="types"></span>
-    <input type="text" size=8 value="2004-2013" name="time" title="Zeit"><br>
+    <input type="text" size=8 name="time" title="Zeit"><br>
   </form>
   <ul id="details"></ul>
   </body>
