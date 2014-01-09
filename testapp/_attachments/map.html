@@ -330,8 +330,8 @@ $(document).ready(function() {
       $("#settings [name='precise']").show();
       // show refined geometry once, and
       for (var id in items) {
+        items[id].keep=!items[id].keys[0][1];
         items[id].keys[0][1]=0;
-        items[id].keep=false;
       }
       call.this_one_next(update_geometry)();
       // revert to 'refine', if viewport was moved
