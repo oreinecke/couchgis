@@ -32,11 +32,11 @@ $(document).ready(function() {
   var types=[];
 
   // call _list/bbox-filter/<view> with some useful options
-  function list(view, options, success) {
+  function list(list, options, success) {
     var keys=(options.keys?'{"keys":["'+options.keys.join('","')+'"]}':"{}");
     options.keys=undefined;
-    view+="?options="+encodeURIComponent(JSON.stringify(options));
-    $.ajax("_list/bbox-filter/"+view, {
+    list+="?options="+encodeURIComponent(JSON.stringify(options));
+    $.ajax("_list/"+list, {
       type:"POST",
       dataType:"json",
       data:keys,
@@ -222,7 +222,7 @@ $(document).ready(function() {
     // ignore items that were already dropped by previous viewport
     options.keys=vp.prefix.concat(keys.slice(vp.position));
     var details = $("#details")
-    list("bbox", options, function(data) {
+    list("bbox-filter/bbox", options, function(data) {
       var position=0;
       // lists items to be removed as {id:null}
       var old_items={};
