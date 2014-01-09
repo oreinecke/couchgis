@@ -2,36 +2,29 @@
 // Also unifies time ranges as general info.
 
 function(keys, values, rereduce) {
-  ;function less_or_equal(a, b) {
+  ;function lesser(a, b) {
+    // Do not expand to -infinity, because
+    // these are covered by any range anyway.
+    if (!a.length) return b;
+    if (!b.length) return a;
     for (var d=0;d<3;d++) {
-      if (d==a.length) return true;
-      if (d==b.length) return false;
-      if (a[d]<b[d]) return true;
-      if (a[d]>b[d]) return false;
+      if (d==a.length) return a;
+      if (d==b.length) return b;
+      if (a[d]<b[d]) return a;
+      if (a[d]>b[d]) return b;
     }
-    return true;
+    return a;
   }
-  ;function greater_or_equal(a, b) {
+  ;function greater(a, b) {
+    if (!a.length) return b;
+    if (!b.length) return a;
     for (var d=0;d<3;d++) {
-      if (d==a.length) return true;
-      if (d==b.length) return false;
-      if (a[d]>b[d]) return true;
-      if (a[d]<b[d]) return false;
+      if (d==a.length) return a;
+      if (d==b.length) return b;
+      if (a[d]>b[d]) return a;
+      if (a[d]<b[d]) return b;
     }
-    return true;
-  }
-  ;function expand(a,b) {
-    var a1=a.begin, a2=a.end;
-    var b1=b.begin, b2=b.end;
-    var result={
-      begin:(less_or_equal(a1,b1)?a1:b1),
-      end:(greater_or_equal(a2,b2)?a2:b2)
-    };
-    if (!a1.length) result.begin=b1;
-    if (!b1.length) result.begin=a1;
-    if (!a2.length) result.end=b2;
-    if (!b2.length) result.end=a2;
-    return result;
+    return a;
   }
   var bbox=values[0].bbox;
   var range=values[0].range;
@@ -41,7 +34,9 @@ function(keys, values, rereduce) {
     bbox[1]=(bbox[1]<bbox2[1])?bbox[1]:bbox2[1];
     bbox[2]=(bbox[2]>bbox2[2])?bbox[2]:bbox2[2];
     bbox[3]=(bbox[3]>bbox2[3])?bbox[3]:bbox2[3];
-    range=expand(range, values[v].range);
+    var range2=values[v].range;
+    range.begin=lesser(range.begin,range2.begin);
+    range.end=greater(range.end,range2.end);
   }
   return {bbox:bbox, range:range};
 }
