@@ -259,8 +259,9 @@ $(document).ready(function() {
         // note that we've retrieved all items with this viewport
         new_vp.populated=true;
         // set full detail level automatically in this case
-        if (error!==0) for (var id in items) {
-          items[id].keep=!items[id].keys[0][1];
+        if (error!==0) for (var id in data) {
+          // keep items that are already displayed
+          items[id].keep=items[id].shape && !items[id].keys[0][1];
           items[id].keys[0][1]=0;
         }
       }
