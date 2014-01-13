@@ -33,13 +33,13 @@ $(document).ready(function() {
 
   // call _list/bbox-filter/<view> with some useful options
   function list(list, options, success) {
-    var keys=(options.keys?'{"keys":["'+options.keys.join('","')+'"]}':"{}");
+    var keys=options.keys;
     options.keys=undefined;
     list+="?options="+encodeURIComponent(JSON.stringify(options));
     $.ajax("_list/"+list, {
       type:"POST",
       dataType:"json",
-      data:keys,
+      data:JSON.stringify({keys:keys}),
       success:success,
       error:call.that_last_one
     });
@@ -91,8 +91,7 @@ $(document).ready(function() {
     position: 0 // index from which to append remaining keys
   }];
   // Same as viewports for content-based filters.
-  var filters=[{
-  }];
+  var filters=[{ documents:[] }];
 
   // query for GeoJSON and full documents
   function update_geometry() {
@@ -229,6 +228,7 @@ $(document).ready(function() {
       for (var id in items) old_items[id]=null;
       // prepare new viewport
       var new_vp={ bbox:options.bbox, prefix:[] };
+      var documents=filters[filters.length-1].documents;
       // I need the last prop of data after the loop again. This is one
       // exceptional case where no 'var' is found in a for-statement.
       var id; for (id in data) {
@@ -304,7 +304,7 @@ $(document).ready(function() {
       $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
         while (data.rows.length) {
           var row=data.rows.shift();
-          documents.push([row.key, row.id]);
+          filters[0].documents.push([row.key, row.id]);
         }
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
         Maps.event.trigger(map, 'bounds_changed');
