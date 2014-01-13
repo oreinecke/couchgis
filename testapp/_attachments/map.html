@@ -249,10 +249,8 @@ $(document).ready(function() {
         while (documents[position][0]!==id)
           position=(position+1)%documents.length;
         // add all associated documents
-        while (documents[position][0]===id) {
-          KEYS.push(documents[position]);
-          position=(position+1)%documents.length;
-        }
+        while (position<documents.length && documents[position][0]===id)
+          KEYS.push(documents[position++]);
         items[id].keys=KEYS;
       }
       if (new_vp.prefix.length<options.limit) {
