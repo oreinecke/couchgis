@@ -244,8 +244,9 @@ $(document).ready(function() {
         var link=$(document.createElement("li"));
         details.append(link);
         items[id].link=link;
-        // skip to matching document id
+        // fetch GeoJSON of specified detail level
         var KEYS=[[id, data[id].GeoJSON.error]];
+        // skip to matching document id
         while (documents[position][0]!==id)
           position=(position+1)%documents.length;
         // add all associated documents
