@@ -378,7 +378,7 @@ $(document).ready(function() {
     });
     // Suppress page load if user presses enter in any
     // text input and update map if anything changed.
-    $("#settings").change( function(e) {
+    $("#settings").change( function() {
       Maps.event.trigger(map, 'bounds_changed');
     });
     $("form").submit( function(e) {e.preventDefault();} );
