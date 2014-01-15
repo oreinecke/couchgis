@@ -409,6 +409,20 @@ $(document).ready(function() {
         span.append(type);
       }
     });
+    // refine document list if date has changed
+    $("#filter [name='time']").change( function() {
+      filter_documents({ time: $(this).val() });
+    });
+    // refine document list if types have changed
+    $("#filter .types").change( function() {
+      var types=[];
+      $("#filter .types :input").each(function() {
+        var input=$(this);
+        if (input.prop('checked'))
+          types.push(input.prop('name'));
+      });
+      filter_documents({types:types});
+    });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
     $("#settings [name='refine']").click( function() {
