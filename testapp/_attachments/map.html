@@ -45,9 +45,10 @@ $(document).ready(function() {
     });
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
-  list.parts=window.location.pathname.match(/[^/]+/g);
-  list.db=list.parts[0];
-  list.app=list.parts[2];
+  list.parts=window.location.pathname.split('/');
+  list.db=list.parts[1];
+  list.app=list.parts[3];
+  delete list.parts;
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
