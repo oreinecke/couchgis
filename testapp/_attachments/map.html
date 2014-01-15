@@ -29,7 +29,6 @@ $(document).ready(function() {
 
   // some nice colors for different types
   var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
-  var types=[];
 
   // call _list/bbox-filter/<view> with some useful options
   function list(list, options, success) {
@@ -92,7 +91,7 @@ $(document).ready(function() {
     position: 0 // index from which to append remaining keys
   }];
   // Same as viewports for content-based filters.
-  var filters=[{ documents:[] }];
+  var filters=[{ types:[], documents:[] }];
 
   // query for GeoJSON and full documents
   function update_geometry() {
@@ -319,7 +318,7 @@ $(document).ready(function() {
       var span=$("#filter .types");
       for (var row=0;row<data.rows.length;row++) {
         var type=data.rows[row].key[0];
-        types.push(type);
+        filters[0].types.push(type);
         fillColors[type]=fillColors.shift();
         span.append('<input type="checkbox" checked>');
         span.append(type);
