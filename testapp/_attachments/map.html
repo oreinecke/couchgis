@@ -91,7 +91,7 @@ $(document).ready(function() {
     position: 0 // index from which to append remaining keys
   }];
   // Same as viewports for content-based filters.
-  var filters=[{ types:[], documents:[] }];
+  var filters=[{ types:[], time:"", documents:[] }];
 
   // query for GeoJSON and full documents
   function update_geometry() {
@@ -284,6 +284,90 @@ $(document).ready(function() {
       }
       // fetch changed geometries
       update_geometry();
+    });
+  }
+
+  // Applies new filter to document list; new_filter must be a single-member
+  // object denoting the filter type. It is then either
+  // i) attached at the end of the filter queue
+  // ii) inserted in the middle and merged with filters following it
+  // iii) nothing of the above if an identical filter is already used.
+  function filter_documents(new_filter) {
+    // Aquire (single) property name of new_filter.
+    var filter_name=function() {for (var prop in new_filter) return prop;}();
+    // In any case, we can use the full, non-filtered document list.
+    var documents=filters[0].documents;
+    // Remind me if we already have an identical filter in place.
+    var equal_filter=false;
+    var position=0;
+    // Check what document list to reuse: As soon as a conflicting (that is
+    // non-containing) filter is found, this one and every filter following it
+    // need to be re-evaluated.
+    while ( position<filters.length && (function(filter) {
+      // In this part we determine for each filter type if it
+      // a) is more restrictive than an already applied filter, and
+      // b) happens to be identical to said filter.
+      // I have written this part using an anonymous function because it is
+      // most concise and every attempt to do this without resulted in
+      // additional clutter. Also I expect filters.length not to exceed 20.
+      if (filter_name==="time") {
+        if (filter.time==null) return true;
+        var contains=(range.contains(filter.time, new_filter.time));
+        if (contains) equal_filter=(range.contains(new_filter.time, filter.time));
+        return contains;
+      }
+      if (filter_name==="types") {
+        if (!filter.types) return true;
+        var contains=(new_filter.types.length<=filter.types.length);
+        for (var t=0; contains && t<new_filter.types.length; t++)
+          contains &= (filter.types.indexOf(new_filter.types[t])>=0);
+        if (contains) equal_filter=(new_filter.types.length===filter.types.length);
+        return contains;
+      }
+    }(filters[position])) )
+      // If the last filter was compatible, we can use its document list.
+      documents=filters[position++].documents;
+    filters.push(new_filter);
+    var options={};
+    // Collapse remaining filters into options.
+    while (filter=filters.splice(position,1)[0]) {
+      if ('time' in filter) options.time=filter.time;
+      if ('types' in filter) options.types=filter.types;
+    }
+    // Generates geometry id list from latest document list and
+    // resets viewports because they are most likely invalidated.
+    function reset_viewports() {
+      var documents=filters[filters.length-1].documents;
+      keys.splice(0);
+      viewports.splice(1);
+      var old_id=null;
+      for (var d=0;d<documents.length;d++) {
+        var id=documents[d][1];
+        if (old_id===id) continue;
+        keys.push(id);
+        old_id=id;
+      }
+      Maps.event.trigger(map, 'bounds_changed');
+    }
+    // Remove filter from options if an identical one has already been applied.
+    if (equal_filter) delete options[filter_name];
+    // Avoid query if all filters have been removed from options.
+    if (function() { for (var prop in options) return false; return true; }()) {
+      reset_viewports();
+      return;
+    }
+    options.keys=documents;
+    list("tabulate/geojson", options, function(data) {
+      var new_documents=[], d=0;
+      for (var i=0;i<data.length;i++) {
+        var doc_id=data[i];
+        while (documents[d][1]!=doc_id) d++;
+        new_documents.push(documents[d]);
+      }
+      options.documents=new_documents;
+      options.keys=undefined;
+      filters.push(options);
+      reset_viewports();
     });
   }
 
