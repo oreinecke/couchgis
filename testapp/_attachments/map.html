@@ -321,7 +321,7 @@ $(document).ready(function() {
         var type=data.rows[row].key[0];
         filters[0].types.push(type);
         fillColors[type]=fillColors.shift();
-        span.append('<input type="checkbox" checked>');
+        span.append('<input type="checkbox" name="'+type+'" checked>');
         span.append(type);
       }
     });
