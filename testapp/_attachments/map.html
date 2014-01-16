@@ -96,9 +96,14 @@ $(document).ready(function() {
   // query for GeoJSON and full documents
   function update_geometry() {
     var keys=[];
-    for (var id in items)
-      if (!items[id].keep)
-        keys=keys.concat(items[id].keys);
+    for (var id in items) {
+      var item=items[id];
+      if (!item.keep)
+        keys=keys.concat(item.keys);
+      if (item.update_documents)
+        keys=keys.concat(item.keys.slice(1));
+      item.keep_documents=false;
+    }
     if (!keys.length) {
       call.that_last_one();
       return;
@@ -130,60 +135,66 @@ $(document).ready(function() {
         while (data.rows.length) {
           var row=data.rows.shift();
           var item=items[row.key[0]];
-          var GeoJSON=row.value.GeoJSON;
-          // Replace all 2-element arrays inside GeoJSON.coordinates with
-          // LatLngs; This is written with extra-ugly comma operators and
-          // multiple vars inside the for loop to increase performance.
-          var c=GeoJSON.coordinates;
-          if (typeof(c[0])=="number") GeoJSON.coordinates=new LatLng(c[1]+offset[1],c[0]+offset[0]);
-          else if (typeof(c[0][0])=="number")
-            for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1]+offset[1],ci[0]+offset[0]);
-          else if (typeof(c[0][0][0])=="number")
-            for (var i=0, ci; ci=c[i], i<c.length; i++)
-            for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1]+offset[1],cij[0]+offset[0]);
-          else if (typeof(c[0][0][0][0])=="number")
-            for (var i=0, ci; ci=c[i], i<c.length; i++)
-            for (var j=0, cij; cij=ci[j], j<ci.length; j++)
-            for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+offset[1],cijk[0]+offset[0]);
-          var options={
-            map:map,
-            position:GeoJSON.coordinates,
-            path:GeoJSON.coordinates,
-            paths:GeoJSON.coordinates,
-            strokecolor: '#FF0000',
-            fillOpacity: 0.25,
-            icon:"svg/marker.svg"
-          };
-          var link=item.link;
-          link.html('');
-          for (var d=1;d<item.keys.length;d++) {
-            // Group docs with identical GIS into one li.
-            var doc=data.rows.shift().value.doc;
-            if (options.fillColor) link.append('<br>');
-            else options.fillColor=fillColors[doc.type];
-            // Link to Futon for the lack of a better interface
-            // and set link text to a useful item explanation.
-            link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
-                                     +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
-          }
-          var shape=function(type) {
-            // yes this is the new switch
-            if (type=="Point") return new Maps.Marker(options);
-            if (type=="Polygon") return new Maps.Polygon(options);
-            if (type=="LineString") return new Maps.Polyline(options);
-            // remind myself that this needs work!!!
-            alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
-          }(GeoJSON.type);
-          // Select link if user clicks on shape and decrease
-          // zIndex to give access to obstructed shapes.
-          Maps.event.addListener(shape, 'click', function(href) {
-            return function() {
-              this.setOptions({zIndex:-new Date().getTime()});
-              href.focus();
+          if (row.value.GeoJSON) {
+            var GeoJSON=row.value.GeoJSON;
+            // Replace all 2-element arrays inside GeoJSON.coordinates with
+            // LatLngs; This is written with extra-ugly comma operators and
+            // multiple vars inside the for loop to increase performance.
+            var c=GeoJSON.coordinates;
+            if (typeof(c[0])=="number") GeoJSON.coordinates=new LatLng(c[1]+offset[1],c[0]+offset[0]);
+            else if (typeof(c[0][0])=="number")
+              for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1]+offset[1],ci[0]+offset[0]);
+            else if (typeof(c[0][0][0])=="number")
+              for (var i=0, ci; ci=c[i], i<c.length; i++)
+              for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1]+offset[1],cij[0]+offset[0]);
+            else if (typeof(c[0][0][0][0])=="number")
+              for (var i=0, ci; ci=c[i], i<c.length; i++)
+              for (var j=0, cij; cij=ci[j], j<ci.length; j++)
+              for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+offset[1],cijk[0]+offset[0]);
+            var options={
+              map:map,
+              position:GeoJSON.coordinates,
+              path:GeoJSON.coordinates,
+              paths:GeoJSON.coordinates,
+              strokecolor: '#FF0000',
+              fillOpacity: 0.25,
+              icon:"svg/marker.svg"
             };
-          }(item.link.find('a').last()));
-          if (item.shape) item.shape.setMap();
-          item.shape=shape;
+            var shape=function(type) {
+              // yes this is the new switch
+              if (type=="Point") return new Maps.Marker(options);
+              if (type=="Polygon") return new Maps.Polygon(options);
+              if (type=="LineString") return new Maps.Polyline(options);
+              // remind myself that this needs work!!!
+              alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+            }(GeoJSON.type);
+            // Select link if user clicks on shape and decrease
+            // zIndex to give access to obstructed shapes.
+            Maps.event.addListener(shape, 'click', function(href) {
+              return function() {
+                this.setOptions({zIndex:-new Date().getTime()});
+                href.focus();
+              };
+            }(item.link.find('a').last()));
+            if (item.shape) item.shape.setMap();
+            item.shape=shape;
+          } else {
+          var link=item.link;
+            link.html('');
+            data.rows.unshift(row);
+            var fillColor=null;
+            for (var d=1;d<item.keys.length;d++) {
+              // Group docs with identical GIS into one li.
+              var doc=data.rows.shift().value.doc;
+              if (fillColor) link.append('<br>');
+              else fillColor=fillColors[doc.type];
+              // Link to Futon for the lack of a better interface
+              // and set link text to a useful item explanation.
+              link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
+                                       +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
+            }
+            item.shape.setOptions({fillColor:fillColor});
+          }
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
           return;
@@ -346,14 +357,13 @@ $(document).ready(function() {
         if (old_id===id) continue;
         keys.push(id);
         old_id=id;
-        var item=items[id];
-        if (!item) continue;
-          var new_keys=[[id]];
+        if (!items[id]) continue;
+        var old_keys=item.keys;
+        old_keys.splice(1);
         while (d<documents.length && old_id===documents[d][0])
-          new_keys.push(documents[d++]);
-        item.keys=new_keys;
-        item.shape.setMap();
-        delete item.shape;
+          old_keys.push(documents[d++]);
+        // update document list in the next _view/geojson
+        items[id].update_documents=true;
         // the nested loop results in an off-by-one document index
         d--;
       }
