@@ -33,7 +33,7 @@ $(document).ready(function() {
   // call _list/bbox-filter/<view> with some useful options
   function list(list, options, success) {
     var keys=options.keys;
-    options.keys=undefined;
+    delete options.keys;
     list+="?options="+encodeURIComponent(JSON.stringify(options));
     $.ajax("_list/"+list, {
       type:"POST",
@@ -260,7 +260,7 @@ $(document).ready(function() {
         // set full detail level automatically in this case
         if (error!==0) for (var id in data) {
           // keep items that are already displayed
-          items[id].keep=items[id].shape && !items[id].keys[0][1];
+          items[id].keep=items[id].shape && (items[id].keys[0][1]===0);
           items[id].keys[0][1]=0;
         }
       }
@@ -334,18 +334,28 @@ $(document).ready(function() {
       if ('time' in filter) options.time=filter.time;
       if ('types' in filter) options.types=filter.types;
     }
-    // Generates geometry id list from latest document list and
-    // resets viewports because they are most likely invalidated.
+    // Generate geometry id list from latest document list and
+    // reset viewports because they are most likely invalidated.
     function reset_viewports() {
       var documents=filters[filters.length-1].documents;
       keys.splice(0);
       viewports.splice(1);
       var old_id=null;
       for (var d=0;d<documents.length;d++) {
-        var id=documents[d][1];
+        var id=documents[d][0];
         if (old_id===id) continue;
         keys.push(id);
         old_id=id;
+        var item=items[id];
+        if (!item) continue;
+          var new_keys=[[id]];
+        while (d<documents.length && old_id===documents[d][0])
+          new_keys.push(documents[d++]);
+        item.keys=new_keys;
+        item.shape.setMap();
+        delete item.shape;
+        // the nested loop results in an off-by-one document index
+        d--;
       }
       Maps.event.trigger(map, 'bounds_changed');
     }
@@ -365,7 +375,7 @@ $(document).ready(function() {
         new_documents.push(documents[d]);
       }
       options.documents=new_documents;
-      options.keys=undefined;
+      delete options.keys;
       filters.push(options);
       reset_viewports();
     });
@@ -430,7 +440,7 @@ $(document).ready(function() {
       $("#settings [name='precise']").show();
       // show refined geometry once, and
       for (var id in items) {
-        items[id].keep=!items[id].keys[0][1];
+        items[id].keep=(items[id].keys[0][1]===0);
         items[id].keys[0][1]=0;
       }
       call.this_one_next(update_geometry)();
