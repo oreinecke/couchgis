@@ -403,7 +403,7 @@ $(document).ready(function() {
       $("#filter [name='time']").val(range.toString(data.rows[0].value.range));
     });
     // get list of GeoJSON keys, largest to smallest item
-    $.getJSON("_view/dimensions?reduce=false&descending=true", function(data) {
+    $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
       for (var row=0;row<data.rows.length;row++)
         keys.push(data.rows[row].id);
       // update GeoJSON according to viewport

@@ -29,14 +29,16 @@ function(keys, values, rereduce) {
   var bbox=values[0].bbox;
   var range=values[0].range;
   for (var v=1;v<values.length;v++) {
+    var range2=values[v].range;
+    range.begin=lesser(range.begin,range2.begin);
+    range.end=greater(range.end,range2.end);
     var bbox2=values[v].bbox;
+    if (!bbox) bbox=bbox2;
+    if (!bbox || !bbox2) continue;
     bbox[0]=(bbox[0]<bbox2[0])?bbox[0]:bbox2[0];
     bbox[1]=(bbox[1]<bbox2[1])?bbox[1]:bbox2[1];
     bbox[2]=(bbox[2]>bbox2[2])?bbox[2]:bbox2[2];
     bbox[3]=(bbox[3]>bbox2[3])?bbox[3]:bbox2[3];
-    var range2=values[v].range;
-    range.begin=lesser(range.begin,range2.begin);
-    range.end=greater(range.end,range2.end);
   }
   return {bbox:bbox, range:range};
 }

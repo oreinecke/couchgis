@@ -3,7 +3,10 @@
 function(doc) {
   var utils=require('views/lib/utils');
   var range=require('views/lib/range');
-  if (doc.GeoJSON==null) return;
+  if (doc.GeoJSON==null) {
+    emit(null, {range:range.toRange(doc.time)});
+    return;
+  }
   var GeoJSON=utils.clone(doc.GeoJSON);
   utils.toWGS84(GeoJSON);
   utils.bbox(GeoJSON);
