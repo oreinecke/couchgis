@@ -99,10 +99,9 @@ $(document).ready(function() {
     for (var id in items) {
       var item=items[id];
       if (!item.keep)
-        keys=keys.concat(item.keys);
-      if (item.update_documents)
+        keys.push(item.keys[0]);
+      if (!item.keep_documents)
         keys=keys.concat(item.keys.slice(1));
-      item.keep_documents=false;
     }
     if (!keys.length) {
       call.that_last_one();
@@ -170,16 +169,16 @@ $(document).ready(function() {
             }(GeoJSON.type);
             // Select link if user clicks on shape and decrease
             // zIndex to give access to obstructed shapes.
-            Maps.event.addListener(shape, 'click', function(href) {
+            Maps.event.addListener(shape, 'click', function(link) {
               return function() {
                 this.setOptions({zIndex:-new Date().getTime()});
-                href.focus();
+                link.find('a').last().focus();
               };
-            }(item.link.find('a').last()));
+            }(item.link));
             if (item.shape) item.shape.setMap();
             item.shape=shape;
           } else {
-          var link=item.link;
+            var link=item.link;
             link.html('');
             data.rows.unshift(row);
             var fillColor=null;
@@ -194,6 +193,7 @@ $(document).ready(function() {
                                        +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
             }
             item.shape.setOptions({fillColor:fillColor});
+            item.keep_documents=true;
           }
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
@@ -363,7 +363,7 @@ $(document).ready(function() {
         while (d<documents.length && old_id===documents[d][0])
           old_keys.push(documents[d++]);
         // update document list in the next _view/geojson
-        items[id].update_documents=true;
+        items[id].keep_documents=false;
         // the nested loop results in an off-by-one document index
         d--;
       }
