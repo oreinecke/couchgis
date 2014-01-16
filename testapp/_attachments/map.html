@@ -489,6 +489,8 @@ $(document).ready(function() {
 <style>
   #details a:focus {font-weight:bold}
   #settings .geometry-level {width:6em}
+  span {white-space:nowrap}
+  .types {white-space:normal}
 </style>
 
   </head>
@@ -502,16 +504,16 @@ $(document).ready(function() {
     <input type="button" name="refine" class="geometry-level" value="verfeinern">
     <input type="button" name="precise" class="geometry-level" value="exakt" style="display:none">
     <input type="button" name="simplified" class="geometry-level" value="vereinfacht" style="display:none">
-    <input type="checkbox" name="delayed">verzögert
-    <input type="text" name="limit" size=2 value="50"> Polygone
-    <input type="button" value="weniger" name="less">
-    <input type="button" value="mehr" name="more">
+    <span><input type="checkbox" name="delayed">verzögert</span>
+    <span><input type="text" name="limit" size=2 value="50"> Polygone</span>
+    <span><input type="button" value="weniger" name="less">
+    <input type="button" value="mehr" name="more"></span>
   </form>
   <div id="map" style="height:90%"></div>
   <form id="filter"> Filter:
     <span class="types"></span>
-    von: <input type="text" size=8 name="time" title="Zeit">
-    enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff">
+    <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
+    <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
   </form>
   <ul id="details"></ul>
   </body>
