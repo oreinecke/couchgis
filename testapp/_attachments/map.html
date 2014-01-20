@@ -336,15 +336,19 @@ $(document).ready(function() {
         if (contains) equal_filter=(new_filter.types.length===filter.types.length);
         return contains;
       }
+      if (filter_name==="cuts") {
+        return true;
+      }
     }(filters[position])) )
       // If the last filter was compatible, we can use its document list.
       documents=filters[position++].documents;
     filters.push(new_filter);
-    var options={};
+    var options={cuts:[]};
     // Collapse remaining filters into options.
     while (filter=filters.splice(position,1)[0]) {
       if ('time' in filter) options.time=filter.time;
       if ('types' in filter) options.types=filter.types;
+      if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
     }
     // Generate geometry id list from latest document list and
     // reset viewports because they are most likely invalidated.
@@ -444,6 +448,12 @@ $(document).ready(function() {
       });
       filter_documents({types:types});
     });
+    // add content-filter
+    $("#filter [name='content']").change( function() {
+      var val=$(this).val();
+      console.log(val);
+      filter_documents({cuts:{value:val}});
+    });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
     $("#settings [name='refine']").click( function() {
@@ -520,8 +530,7 @@ $(document).ready(function() {
   <iframe src="login_bar.htm" style="width:100%; height:1.6em; border:0;"></iframe>
 
   <h1> Karte </h1>
-  <form id="settings">
-    Darstellung:
+  <form id="settings"> Darstellung:
     <input type="button" name="refine" class="geometry-level" value="verfeinern">
     <input type="button" name="precise" class="geometry-level" value="exakt" style="display:none">
     <input type="button" name="simplified" class="geometry-level" value="vereinfacht" style="display:none">
@@ -535,6 +544,7 @@ $(document).ready(function() {
     <span class="types"></span>
     <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
     <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
+    <ol id="cuts"></ol>
   </form>
   <ul id="details"></ul>
   </body>
