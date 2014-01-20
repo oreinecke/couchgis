@@ -98,7 +98,7 @@ $(document).ready(function() {
     var keys=[];
     for (var id in items) {
       var item=items[id];
-      if (!item.keep)
+      if (!item.keep_shape)
         keys.push(item.keys[0]);
       if (!item.keep_documents)
         keys=keys.concat(item.keys.slice(1));
@@ -247,7 +247,7 @@ $(document).ready(function() {
         if (items[id]) {
           delete old_items[id];
           var KEYS=items[id].keys;
-          items[id].keep=(KEYS[0][1]===data[id].GeoJSON.error);
+          items[id].keep_shape=(KEYS[0][1]===data[id].GeoJSON.error);
           KEYS[0][1]=data[id].GeoJSON.error;
           continue;
         }
@@ -271,7 +271,7 @@ $(document).ready(function() {
         // set full detail level automatically in this case
         if (error!==0) for (var id in data) {
           // keep items that are already displayed
-          items[id].keep=items[id].shape && (items[id].keys[0][1]===0);
+          items[id].keep_shape=items[id].shape && (items[id].keys[0][1]===0);
           items[id].keys[0][1]=0;
         }
       }
@@ -450,7 +450,7 @@ $(document).ready(function() {
       $("#settings [name='precise']").show();
       // show refined geometry once, and
       for (var id in items) {
-        items[id].keep=(items[id].keys[0][1]===0);
+        items[id].keep_shape=(items[id].keys[0][1]===0);
         items[id].keys[0][1]=0;
       }
       call.this_one_next(update_geometry)();
