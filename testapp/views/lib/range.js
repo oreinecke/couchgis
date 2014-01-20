@@ -2,7 +2,7 @@
 
 function toDate(date) {
   if (date=="") return [];
-  date=date.split('.').reverse();
+  date=date.split(/[./]/).reverse();
   for (var d=0;d<date.length;d++)
     date[d]=parseInt(date[d].replace(/^0/g, ""));
   return date;
@@ -21,12 +21,15 @@ function toRange(range) {
 }
 exports.toRange=toRange;
 
-// Convert range to string.
+// Convert range to string. If no day is given,
+// MM/YYYY is returned, DD.MM.YYYY otherwise.
 
 exports.toString=function(range) {
-  var begin=range.begin.reverse().join('.');
-  var end=range.end.reverse().join('.');
-  if (begin==end) return begin;
+  var begin=range.begin.reverse();
+  var end=range.end.reverse();
+  begin=begin.join(begin.length===2?'/':'.');
+  end=end.join(end.length===2?'/':'.');
+  if (begin===end) return begin;
   else return begin+'-'+end;
 };
 
