@@ -20,6 +20,34 @@ function(head, req) {
       return range.intersects(time, doc_time);
     };
   }
+  var content_matches=pass;
+  if ('cuts' in options) {
+    var keywords=[];
+    var fields=[];
+    var values=[];
+    var cuts=options.cuts;
+    for (var c=0;c<cuts.length;c++)
+      if (cuts[c].field) {
+        fields.push(cuts[c].field.split('.'));
+        values.push(cuts[c].value);
+      } else keywords.push(cuts[c].value);
+    content_matches=function(doc) {
+      for (var f=0;f<fields.length;f++) {
+        var field=fields[f];
+        var value=doc;
+        for (var g=0;g<field.length && value!=null;g++)
+          value=value[field[f]];
+        if (value!=values[f]) return false;
+      }
+      if (!keywords.length) return true;
+      var content="";
+      for (var prop in doc)
+        if (prop!=="time" && prop!=="type") content+=doc[prop]+'\n';
+      for (var k=0;k<keywords.length;k++)
+        if (content.search(keywords[k])===-1) return false;
+      return true;
+    };
+  }
   var send_separator=function() {
     send_separator=function() {send(',\n');};
   };
@@ -32,6 +60,7 @@ function(head, req) {
     if (!doc) continue;
     if (!type_matches(doc.type)) continue;
     if (!time_matches(doc.time)) continue;
+    if (!content_matches(doc)) continue;
     send_separator();
     send_fields();
   }
