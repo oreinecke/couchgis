@@ -5,21 +5,16 @@
     <title>Übersicht</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script src="script/jquery-1.10.2.js"></script>
-    <script src="script/jquery.couch.js"></script>
-    <script src="script/login_bar.js"></script>
 
 <script>
 $(document).ready(function() {
-  var parts=window.location.pathname.match(/[^/]+/g);
-  var db=parts[0];
-  var app=parts[1]+'/'+parts[2];
-  $.couch.db(db).openDoc(app, {success:function(doc) {
+  $.getJSON("./", function(doc) {
     var pages=$("#pages");
     // list top level html pages
     for (var a in doc._attachments)
       if (a.search(/^[^/]+html$/i)>=0)
         pages.append('<li><a href="'+a+'">'+a+"</a>");
-  }});
+  });
 });
 </script>
 
