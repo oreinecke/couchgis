@@ -323,14 +323,13 @@ $(document).ready(function() {
       // I have written this part using an anonymous function because it is
       // most concise and every attempt to do this without resulted in
       // additional clutter. Also I expect filters.length not to exceed 20.
+      if (filter[filter_name]==null) return true;
       if (filter_name==="time") {
-        if (filter.time==null) return true;
         var contains=(range.contains(filter.time, new_filter.time));
         if (contains) equal_filter=(range.contains(new_filter.time, filter.time));
         return contains;
       }
       if (filter_name==="types") {
-        if (!filter.types) return true;
         var contains=(new_filter.types.length<=filter.types.length);
         for (var t=0; contains && t<new_filter.types.length; t++)
           contains &= (filter.types.indexOf(new_filter.types[t])>=0);
