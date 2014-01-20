@@ -289,9 +289,7 @@ $(document).ready(function() {
         viewports.push(new_vp);
       // remove out-of-viewport shapes and links
       for (var id in old_items) {
-        // shape is not guaranteed to be set because
-        // _list/bbox-filter/geojson might be unsuccessful
-        if (items[id].shape) items[id].shape.setMap();
+        items[id].shape.setMap();
         items[id].link.remove();
         delete items[id];
       }
@@ -337,7 +335,14 @@ $(document).ready(function() {
         return contains;
       }
       if (filter_name==="cuts") {
-        return true;
+        var cut=new_filter.cuts[0];
+        if (!cut.remove_me) return true;
+        var index=filter.cuts.indexOf(cut);
+        if (index===-1) return true;
+        equal_filter=true;
+        filter.cuts.splice(index,1);
+        console.log("REMOVED CUT", JSON.stringify(cut));
+        return false;
       }
     }(filters[position])) )
       // If the last filter was compatible, we can use its document list.
@@ -374,6 +379,8 @@ $(document).ready(function() {
       }
       Maps.event.trigger(map, 'bounds_changed');
     }
+    // Remove options.cuts array if empty.
+    if (!options.cuts.length) delete options.cuts;
     // Remove filter from options if an identical one has already been applied.
     if (equal_filter) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
@@ -451,8 +458,19 @@ $(document).ready(function() {
     // add content-filter
     $("#filter [name='content']").change( function() {
       var val=$(this).val();
-      console.log(val);
-      filter_documents({cuts:{value:val}});
+      if (val.search("^ *$")>=0) return;
+      var cut={value:val};
+      filter_documents({cuts:[cut]});
+      var ol=$("#cuts");
+      var li=$(document.createElement("li"));
+      li.html('<input type="button" value="x" title="Kriterium entfernen"> '+val);
+      li.find(':button').click(function() {
+        // Tell filter_documents() to remove me from the queue.
+        cut.remove_me=true;
+        filter_documents({cuts:[cut]});
+        li.remove();
+      });
+      ol.append(li);
     });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
@@ -543,7 +561,14 @@ $(document).ready(function() {
   <form id="filter"> Filter:
     <span class="types"></span>
     <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
-    <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
+    <span>
+      enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff">
+      als: <select>
+      <option>alles</option>
+      <option>FLIK</option>
+      <option>Hauptanbau</option>
+      </select>
+    </span>
     <ol id="cuts"></ol>
   </form>
   <ul id="details"></ul>
