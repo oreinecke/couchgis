@@ -358,7 +358,7 @@ $(document).ready(function() {
         keys.push(id);
         old_id=id;
         if (!items[id]) continue;
-        var old_keys=item.keys;
+        var old_keys=items[id].keys;
         old_keys.splice(1);
         while (d<documents.length && old_id===documents[d][0])
           old_keys.push(documents[d++]);
