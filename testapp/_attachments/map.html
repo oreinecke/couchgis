@@ -159,24 +159,26 @@ $(document).ready(function() {
               fillOpacity: 0.25,
               icon:"svg/marker.svg"
             };
-            var shape=function(type) {
-              // yes this is the new switch
-              if (type=="Point") return new Maps.Marker(options);
-              if (type=="Polygon") return new Maps.Polygon(options);
-              if (type=="LineString") return new Maps.Polyline(options);
-              // remind myself that this needs work!!!
-              alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
-            }(GeoJSON.type);
-            // Select link if user clicks on shape and decrease
-            // zIndex to give access to obstructed shapes.
-            Maps.event.addListener(shape, 'click', function(link) {
-              return function() {
-                this.setOptions({zIndex:-new Date().getTime()});
-                link.find('a').last().focus();
-              };
-            }(item.link));
-            if (item.shape) item.shape.setMap();
-            item.shape=shape;
+            if (item.shape) item.shape.setOptions(options);
+            else {
+              var shape=function(type) {
+                // yes this is the new switch
+                if (type=="Point") return new Maps.Marker(options);
+                if (type=="Polygon") return new Maps.Polygon(options);
+                if (type=="LineString") return new Maps.Polyline(options);
+                // remind myself that this needs work!!!
+                alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+              }(GeoJSON.type);
+              // Select link if user clicks on shape and decrease
+              // zIndex to give access to obstructed shapes.
+              Maps.event.addListener(shape, 'click', function(link) {
+                return function() {
+                  this.setOptions({zIndex:-new Date().getTime()});
+                  link.find('a').last().focus();
+                };
+              }(item.link));
+              item.shape=shape;
+            }
           } else {
             var link=item.link;
             link.html('');
