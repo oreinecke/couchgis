@@ -448,6 +448,20 @@ $(document).ready(function() {
     // refine document list if date has changed
     $("#filter [name='time']").change( function() {
       filter_documents({ time: $(this).val() });
+      var ol=$("#cuts");
+      var li=$("#timecut");
+      // add filter to filter list if not present
+      if (!li.length) {
+        li=$(document.createElement("li"));
+        li.prop('id', "timecut");
+        ol.append(li);
+      }
+      li.html('<input type="button" value="x" title="Kriterium entfernen"> <b>Zeit:</b> '+$(this).val());
+      li.find(':button').click(function() {
+        filter_documents({time:""});
+        $("#filter [name='time']").val('');
+        li.remove();
+      });
     });
     // refine document list if types have changed
     $("#filter .types").change( function() {
