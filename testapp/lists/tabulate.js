@@ -23,15 +23,30 @@ function(head, req) {
   var content_matches=pass;
   if ('cuts' in options) {
     var keywords=[];
+    var non_nulls=[];
     var fields=[];
     var values=[];
     var cuts=options.cuts;
+    // sort cuts into these handy arrays:
     for (var c=0;c<cuts.length;c++)
-      if (cuts[c].field) {
+      // ignore value but require field to be non-null
+      if (cuts[c].field && !cuts[c].value)
+        non_nulls.push(cuts[c].field.split('.'));
+      // value must match
+      else if (cuts[c].field) {
         fields.push(cuts[c].field.split('.'));
         values.push(cuts[c].value);
+        // value should be somewhere in the document
       } else keywords.push(cuts[c].value);
     content_matches=function(doc) {
+      for (var f=0;f<non_nulls.length;f++) {
+        var field=non_nulls[f];
+        var value=doc;
+        for (var g=0;g<field.length;g++) {
+          value=value[field[f]];
+          if (value==null) return false;
+        }
+      }
       for (var f=0;f<fields.length;f++) {
         var field=fields[f];
         var value=doc;
