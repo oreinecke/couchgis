@@ -433,7 +433,7 @@ $(document).ready(function() {
       // to each element!! How nice!!!
       var span=$("#filter .types");
       for (var row=0;row<data.rows.length;row++) {
-        var type=data.rows[row].key[0];
+        var type=data.rows[row].key;
         filters[0].types.push(type);
         fillColors[type]=fillColors.shift();
         span.append('<input type="checkbox" name="'+type+'" checked>');

@@ -3,14 +3,8 @@
 
 function(keys, values, rereduce) {
   var L=[];
-  var K=(rereduce?values.length:keys.length);
-  if (!rereduce) {
-    values=[];
-    for (var k=0;k<K;k++)
-      values.push(keys[k][0][1].split('/'));
-  }
   values=values.sort().reverse();
-  for (var k=0;k<K;k++) {
+  for (var k=0;k<values.length;k++) {
     var fields=values[k];
     if (fields.length<2) continue; // that is super
     var attached=false;
