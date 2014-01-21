@@ -487,13 +487,23 @@ $(document).ready(function() {
     });
     // add content-filter
     $("#filter [name='content']").change( function() {
-      var val=$(this).val();
-      if (val.search("^ *$")>=0) return;
-      var cut={value:val};
+      var cut={
+        field:$("#filter [name='field']").val(),
+        value:$(this).val()
+      };
+      if (cut.field==="") delete cut.field;
+      if (cut.value.search(/^ *$/)>=0) delete cut.value;
+      if (cut.field==null && cut.value==null) return;
       filter_documents({cuts:[cut]});
       var ol=$("#cuts");
       var li=$(document.createElement("li"));
-      li.html('<input type="button" value="x" title="Kriterium entfernen"> '+val);
+      li.html('<input type="button" value="x" title="Kriterium entfernen"> ');
+      if (cut.field && cut.value)
+        li.append('<b>'+cut.field+':</b> '+cut.value);
+      else if (cut.field)
+        li.append('<b>'+cut.field+'</b> zugewiesen');
+      else
+        li.append('<b>enthält:</b> '+cut.value);
       li.find(':button').click(function() {
         // Tell filter_documents() to remove me from the queue.
         cut.remove_me=true;
