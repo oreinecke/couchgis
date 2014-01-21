@@ -432,13 +432,18 @@ $(document).ready(function() {
       // I can use fillColors first as a set and then assign keys
       // to each element!! How nice!!!
       var span=$("#filter .types");
+      var options={};
       for (var row=0;row<data.rows.length;row++) {
         var type=data.rows[row].key;
         filters[0].types.push(type);
         fillColors[type]=fillColors.shift();
         span.append('<input type="checkbox" name="'+type+'" checked>');
         span.append(type);
+        var fields=data.rows[row].value;
+        while (fields.length) options[fields.shift()]=null;
       }
+      var optgroup=$("#filter [name='field'] optgroup");
+      for (var field in options) optgroup.append('<option>'+field+'</option>');
     });
     // refine document list if date has changed
     $("#filter [name='time']").change( function() {
@@ -453,6 +458,18 @@ $(document).ready(function() {
           types.push(input.prop('name'));
       });
       filter_documents({types:types});
+      // update available fields real quick
+      $.getJSON("_view/types-fields?group_level=1&group=true&keys="+encodeURIComponent(JSON.stringify(types)), 
+      function(data) {
+        var options={};
+        while (data.rows.length) {
+          var fields=data.rows.shift().value;
+          while (fields.length) options[fields.shift()]=null;
+        }
+        var optgroup=$("#filter [name='field'] optgroup");
+        optgroup.html('');
+        for (var field in options) optgroup.append('<option>'+field+'</option>');
+      });
     });
     // add content-filter
     $("#filter [name='content']").change( function() {
@@ -562,11 +579,7 @@ $(document).ready(function() {
     <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
     <span>
       enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff">
-      als: <select>
-      <option>alles</option>
-      <option>FLIK</option>
-      <option>Hauptanbau</option>
-      </select>
+      als: <select name="field"><option value="">Text</option><optgroup label="Felder"></optgroup></select>
     </span>
     <ol id="cuts"></ol>
   </form>
