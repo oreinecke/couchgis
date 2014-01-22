@@ -504,7 +504,11 @@ $(document).ready(function() {
       else
         li.append('<b>enthält:</b> '+cut.value);
       li.find(':button').click(function() {
-        // Tell filter_documents() to remove me from the queue.
+        // Tell filter_documents() to remove cut from the queue and set form
+        // fields to its parameters; it is likely that the filter had a
+        // spelling error, so I should provide an easy way to correct it.
+        $("#filter [name='content']").val(cut.value==null?"":cut.value);
+        $("#filter [name='field']").val(cut.field==null?"":cut.field);
         cut.remove_me=true;
         filter_documents({cuts:[cut]});
         li.remove();
