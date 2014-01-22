@@ -485,7 +485,8 @@ $(document).ready(function() {
       });
     });
     // add content-filter
-    $("#filter [name='content']").change( function() {
+    $("#filter [name='content']").keypress( function(event) {
+      if (event.which!==13) return;
       var cut={
         field:$("#filter [name='field']").val(),
         value:$(this).val()
