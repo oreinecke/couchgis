@@ -513,7 +513,6 @@ $(document).ready(function() {
       };
       if (cut.field==="") delete cut.field;
       if (cut.value.search(/^ *$/)>=0) delete cut.value;
-      filter_documents({cuts:[cut]});
       // I've made template filter items at the bottom of the
       // page for these three different field/value combinations.
       var id=function(field, value) {
@@ -522,6 +521,7 @@ $(document).ready(function() {
         if (value) return "#contains";
       }(cut.field, cut.value);
       if (!id) return;
+      filter_documents({cuts:[cut]});
       var li=$(id).clone();
       li.show().prop('id',"");
       li.find('b').html(cut.field);
