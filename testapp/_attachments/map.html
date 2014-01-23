@@ -481,9 +481,11 @@ $(document).ready(function() {
             options[fields.shift()]=null;
         }
         var optgroup=$("#filter [name='field'] optgroup");
+        var val=$("#filter [name='field']").val();
         optgroup.html('');
         for (var field in options)
           optgroup.append('<option>'+field+'</option>');
+        $("#filter [name='field']").val(val);
       });
       filter_documents({types:types});
       // It sure would be nice to see the new filter appear
