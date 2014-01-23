@@ -349,7 +349,7 @@ $(document).ready(function() {
     filters.push(new_filter);
     var options={cuts:[]};
     // Collapse remaining filters into options.
-    while (filter=filters.splice(position,1)[0]) {
+    for (var filter; filter=filters.splice(position,1)[0]; ) {
       if ('time' in filter) options.time=filter.time;
       if ('types' in filter) options.types=filter.types;
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
