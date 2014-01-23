@@ -459,7 +459,7 @@ $(document).ready(function() {
         li.hide();
       });
     });
-    // refine document list if types have changed
+    // Refine document list if types have changed.
     $("#filter .types").change( function() {
       var types=[];
       $("#filter .types :input").each(function() {
@@ -467,41 +467,38 @@ $(document).ready(function() {
         if (input.prop('checked'))
           types.push(input.prop('name'));
       });
-      filter_documents({types:types});
+      // If no types are selected we might as well select  all of
+      // them, because no-one really wants to see an empty list.
+      if (!types.length) types=filters[0].types;
       // Update the list of fields to show only those
       // that are available by the given type selection.
-      function update_fields(types) {
-        function success(data) {
-          var options={};
-          while (data.rows.length) {
-            var fields=data.rows.shift().value;
-            while (fields.length) options[fields.shift()]=null;
-          }
-          var optgroup=$("#filter [name='field'] optgroup");
-          optgroup.html('');
-          for (var field in options) optgroup.append('<option>'+field+'</option>');
+      $.getJSON("_view/types-fields?group_level=1&group=true" +
+                "&keys="+encodeURIComponent(JSON.stringify(types)), function(data) {
+        var options={};
+        while (data.rows.length) {
+          var fields=data.rows.shift().value;
+          while (fields.length)
+            options[fields.shift()]=null;
         }
-        $.getJSON("_view/types-fields?group_level=1&group=true&keys="
-                  +encodeURIComponent(JSON.stringify(types)), success);
-      }
-      update_fields(types);
-      // It sure is nice to see the new filter appear in
-      // the list, and I am in a good mood right now.
-      var li=$("#typecut");
-      if (!li.length) {
-        li=$(document.createElement("li"));
-        li.prop('id', "typecut");
-        $("#cuts").append(li);
-      }
-      li.html('<input type="button" value="x" title="Kriterium entfernen"> ');
-      li.append(types.join('/'));
-      li.find(':button').click(function() {
-        filter_documents({types:filters[0].types});
-        update_fields(filters[0].types);
-        // If this filter is erased, I will also
-        // uncheck all the boxes just for you!!
+        var optgroup=$("#filter [name='field'] optgroup");
+        optgroup.html('');
+        for (var field in options)
+          optgroup.append('<option>'+field+'</option>');
+      });
+      filter_documents({types:types});
+      // It sure would be nice to see the new filter appear
+      // in the list, and I am in a good mood right now.
+      var li=$("#type-is");
+      li.find('a').html(types.join('/'));
+      // append filter item at the end instead of inserting it
+      if (li.css("display")==="none")
+        $("#cuts").append(li.remove().show());
+      if (types.length===filters[0].types.length)
+        li.hide();
+      li.find(':button').off().click(function() {
+        // Remove all the type checkboxes and run it again.
         $("#filter .types :checkbox").prop('checked', false);
-        li.remove();
+        $("#filter .types").change();
       });
     });
     // Add content-filter on <enter> key press.
