@@ -631,7 +631,18 @@ $(document).ready(function() {
       enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff">
       als: <select name="field"><option value="">Text</option><optgroup label="Felder"></optgroup></select>
     </span>
-    <ol id="cuts"></ol>
+    <ol id="cuts">
+      <li style="display:none" id="type-is">
+        <input type="button" value="x" title="löschen"> <a></a></li>
+      <li style="display:none" id="time-is">
+        <input type="button" value="x" title="löschen"> <b>Zeit:</b> <a></a></li>
+      <li style="display:none" id="contains">
+        <input type="button" value="x" title="löschen"> <b>enthält</b> <a></a></li>
+      <li style="display:none" id="has-defined">
+        <input type="button" value="x" title="löschen"> <b></b> zugewiesen</li>
+      <li style="display:none" id="field-is">
+        <input type="button" value="x" title="löschen"> <b></b> <a></a></li>
+    </ol>
   </form>
   <ul id="details"></ul>
   </body>
