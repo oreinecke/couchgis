@@ -445,21 +445,19 @@ $(document).ready(function() {
       var optgroup=$("#filter [name='field'] optgroup");
       for (var field in options) optgroup.append('<option>'+field+'</option>');
     });
-    // refine document list if date has changed
+    // Refine document list if date has changed.
     $("#filter [name='time']").change( function() {
       filter_documents({ time: $(this).val() });
-      var li=$("#timecut");
-      // add filter to filter list if not present
-      if (!li.length) {
-        li=$(document.createElement("li"));
-        li.prop('id', "timecut");
-        $("#cuts").append(li);
-      }
-      li.html('<input type="button" value="x" title="Kriterium entfernen"> <b>Zeit:</b> '+$(this).val());
-      li.find(':button').click(function() {
+      var li=$("#time-is");
+      // This way the filter shows up at the end of the list instead of at the
+      // beginning. It is completely useless but I certainly like it.
+      if (li.css("display")==="none")
+        $("#cuts").append(li.remove().show());
+      li.find('a').html($(this).val());
+      li.find(':button').off().click(function() {
         filter_documents({time:""});
         $("#filter [name='time']").val('');
-        li.remove();
+        li.hide();
       });
     });
     // refine document list if types have changed
