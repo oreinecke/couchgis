@@ -52,14 +52,16 @@ function(head, req) {
         var value=doc;
         for (var g=0;g<field.length && value!=null;g++)
           value=value[field[f]];
-        if (value!=values[f]) return false;
+        if (value==null) return false;
+        if (typeof(value)==="number") value=String(value);
+        if (value.search(values[f],'im')==-1) return false;
       }
       if (!keywords.length) return true;
       var content="";
       for (var prop in doc)
         if (prop!=="time" && prop!=="type") content+=doc[prop]+'\n';
       for (var k=0;k<keywords.length;k++)
-        if (content.search(keywords[k])===-1) return false;
+        if (content.search(keywords[k],'im')===-1) return false;
       return true;
     };
   }

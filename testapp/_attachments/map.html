@@ -448,8 +448,8 @@ $(document).ready(function() {
     $("#filter [name='time']").change( function() {
       filter_documents({ time: $(this).val() });
       var li=$("#time-is");
-      // This way the filter shows up at the end of the list instead of at the
-      // beginning. It is completely useless but I certainly like it.
+      // This way the filter shows up at the end of the list instead of at
+      // the beginning. It is completely useless but I certainly like it.
       if (li.css("display")==="none")
         $("#cuts").append(li.remove().show());
       li.find('a').html($(this).val());
@@ -493,6 +493,7 @@ $(document).ready(function() {
       // append filter item at the end instead of inserting it
       if (li.css("display")==="none")
         $("#cuts").append(li.remove().show());
+      // hide filter item if it displays every type anyway
       if (types.length===filters[0].types.length)
         li.hide();
       li.find(':button').off().click(function() {
