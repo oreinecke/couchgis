@@ -85,12 +85,21 @@ exports.size=function(GeoJSON) {
 // Transform to WGS84.
 
 exports.toWGS84=function(GeoJSON) {
-  try {
+try {
     var target="urn:ogc:def:crs:OGC:1.3:CRS84";
     var source=GeoJSON.crs.properties.name;
     if (source==target) return GeoJSON;
-    var EPSG=source.match(/EPSG:+([0-9]+)/);
-    var projector=require('./proj4js/core')("EPSG:"+EPSG[1]);
+    var EPSG=source.match(/EPSG:+([0-9]+)/)[1];
+    var projector=require('./proj4')({
+      3396:"+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel +units=m +no_defs",
+      3397:"+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel +units=m +no_defs",
+      31467:"+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel "
+           +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs",
+      31468:"+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel "
+           +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs",
+      31469:"+proj=tmerc +lat_0=0 +lon_0=15 +k=1 +x_0=5499926.0 +y_0=-133 +ellps=bessel "
+           +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs"
+    }[EPSG]);
     exports.eachPoint(GeoJSON, function(coord) {
       var newCoord=projector.inverse(coord);
       coord[0]=newCoord[0];

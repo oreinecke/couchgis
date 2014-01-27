@@ -26,6 +26,7 @@ var require=function() {
     }
     // provide exports
     var exports={};
+    var module={exports:exports};
     // hide require and provide last location
     var require=function(lib) {
       result(lib, root);
@@ -41,3 +42,5 @@ var require=function() {
     return result(lib, ddoc);
   };
 }();
+
+REQUIRE=require;//<-REMOVE-ME
