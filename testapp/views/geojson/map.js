@@ -3,7 +3,6 @@
 
 function(doc) {
   var utils=require('views/lib/utils');
-  var range=require('views/lib/range');
   var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
   // abort if no GeoJSON is set at all
   if (id==null) return;
@@ -11,6 +10,7 @@ function(doc) {
     // I need a copy that can be modified
     var GeoJSON=utils.clone(doc.GeoJSON);
     utils.toWGS84(GeoJSON);
+    utils.bbox(GeoJSON);
     // Provide a neat set of reduced polygons: we start with the crappiest
     // resolution that usually consists of only two points. This version is
     // usually dropped. Then we set a new error limit of half the accuracy of
@@ -26,7 +26,8 @@ function(doc) {
         emit([id,simplified_GeoJSON.error], {GeoJSON:simplified_GeoJSON});
       error=simplified_GeoJSON.error;
     }
-  };
+  }
+  var range=require('views/lib/range');
   var val={doc:{_id:doc._id, type:doc.type, time:range.toRange(doc.time)}};
   for (var field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
