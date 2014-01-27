@@ -35,9 +35,9 @@ function(head, req) {
       // value must match
       else if (cuts[c].field) {
         fields.push(cuts[c].field.split('.'));
-        values.push(cuts[c].value);
+        values.push(new RegExp(cuts[c].value, 'im'));
         // value should be somewhere in the document
-      } else keywords.push(cuts[c].value);
+      } else keywords.push(new RegExp(cuts[c].value, 'im'));
     content_matches=function(doc) {
       for (var f=0;f<non_nulls.length;f++) {
         var field=non_nulls[f];
@@ -54,14 +54,14 @@ function(head, req) {
           value=value[field[f]];
         if (value==null) return false;
         if (typeof(value)==="number") value=String(value);
-        if (value.search(values[f],'im')==-1) return false;
+        if (value.search(values[f])==-1) return false;
       }
       if (!keywords.length) return true;
       var content="";
       for (var prop in doc)
         if (prop!=="time" && prop!=="type") content+=doc[prop]+'\n';
       for (var k=0;k<keywords.length;k++)
-        if (content.search(keywords[k],'im')===-1) return false;
+        if (content.search(keywords[k])===-1) return false;
       return true;
     };
   }
