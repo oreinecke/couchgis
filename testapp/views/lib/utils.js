@@ -108,8 +108,11 @@ exports.toWGS84=function(GeoJSON) {
 
 exports.stripLastCoord=function(GeoJSON) {
   exports.eachCoords(GeoJSON, function(coords, type) {
-    if (type=="Polygon" || type=="MultiPolygon")
-      coords.pop();
+    if (type=="Polygon" || type=="MultiPolygon") {
+      var first=coords[0], last=coords[coords.length-1];
+      if (first[0]===last[0] && first[1]===last[1])
+        coords.pop();
+    }
   });
   return GeoJSON;
 }
