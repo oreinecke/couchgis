@@ -114,12 +114,14 @@ $(document).ready(function() {
   $("#upload").submit(function(e) {
     submit.prop('disabled', true);
     var type=$("#modify [name='type']").val();
+    var time=$("#modify [name='time']").val();
     var docs=[];
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
       var doc={};
-      // set doc-type
+      // set doc-type and time
       doc.type=type;
+      doc.time=time;
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
