@@ -442,7 +442,7 @@ $(document).ready(function() {
         var fields=data.rows[row].value;
         while (fields.length) options[fields.shift()]=null;
       }
-      var optgroup=$("#filter [name='field'] optgroup");
+      var optgroup=$("[name='field'] optgroup");
       for (var field in options) optgroup.append('<option>'+field+'</option>');
     });
     // Refine document list if date has changed.
@@ -481,7 +481,7 @@ $(document).ready(function() {
           while (fields.length)
             options[fields.shift()]=null;
         }
-        var optgroup=$("#filter [name='field'] optgroup");
+        var optgroup=$("[name='field'] optgroup");
         var val=$("#filter [name='field']").val();
         optgroup.html('');
         for (var field in options)
@@ -644,6 +644,12 @@ $(document).ready(function() {
         <input type="button" value="x" title="löschen"> <b></b> <a></a></li>
     </ol>
   </form>
-  <ul id="details"></ul>
+  <table id="table">
+    <tr>
+      <th><input type="checkbox" checked></th>
+      <th><select name="field"><optgroup label="Feld hinzufügen"></optgroup></select>
+    </tr>
+  </table>
+  <ul id="details" style="display:none"></ul>
   </body>
 </html>
