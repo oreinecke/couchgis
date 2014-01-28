@@ -183,6 +183,11 @@ $(document).ready(function() {
             var link=item.link;
             link.html('');
             data.rows.unshift(row);
+            var tr=item.tr;
+            tr.html('');
+            var fields=$("#table .field");
+            for (var c=0;c<fields.length+1;c++) tr.append($("<td>"));
+            var columns=tr.find("td");
             var fillColor=null;
             for (var d=1;d<item.keys.length;d++) {
               // Group docs with identical GIS into one li.
@@ -193,6 +198,10 @@ $(document).ready(function() {
               // and set link text to a useful item explanation.
               link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
                                        +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
+              $(columns[0]).append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
+                                   +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
+              for (var c=0;c<fields.length;c++)
+                $(columns[c+1]).append(doc[$(fields[c]).html()]+'<br>');
             }
             item.shape.setOptions({fillColor:fillColor});
             item.keep_documents=true;
@@ -233,7 +242,8 @@ $(document).ready(function() {
     }
     // ignore items that were already dropped by previous viewport
     options.keys=vp.prefix.concat(keys.slice(vp.position));
-    var details = $("#details")
+    var details = $("#details");
+    var table = $("#table tbody");
     list("bbox-filter/bbox", options, function(data) {
       var position=0;
       // lists items to be removed as {id:null}
@@ -257,6 +267,9 @@ $(document).ready(function() {
         var link=$(document.createElement("li"));
         details.append(link);
         items[id].link=link;
+        var tr=$("<tr>");
+        table.append(tr);
+        items[id].tr=tr;
         // fetch GeoJSON of specified detail level
         var KEYS=[[id, data[id].GeoJSON.error]];
         // skip to matching document id
@@ -291,6 +304,7 @@ $(document).ready(function() {
       for (var id in old_items) {
         items[id].shape.setMap();
         items[id].link.remove();
+        items[id].tr.remove();
         delete items[id];
       }
       // Fetch changed geometries in 50 ms.
@@ -543,9 +557,12 @@ $(document).ready(function() {
     // add new column to #table
     $("#table [name='field']").change( function() {
       var last=$("#table thead th").last();
-      $("#table thead tr").append("<th>"+$(this).val()+"</th>");
+      $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
       // move column selection to the right
       $("#table thead tr").append(last);
+      for (var id in items) items[id].keep_documents=false;
+      $(this).val('');
+      call.this_one_next(update_geometry)();
     });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
@@ -615,6 +632,7 @@ $(document).ready(function() {
   #settings .geometry-level {width:6em}
   span {white-space:nowrap}
   .types {white-space:normal}
+  table, th, tr, td {margin:0;padding:0;border:0;border-collapse:collapse}
 </style>
 
   </head>
@@ -654,7 +672,7 @@ $(document).ready(function() {
   </form>
   <table id="table">
     <thead><tr>
-      <th><input type="checkbox" checked name="description">Datensatz-Typ</th>
+      <th><input type="checkbox" checked name="description" style="display:none">Typ</th>
       <th><select name="field">
         <!-- unselect any column on page load --!>
         <option selected style="display:none"></option>
