@@ -123,8 +123,8 @@ $(document).ready(function() {
       });
     }
     ajax();
-    // Even more sadly, I need to add this because
-    // Chrome does not use the 'complete' callback.
+    // Even more sad: I need to add this timer
+    // because Chrome does not call 'complete'
     window.setTimeout(function() { if (!successful) ajax(); }, 3000);
     function success(data) {
       successful=true;
@@ -293,8 +293,8 @@ $(document).ready(function() {
         items[id].link.remove();
         delete items[id];
       }
-      // fetch changed geometries
-      update_geometry();
+      // Fetch changed geometries in 50 ms.
+      window.setTimeout(update_geometry, 50);
     });
   }
 
@@ -376,6 +376,7 @@ $(document).ready(function() {
         // the nested loop results in an off-by-one document index
         d--;
       }
+//    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
       Maps.event.trigger(map, 'bounds_changed');
     }
     // Remove options.cuts array if empty.
