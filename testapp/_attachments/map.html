@@ -540,6 +540,13 @@ $(document).ready(function() {
       });
       $("#cuts").append(li);
     });
+    // add new column to #table
+    $("#table [name='field']").change( function() {
+      var last=$("#table thead th").last();
+      $("#table thead tr").append("<th>"+$(this).val()+"</th>");
+      // move column selection to the right
+      $("#table thead tr").append(last);
+    });
     // cycle through geometric detail mode:
     // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
     $("#settings [name='refine']").click( function() {
@@ -632,6 +639,7 @@ $(document).ready(function() {
     <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
     <span>als: <select name="field"><option value="">Text</option><optgroup label="Felder"></optgroup></select></span>
     <ol id="cuts">
+      <!-- default filter list items --!>
       <li style="display:none" id="type-is">
         <input type="button" value="x" title="löschen"> <a></a></li>
       <li style="display:none" id="time-is">
@@ -645,10 +653,15 @@ $(document).ready(function() {
     </ol>
   </form>
   <table id="table">
-    <tr>
-      <th><input type="checkbox" checked></th>
-      <th><select name="field"><optgroup label="Feld hinzufügen"></optgroup></select>
-    </tr>
+    <thead><tr>
+      <th><input type="checkbox" checked name="description">Datensatz-Typ</th>
+      <th><select name="field">
+        <!-- unselect any column on page load --!>
+        <option selected style="display:none"></option>
+        <optgroup label="neue Spalte"></optgroup>
+      </select></th>
+    </tr></thead>
+    <tbody></tbody>
   </table>
   <ul id="details" style="display:none"></ul>
   </body>
