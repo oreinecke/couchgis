@@ -493,12 +493,18 @@ $(document).ready(function() {
           while (fields.length)
             options[fields.shift()]=null;
         }
-        var optgroup=$("[name='field'] optgroup");
+        var optgroup=$("#filter [name='fields']");
         var val=$("#filter [name='field']").val();
-        optgroup.html('');
+        $("[name='fields']").html('');
         for (var field in options)
           optgroup.append('<option>'+field+'</option>');
         $("#filter [name='field']").val(val);
+        $("#table [name='columns'] option").each( function() {
+          delete options[$(this).val()];
+        });
+        var optgroup=$("#table [name='fields']");
+        for (var field in options)
+          optgroup.append('<option>'+field+'</option>');
       });
       filter_documents({types:types});
       // It sure would be nice to see the new filter appear
