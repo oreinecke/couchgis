@@ -511,7 +511,7 @@ $(document).ready(function() {
       // hide filter item if it displays every type anyway
       if (types.length===filters[0].types.length)
         li.hide();
-      li.find(':button').off().click(function() {
+      li.find(':button').off().click( function() {
         // Remove all the type checkboxes and run it again.
         $("#filter .types :checkbox").prop('checked', false);
         $("#filter .types").change();
