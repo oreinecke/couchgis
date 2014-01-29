@@ -552,14 +552,38 @@ $(document).ready(function() {
       });
       $("#cuts").append(li);
     });
-    // add new column to #table
+    // add or remove column to #table
     $("#table [name='field']").change( function() {
+      var option;
+      var select=$(this);
+      // Find selected <option> jQuery; I wonder
+      // if there was a faster way to do this?
+      select.find("option").each( function() {
+        if (!$(this).prop('selected')) return;
+        option=$(this);
+        return false;
+      });
+      if (select.find("[name='columns']").find(option).length) {
+        // remove th from #table
+        $("#table thead .field").each( function() {
+          var th=$(this);
+          if (th.html()!==option.val()) return;
+          th.remove();
+          return false;
+        });
+        // move option back to the fields optgroup
+        select.find("[name='fields']").prepend(option);
+      } else {
       var last=$("#table thead th").last();
       $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
       // move column selection to the right
       $("#table thead tr").append(last);
-      // and unselect column
-      $(this).val('');
+        var select=$(this);
+        // move option to the columns optgroup
+        select.find("[name='columns']").append(option);
+      }
+      // unselect column
+      select.val('');
       for (var id in items) items[id].keep_documents=false;
       call.this_one_next(update_geometry)();
     });
