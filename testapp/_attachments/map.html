@@ -202,7 +202,7 @@ $(document).ready(function() {
                   td.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
                                               +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
                 else if (cl==="field") td.append(doc[th.html()]+'<br>');
-                else if (cl==="geometry") td.html('&bull;');
+                else if (cl==="geometry") td.html('<a href="#settings">&bull;</a>');
               });
             }
             item.shape.setOptions({fillColor:fillColor});
