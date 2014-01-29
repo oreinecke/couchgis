@@ -185,8 +185,8 @@ $(document).ready(function() {
             data.rows.unshift(row);
             var tr=item.tr;
             tr.html('');
-            var fields=$("#table .field");
-            for (var c=0;c<fields.length+1;c++) tr.append($("<td>"));
+            var headers=$("#table th");
+            headers.each(function() { tr.append($("<td>")); });
             var columns=tr.find("td");
             var fillColor=null;
             for (var d=1;d<item.keys.length;d++) {
@@ -198,10 +198,16 @@ $(document).ready(function() {
               // and set link text to a useful item explanation.
               link.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
                                        +doc.type+' '+doc[doc.type]+' ('+range.toString(doc.time)+')</a>');
-              $(columns[0]).append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
-                                   +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
-              for (var c=0;c<fields.length;c++)
-                $(columns[c+1]).append(doc[$(fields[c]).html()]+'<br>');
+              headers.each(function(i) {
+                var th=$(this);
+                var td=$(columns[i]);
+                var cl=th.prop('class');
+                if (cl==="document")
+                  td.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
+                                              +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
+                else if (cl==="field") td.append(doc[th.html()]+'<br>');
+                else if (cl==="geometry") td.html('&bull;');
+              });
             }
             item.shape.setOptions({fillColor:fillColor});
             item.keep_documents=true;
@@ -560,8 +566,9 @@ $(document).ready(function() {
       $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
       // move column selection to the right
       $("#table thead tr").append(last);
-      for (var id in items) items[id].keep_documents=false;
+      // and unselect column
       $(this).val('');
+      for (var id in items) items[id].keep_documents=false;
       call.this_one_next(update_geometry)();
     });
     // cycle through geometric detail mode:
@@ -675,7 +682,8 @@ $(document).ready(function() {
   </form>
   <table id="table">
     <thead><tr>
-      <th><input type="checkbox" checked name="description" style="display:none">Typ</th>
+      <th class="geometry"></th>
+      <th class="document">Typ</th>
       <th><select name="field">
         <!-- unselect any column on page load --!>
         <option selected style="display:none"></option>
