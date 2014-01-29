@@ -464,7 +464,7 @@ $(document).ready(function() {
       // This way the filter shows up at the end of the list instead of at
       // the beginning. It is completely useless but I certainly like it.
       if (li.css("display")==="none")
-        $("#cuts").append(li.remove().show());
+        $("#cuts").append(li.show());
       li.find('a').html($(this).val());
       li.find(':button').off().click(function() {
         filter_documents({time:""});
@@ -498,10 +498,14 @@ $(document).ready(function() {
         $("[name='fields']").html('');
         for (var field in options)
           optgroup.append('<option>'+field+'</option>');
+        // The selected option was destroyed three
+        // lines above, so I just re-select it here.
         $("#filter [name='field']").val(val);
+        // Remove options that are in the 'columns' <optgroup> already.
         $("#table [name='columns'] option").each( function() {
           delete options[$(this).val()];
         });
+        // Fill 'fields' optgroup with reduced set of options.
         var optgroup=$("#table [name='fields']");
         for (var field in options)
           optgroup.append('<option>'+field+'</option>');
@@ -513,7 +517,7 @@ $(document).ready(function() {
       li.find('a').html(types.join('/'));
       // append filter item at the end instead of inserting it
       if (li.css("display")==="none")
-        $("#cuts").append(li.remove().show());
+        $("#cuts").append(li.show());
       // hide filter item if it displays every type anyway
       if (types.length===filters[0].types.length)
         li.hide();
