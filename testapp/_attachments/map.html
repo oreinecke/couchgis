@@ -171,12 +171,12 @@ $(document).ready(function() {
               }(GeoJSON.type);
               // Select link if user clicks on shape and decrease
               // zIndex to give access to obstructed shapes.
-              Maps.event.addListener(shape, 'click', function(link) {
+              Maps.event.addListener(shape, 'click', function(tr) {
                 return function() {
                   this.setOptions({zIndex:-new Date().getTime()});
-                  link.find('a').last().focus();
+                  tr.find('a').last().focus();
                 };
-              }(item.link));
+              }(item.tr));
               item.shape=shape;
             }
           } else {
@@ -204,6 +204,8 @@ $(document).ready(function() {
                 var td=$(columns[i]);
                 var cl=th.prop('class');
                 if (cl==="document")
+                // Link to Futon for the lack of a better interface
+                // and set link text to a useful item explanation.
                   td.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
                                               +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
                 else if (cl==="field") td.append(doc[th.html()]+'<br>');
@@ -645,6 +647,7 @@ $(document).ready(function() {
     border-collapse:collapse;
     vertical-align:top
   }
+  #table a:focus {font-weight:bold}
 </style>
 
   </head>
