@@ -17,11 +17,13 @@ var require=function() {
   });
   var result=function(lib, root) {
     var parts=lib.split('/');
-    if (parts[0]==".") lib=root;
-    else lib=ddoc;
+    if (parts[0]=='.') {
+      lib=root;
+      parts.shift();
+    } else lib=ddoc;
     for (var p=0;p<parts.length;p++) {
       // save location for nested requires
-      if (p==parts.length-1) root=lib;
+      if (p===parts.length-1) root=lib;
       lib=lib[parts[p]];
     }
     // provide exports
@@ -29,18 +31,16 @@ var require=function() {
     var module={exports:exports};
     // hide require and provide last location
     var require=function(lib) {
-      result(lib, root);
+      return result(lib, root);
     };
     // hide vars from lib compilation
     (function() {
       var ddoc, root, parts, result;
       eval(lib);
     }());
-    return exports;
+    return module.exports;
   };
   return function(lib) {
     return result(lib, ddoc);
   };
 }();
-
-REQUIRE=require;//<-REMOVE-ME
