@@ -85,7 +85,7 @@ exports.size=function(GeoJSON) {
 // Transform to WGS84.
 
 exports.toWGS84=function(GeoJSON) {
-try {
+  try {
     var target="urn:ogc:def:crs:OGC:1.3:CRS84";
     var source=GeoJSON.crs.properties.name;
     if (source==target) return GeoJSON;
