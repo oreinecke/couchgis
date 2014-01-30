@@ -201,8 +201,17 @@ $(document).ready(function() {
                 // and set link text to a useful item explanation.
                   td.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
                                               +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
+                // Fill in custom values
                 else if (cl==="field") td.append(doc[th.html()]+'<br>');
-                else if (cl==="geometry") td.html('<a href="#settings">&bull;</a>');
+                if (cl!=="geometry") return;
+                // Set-up link to geometry: I use a very bold bullet point.
+                td.html('<a href="#settings" style="font-weight:900">&bull;</a>');
+                td.find("a").click(function(bbox,shape) { return function() {
+                  // Center map to the shape and highlight it.
+                  map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
+                                           (bbox[2]+bbox[0])/2.0+offset[0]));
+                  shape.setOptions({strokeColor:"#FF0000"});
+                } }(item.GeoJSON.bbox, item.shape) );
               });
             }
             item.shape.setOptions({fillColor:fillColor});
