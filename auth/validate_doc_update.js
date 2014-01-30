@@ -12,7 +12,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
 // linked documents should look like "link:{_id:id}"
 // and 'link' itself has to be on of 'types' because
 // we have to know what we're linking to
-  ;function inspect_ids(obj, addr) {
+  (function inspect_ids(obj, addr) {
     if (typeof(obj)!="object")
       return;
     for (var key in obj) {
@@ -28,8 +28,7 @@ function(newDoc, oldDoc, userCtx, secObj) {
       }
       inspect_ids(obj2, addr2);
     }
-  };
-  inspect_ids(newDoc, "doc");
+  })(newDoc, "doc");
 // allow either GeoJSON or GeoJSON_clone but not both
   if ("GeoJSON" in newDoc && "GeoJSON_clone" in newDoc)
     throw({forbidden: "Either set doc.GeoJSON or doc.GeoJSON_clone"});

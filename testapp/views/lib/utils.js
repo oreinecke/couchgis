@@ -1,7 +1,7 @@
 // Apply action to every [[x1,y1],..].
 
 exports.eachCoords=function(GeoJSON, action) {
-  ;function apply_action(obj) {
+  (function apply_action(obj) {
     if (typeof(obj)!="object") return;
     // ignore sets of unconnected points
     if (obj.type=="Point" || obj.type=="MultiPoint") return;
@@ -22,14 +22,13 @@ exports.eachCoords=function(GeoJSON, action) {
       if (field.search(/^[0-9]+$/)>=0)
         apply_action(obj[field]);
     }
-  }
-  apply_action(GeoJSON);
+  })(GeoJSON);
 };
 
 // Apply action to every [x,y].
 
 exports.eachPoint=function(GeoJSON, action) {
-  ;function apply_action(obj) {
+  (function apply_action(obj) {
     if (typeof(obj)!="object") return;
     if (typeof(obj[0])=="number")
       action(obj);
@@ -39,8 +38,7 @@ exports.eachPoint=function(GeoJSON, action) {
       if (field.search(/^[0-9]+$/)>=0)
         apply_action(obj[field]);
     }
-  }
-  apply_action(GeoJSON);
+  })(GeoJSON);
 };
 
 // Clone GeoJSON and handle arrays properly.

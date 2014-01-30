@@ -130,7 +130,7 @@ $(document).ready(function() {
       successful=true;
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name='delayed']").prop('checked');
-      function update_one_geometry() {
+      (function update_one_geometry() {
         while (data.rows.length) {
           var row=data.rows.shift();
           var item=items[row.key[0]];
@@ -213,8 +213,7 @@ $(document).ready(function() {
           return;
         }
         call.that_last_one();
-      }
-      update_one_geometry();
+      })();
     }
   }
 
