@@ -206,12 +206,14 @@ $(document).ready(function() {
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.
                 td.html('<a href="#settings" style="font-weight:900">&bull;</a>');
-                td.find("a").click(function(bbox,shape) { return function() {
+                td.find("a").click(function(item) { return function() {
                   // Center map to the shape and highlight it.
+                  var bbox=item.GeoJSON.bbox;
                   map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
                                            (bbox[2]+bbox[0])/2.0+offset[0]));
-                  shape.setOptions({strokeColor:"#FF0000"});
-                } }(item.GeoJSON.bbox, item.shape) );
+                  item.shape.setOptions({strokeColor:"#FF0000"});
+                  $("#table tbody").prepend(item.tr);
+                } }(item) );
               });
             }
             item.shape.setOptions({fillColor:fillColor});
