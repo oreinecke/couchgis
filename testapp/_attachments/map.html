@@ -211,7 +211,7 @@ $(document).ready(function() {
                   var bbox=item.GeoJSON.bbox;
                   map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
                                            (bbox[2]+bbox[0])/2.0+offset[0]));
-                  item.shape.setOptions({strokeColor:"#FF0000"});
+                  item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
                   $("#table tbody").prepend(item.tr);
                 } }(item) );
               });
