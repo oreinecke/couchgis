@@ -5,7 +5,10 @@
     <title>Karte</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
+    <link href="css/jquery-ui-1.10.4.custom.css" rel="stylesheet">
+
     <script src="script/jquery-1.10.2.js"></script>
+    <script src="script/jquery-ui-1.10.4.custom.js"></script>
     <script src="script/require.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
@@ -572,7 +575,26 @@ $(document).ready(function() {
       });
       $("#cuts").append(li);
     });
-    // add or remove column to #table
+    // Update autocomplete source array.
+    $("#filter [name='field'").change( function() {
+      var options={ minLength:0, source:[] }
+      var field=$(this).val();
+      if (field==="") {
+        $("#filter [name='content']").autocomplete(options);
+        return;
+      }
+      var start_key=encodeURIComponent(JSON.stringify(["Feldblock", field]));
+      var end_key=encodeURIComponent(JSON.stringify(["Feldblock", field+' ']));
+      var url="_view/fields-values?group=true&inclusive_end=false";
+      url+="&start_key="+start_key+"&end_key="+end_key;
+      $.getJSON(url, function(data) {
+        while (data.rows.length)
+          options.source.push(data.rows.shift().key[2]);
+        console.log(options);
+        $("#filter [name='content']").autocomplete(options);
+      });
+    });
+    // Add or remove column to #table.
     $("#table [name='field']").change( function() {
       var option;
       var select=$(this);
