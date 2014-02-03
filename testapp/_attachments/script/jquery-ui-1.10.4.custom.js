@@ -1475,6 +1475,7 @@ $.widget( "ui.autocomplete", {
 				this._searchTimeout( event );
 			},
 			focus: function() {
+				this._delay( this.search, this.options.delay );
 				this.selectedItem = null;
 				this.previous = this._value();
 			},
