@@ -567,9 +567,10 @@ $(document).ready(function() {
         // Tell filter_documents() to remove cut from the queue and set form
         // fields to its parameters; it is likely that the filter had a
         // spelling error, so I should provide an easy way to correct it.
-        $("#filter [name='content']").val(cut.value==null?"":cut.value);
         $("#filter [name='field']").val(cut.field==null?"":cut.field);
+        // update autocomplete source array
         $("#filter [name='field']").change();
+        $("#filter [name='content']").val(cut.value==null?"":cut.value);
         cut.remove_me=true;
         filter_documents({cuts:[cut]});
         li.remove();
@@ -578,10 +579,13 @@ $(document).ready(function() {
     });
     // Update autocomplete source array.
     $("#filter [name='field']").change( function() {
+      // clear text input on field change.
+      var input=$("#filter [name='content']");
+      input.val('');
       var options={ minLength:0, source:[] }
       var field=$(this).val();
       if (field==="") {
-        $("#filter [name='content']").autocomplete(options);
+        input.autocomplete(options);
         return;
       }
       var start_key=encodeURIComponent(JSON.stringify([field]));
@@ -597,7 +601,7 @@ $(document).ready(function() {
           var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
           options.source.push({label:label, value:value});
         }
-        $("#filter [name='content']").autocomplete(options);
+        input.autocomplete(options);
       });
     });
     // Add or remove column to #table.
