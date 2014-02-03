@@ -493,7 +493,7 @@ $(document).ready(function() {
         if (input.prop('checked'))
           types.push(input.prop('name'));
       });
-      // If no types are selected we might as well select  all of
+      // If no types are selected we might as well select all of
       // them, because no-one really wants to see an empty list.
       if (!types.length) types=filters[0].types;
       // Update the list of fields to show only those
@@ -569,6 +569,7 @@ $(document).ready(function() {
         // spelling error, so I should provide an easy way to correct it.
         $("#filter [name='content']").val(cut.value==null?"":cut.value);
         $("#filter [name='field']").val(cut.field==null?"":cut.field);
+        $("#filter [name='field']").change();
         cut.remove_me=true;
         filter_documents({cuts:[cut]});
         li.remove();
