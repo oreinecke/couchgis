@@ -586,20 +586,25 @@ $(document).ready(function() {
         input.autocomplete(options);
         return;
       }
-      var start_key=encodeURIComponent(JSON.stringify([field]));
-      var end_key=encodeURIComponent(JSON.stringify([field+' ']));
-      var url="_view/fields-values?group=true&inclusive_end=false&group_level=2";
-      url+="&start_key="+start_key+"&end_key="+end_key;
-      $.getJSON(url, function(data) {
-        while (data.rows.length) {
-          var row=data.rows.shift();
-          // Do not suggest numbers or objects right now.
-          if (row.value.type!=="string") continue;
-          var label=row.key[1];
-          var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-          options.source.push({label:label, value:value});
-        }
-        input.autocomplete(options);
+      var types=$("#filter .types :checked");
+      if (!types.length) types=$("#filter .types :checkbox");
+      types.each(function() {
+        var type=$(this).prop('name');
+        var start_key=encodeURIComponent(JSON.stringify([type, field]));
+        var end_key=encodeURIComponent(JSON.stringify([type, field+' ']));
+        var url="_view/fields-values?group=true&inclusive_end=false&group=true";
+        url+="&start_key="+start_key+"&end_key="+end_key;
+        $.getJSON(url, function(data) {
+          while (data.rows.length) {
+            var row=data.rows.shift();
+            // Do not suggest numbers or objects right now.
+            if (row.value.type!=="string") continue;
+            var label=row.key[2];
+            var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            options.source.push({label:label, value:value});
+          }
+          input.autocomplete(options);
+        });
       });
     });
     // Add or remove column to #table.

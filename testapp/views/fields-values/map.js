@@ -13,6 +13,6 @@ function(doc) {
       summary.max=val;
       val=null;
     }
-    emit([field, val, doc.type], summary);
+    emit([doc.type, field, val], summary);
   }
 }
