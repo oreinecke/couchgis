@@ -594,6 +594,8 @@ $(document).ready(function() {
         var end_key=encodeURIComponent(JSON.stringify([type, field+' ']));
         var url="_view/fields-values?group=true&inclusive_end=false&group=true";
         url+="&start_key="+start_key+"&end_key="+end_key;
+        // Store labels as {label:null}.
+        var labels={};
         $.getJSON(url, function(data) {
           while (data.rows.length) {
             var row=data.rows.shift();
@@ -601,7 +603,10 @@ $(document).ready(function() {
             if (row.value.type!=="string") continue;
             var label=row.key[2];
             var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            // Suppress duplicate suggestions.
+            if (labels[label]===null) continue;
             options.source.push({label:label, value:value});
+            labels[label]=null;
           }
           input.autocomplete(options);
         });
