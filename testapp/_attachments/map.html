@@ -583,16 +583,24 @@ $(document).ready(function() {
         $("#filter [name='content']").autocomplete(options);
         return;
       }
-      var start_key=encodeURIComponent(JSON.stringify(["Feldblock", field]));
-      var end_key=encodeURIComponent(JSON.stringify(["Feldblock", field+' ']));
-      var url="_view/fields-values?group=true&inclusive_end=false";
-      url+="&start_key="+start_key+"&end_key="+end_key;
-      $.getJSON(url, function(data) {
-        while (data.rows.length)
-          options.source.push(data.rows.shift().key[2]);
-        console.log(options);
-        $("#filter [name='content']").autocomplete(options);
-      });
+      var types=null;
+      // get last type selection from filter queue
+      for (var f=filters.length-1;!types;f--)
+        types=filters[f].types;
+      for (var t=0;t<types.length;t++) {
+        var start_key=encodeURIComponent(JSON.stringify([types[t], field]));
+        var end_key=encodeURIComponent(JSON.stringify([types[t], field+' ']));
+        var url="_view/fields-values?group=true&inclusive_end=false";
+        url+="&start_key="+start_key+"&end_key="+end_key;
+        $.getJSON(url, function(data) {
+          while (data.rows.length) {
+            var label=data.rows.shift().key[2];
+            var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            options.source.push({label:label, value:value});
+          }
+          $("#filter [name='content']").autocomplete(options);
+        });
+      }
     });
     // Add or remove column to #table.
     $("#table [name='field']").change( function() {
