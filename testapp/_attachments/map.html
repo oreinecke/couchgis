@@ -576,7 +576,7 @@ $(document).ready(function() {
       $("#cuts").append(li);
     });
     // Update autocomplete source array.
-    $("#filter [name='field'").change( function() {
+    $("#filter [name='field']").change( function() {
       var options={ minLength:0, source:[] }
       var field=$(this).val();
       if (field==="") {
