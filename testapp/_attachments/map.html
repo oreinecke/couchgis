@@ -488,10 +488,8 @@ $(document).ready(function() {
     // Refine document list if types have changed.
     $("#filter .types").change( function() {
       var types=[];
-      $("#filter .types :input").each(function() {
-        var input=$(this);
-        if (input.prop('checked'))
-          types.push(input.prop('name'));
+      $("#filter .types :checked").each(function() {
+        types.push($(this).prop('name'));
       });
       // If no types are selected we might as well select all of
       // them, because no-one really wants to see an empty list.
@@ -536,7 +534,7 @@ $(document).ready(function() {
         li.hide();
       li.find(':button').off().click( function() {
         // Remove all the type checkboxes and run it again.
-        $("#filter .types :checkbox").prop('checked', false);
+        $("#filter .types :checked").prop('checked', false);
         $("#filter .types").change();
       });
     });
@@ -608,13 +606,8 @@ $(document).ready(function() {
     $("#table [name='field']").change( function() {
       var option;
       var select=$(this);
-      // Find selected <option> jQuery; I wonder
-      // if there was a faster way to do this?
-      select.find("option").each( function() {
-        if (!$(this).prop('selected')) return;
-        option=$(this);
-        return false;
-      });
+      // Get selected option and find out in wich <optgroup> it belongs.
+      var option=select.find(":selected");
       if (select.find("[name='columns']").find(option).length) {
         // remove th from #table
         $("#table thead .field").each( function() {
