@@ -1325,6 +1325,7 @@ $.widget( "ui.autocomplete", {
 		autoFocus: false,
 		delay: 300,
 		minLength: 1,
+    maxItems: Infinity,
 		position: {
 			my: "left top",
 			at: "left bottom",
@@ -1818,6 +1819,7 @@ $.widget( "ui.autocomplete", {
 		var that = this;
 		$.each( items, function( index, item ) {
 			that._renderItemData( ul, item );
+			return ( index < that.options.maxItems );
 		});
 	},
 
