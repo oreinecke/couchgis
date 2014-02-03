@@ -580,7 +580,7 @@ $(document).ready(function() {
       // clear text input on field change.
       var input=$("#filter [name='content']");
       input.val('');
-      var options={ minLength:0, source:[] }
+      var options={ minLength:0, maxItems:15, source:[] }
       var field=$(this).val();
       if (field==="") {
         input.autocomplete(options);
