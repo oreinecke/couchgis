@@ -1770,7 +1770,7 @@ $.widget( "ui.autocomplete", {
 
 	_normalize: function( items ) {
 		// assume all items have the right format when the first item is complete
-		if ( items.length && items[0].label && items[0].value ) {
+		if ( items.length && !items[0].mixed && items[0].label && items[0].value ) {
 			return items;
 		}
 		return $.map( items, function( item ) {
