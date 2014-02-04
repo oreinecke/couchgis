@@ -26,11 +26,15 @@ function(head, req) {
     var non_nulls=[];
     var fields=[];
     var values=[];
+    var expressions=[];
     var cuts=options.cuts;
     // sort cuts into these handy arrays:
     for (var c=0;c<cuts.length;c++)
+      // eval()'d expression must be true
+      if (cuts[c].expression)
+        expressions.push(cuts[c].expression);
       // ignore value but require field to be non-null
-      if (cuts[c].field && !cuts[c].value)
+      else if (cuts[c].field && !cuts[c].value)
         non_nulls.push(cuts[c].field.split('.'));
       // value must match
       else if (cuts[c].field) {
@@ -54,14 +58,18 @@ function(head, req) {
           value=value[field[g]];
         if (value==null) return false;
         if (typeof(value)==="number") value=String(value);
-        if (value.search(values[f])==-1) return false;
+        if (!values[f].test(value)) return false;
+      }
+      for (var e=0;e<expressions.length;e++) {
+        // YES THIS IS SUPER SAFE!!!!
+        if (!eval(expressions[e])) return false;
       }
       if (!keywords.length) return true;
       var content="";
       for (var prop in doc)
         if (prop!=="time" && prop!=="type") content+=doc[prop]+'\n';
       for (var k=0;k<keywords.length;k++)
-        if (content.search(keywords[k])===-1) return false;
+        if (!keywords[k].test(content)) return false;
       return true;
     };
   }
