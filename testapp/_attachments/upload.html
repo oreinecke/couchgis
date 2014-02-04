@@ -4,7 +4,9 @@
   <head>
     <title>GeoJSON Upload</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link href="css/jquery-ui-1.10.4.custom.css" rel="stylesheet">
     <script src="script/jquery-1.10.2.js"></script>
+    <script src="script/jquery-ui-1.10.4.custom.js"></script>
     <script src="script/jquery.couch.js"></script>
 
 <script>
@@ -13,6 +15,21 @@ $(document).ready(function() {
   var submit=$("#upload :submit");
   var fields={};
   var values={};
+  $.getJSON("_view/types-fields?group_level=1", function(data) {
+    var source=[];
+    while (data.rows.length)
+      source.push(data.rows.shift().key);
+    $("#modify [name='type']").autocomplete({ source:source, minLength:0 });
+  });
+  $("#modify [name='type']").change( function() {
+    var key=encodeURIComponent(JSON.stringify($(this).val()));
+    $.getJSON("_view/types-fields?group_level=1&key="+key, function(data) {
+      $("#modify [name='field']").autocomplete({
+        source:data.rows.length?data.rows[0].value:[],
+        minLength:0
+      });
+    });
+  });
   function show_feature(f) {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
@@ -44,7 +61,7 @@ $(document).ready(function() {
       div.html("");
       // expect all property sets to be identical to the first one
       for (var prop in features[0].properties) {
-        var row=$(document.createElement("tr"));
+        var row=$("<span>");
         // render field: value input pair
         row.html('<input type="checkbox" name="include" checked>'+
                  '<input type="text" name="field">: '+
