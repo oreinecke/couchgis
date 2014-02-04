@@ -27,9 +27,15 @@ $(document).ready(function() {
   });
   $("#modify [name='type']").change( function() {
     var key=encodeURIComponent(JSON.stringify($(this).val()));
+    var source=[ {label:"Datensatz-Typ", value:"type"}, {label:"Zeitraum", value:"time"} ];
     $.getJSON("_view/types-fields?group_level=1&key="+key, function(data) {
+      while (data.rows.length && data.rows[0].value.length) {
+        var value=data.rows[0].value.shift();
+        source.push({value:value, label:value});
+      }
+      console.log(source);
       $("#modify [name='field']").autocomplete({
-        minLength:0, source:data.rows.length?data.rows[0].value:[],
+        minLength:0, source:source,
         change:function() {$(this).change();}
       });
     });
