@@ -34,7 +34,7 @@ $(document).ready(function() {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
     for (var prop in properties)
-      values[prop].attr({value:properties[prop],title:properties[prop]});
+      values[prop].val(properties[prop]).attr('title', properties[prop]);
   }
   $("#upload :file").change(function(e) {
     $("#modify").hide();
