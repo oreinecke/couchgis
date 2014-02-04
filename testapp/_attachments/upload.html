@@ -19,14 +19,18 @@ $(document).ready(function() {
     var source=[];
     while (data.rows.length)
       source.push(data.rows.shift().key);
+    $("#modify [name='type']").autocomplete({
+      source:source, minLength:0,
+      change:function() {$(this).change();}
+    });
     $("#modify [name='type']").autocomplete({ source:source, minLength:0 });
   });
   $("#modify [name='type']").change( function() {
     var key=encodeURIComponent(JSON.stringify($(this).val()));
     $.getJSON("_view/types-fields?group_level=1&key="+key, function(data) {
       $("#modify [name='field']").autocomplete({
-        source:data.rows.length?data.rows[0].value:[],
-        minLength:0
+        minLength:0, source:data.rows.length?data.rows[0].value:[],
+        change:function() {$(this).change();}
       });
     });
   });
