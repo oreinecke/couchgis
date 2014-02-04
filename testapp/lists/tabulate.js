@@ -43,7 +43,7 @@ function(head, req) {
         var field=non_nulls[f];
         var value=doc;
         for (var g=0;g<field.length;g++) {
-          value=value[field[f]];
+          value=value[field[g]];
           if (value==null) return false;
         }
       }
@@ -51,7 +51,7 @@ function(head, req) {
         var field=fields[f];
         var value=doc;
         for (var g=0;g<field.length && value!=null;g++)
-          value=value[field[f]];
+          value=value[field[g]];
         if (value==null) return false;
         if (typeof(value)==="number") value=String(value);
         if (value.search(values[f])==-1) return false;
