@@ -63,10 +63,10 @@ $(document).ready(function() {
       for (var prop in features[0].properties) {
         var row=$("<span>");
         // render field: value input pair
-        row.html('<input type="checkbox" name="include" checked>'+
-                 '<input type="text" name="field">: '+
-                 '<input type="text" name="value"><br>');
-        var value=row.find("[name='value']");
+        var checkbox=$('<input type="checkbox" name="include" checked>');
+        var field=$('<input type="text" name="field">');
+        var value=$('<input type="text" name="value">');
+        row.append(checkbox).append(field).append(': ').append(value).append('<br>');
         // write new value to selected data set
         value.change(function(input, prop) {
           return function() {
@@ -81,10 +81,8 @@ $(document).ready(function() {
           };
         }(value, prop));
         values[prop]=value;
-        var field=row.find("[name='field']");
         field.val(prop);
         fields[prop]=field;
-        var checkbox=row.find(":checkbox");
         // disable input fields on row if unchecked
         checkbox.change(function(checkbox, field, value, prop) {
           return function() {
@@ -173,7 +171,7 @@ $(document).ready(function() {
     <b></b>
   </form>
   <form id="modify" action="" style="display:none">
-    Datensatz-Typ: <input type="text" name="type" size="10" value="Feldblock">
+    Datensatz-Typ: <input type="text" name="type" size="10" value="">
     Zeitraum: <input type="text" name="time" size="15" value="06/2010-10.4.2012"><br>
     <input type="checkbox" name="all" checked> Alle Felder auswählen
     <input type="button" name="prev" value="<">
