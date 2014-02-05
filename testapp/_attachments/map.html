@@ -175,6 +175,7 @@ $(document).ready(function() {
               Maps.event.addListener(shape, 'click', function(tr) {
                 return function() {
                   this.setOptions({zIndex:-new Date().getTime()});
+                  $("#table tbody").prepend(tr);
                   tr.find('a').last().focus();
                 };
               }(item.tr));
