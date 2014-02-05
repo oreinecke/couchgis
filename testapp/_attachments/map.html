@@ -236,7 +236,7 @@ $(document).ready(function() {
     var SW=map.getBounds().getSouthWest();
     var options={
       limit:parseFloat($("#settings [name='limit']").val()),
-      error:error==null?(NE.lat()-SW.lat())/100:error,
+      error:error || (NE.lat()-SW.lat())/100,
       bbox:[
         SW.lng()-offset[0], SW.lat()-offset[1],
         NE.lng()-offset[0], NE.lat()-offset[1]
@@ -542,9 +542,8 @@ $(document).ready(function() {
       if (e.which!==13) return;
       var cut={
         field:$("#filter [name='field']").val(),
-        value:$(this).val()
+        value:$(this).val().replace(/(^\s+|\s+$)/g,'') || undefined
       };
-      if (/^\s*$/.test(cut.value)) delete cut.value;
       // I've made template filter items at the bottom of the
       // page for the following field/value combinations.
       var id=function(field, value) {
@@ -564,10 +563,10 @@ $(document).ready(function() {
         // Tell filter_documents() to remove cut from the queue and set form
         // fields to its parameters; it is likely that the filter had a
         // spelling error, so I should provide an easy way to correct it.
-        $("#filter [name='field']").val(cut.field==null?"":cut.field);
+        $("#filter [name='field']").val( cut.field || "" );
         // update autocomplete source array
         $("#filter [name='field']").change();
-        $("#filter [name='content']").val(cut.value==null?"":cut.value);
+        $("#filter [name='content']").val( cut.value || "" );
         cut.remove_me=true;
         filter_documents({cuts:[cut]});
         li.remove();
