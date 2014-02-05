@@ -544,23 +544,21 @@ $(document).ready(function() {
         field:$("#filter [name='field']").val(),
         value:$(this).val()
       };
-      if (cut.field==="") delete cut.field;
-      if (cut.value.search(/^ *$/)>=0) delete cut.value;
-      if (cut.field==="_expression") cut={expression:cut.value};
+      if (/^\s*$/.test(cut.value)) delete cut.value;
       // I've made template filter items at the bottom of the
-      // page for these three different field/value combinations.
-      var id=function(field, value, expression) {
-        if (expression) return "#expression";
-        if (field&&value) return "#field-is";
-        if (field) return "#has-defined";
-        if (value) return "#contains";
-      }(cut.field, cut.value, cut.expression);
+      // page for the following field/value combinations.
+      var id=function(field, value) {
+        if (field==="_keyword" && value) return "#contains";
+        if (field==="_expression" && value) return "#expression";
+        if (field && value) return "#field-is";
+        if (field[0]!=='_') return "#has-defined";
+      }(cut.field, cut.value);
       if (!id) return;
       filter_documents({cuts:[cut]});
       var li=$(id).clone();
       li.show().prop('id',"");
-      li.find('b').html(cut.field);
-      li.find('a').html(cut.value||cut.expression);
+      li.find('a').html(cut.value);
+      li.find('b').html(cut.field[0]==='_'?undefined:cut.field);
       $("#cuts").append(li);
       li.find(':button').click(function() {
         // Tell filter_documents() to remove cut from the queue and set form
@@ -738,7 +736,7 @@ $(document).ready(function() {
     <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
     <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
     <span>als: <select name="field">
-      <option title="Dokumenttext durchsuchen" value="">Text</option>
+      <option title="Dokumenttext durchsuchen" value="_keyword">Text</option>
       <option title="JavaScript-Ausdruck" value="_expression">JavaScript</option>
       <optgroup name="fields" label="Felder"></optgroup>
     </select></span>

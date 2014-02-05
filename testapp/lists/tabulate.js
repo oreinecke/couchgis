@@ -34,17 +34,19 @@ function(head, req) {
     // sort cuts into these handy arrays:
     for (var c=0;c<cuts.length;c++)
       // eval()'d expression must be true
-      if (cuts[c].expression)
-        expressions.push(cuts[c].expression);
+      if (cuts[c].field==="_expression")
+        expressions.push(cuts[c].value);
+      // value should be somewhere in the document
+      else if (cuts[c].field==="_keyword")
+        keywords.push(new RegExp(cuts[c].value, 'im'));
       // ignore value but require field to be non-null
       else if (cuts[c].field && !cuts[c].value)
         non_nulls.push(cuts[c].field.split('.'));
       // value must match
-      else if (cuts[c].field) {
+      else {
         fields.push(cuts[c].field.split('.'));
         values.push(new RegExp(cuts[c].value, 'im'));
-        // value should be somewhere in the document
-      } else keywords.push(new RegExp(cuts[c].value, 'im'));
+      }
     if (non_nulls.length) defines_field=function(doc) {
       for (var f=0;f<non_nulls.length;f++) {
         var field=non_nulls[f];
