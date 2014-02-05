@@ -12,9 +12,11 @@ $(document).ready(function() {
     var pages=$("#pages");
     // list top level html pages
     for (var a in doc._attachments)
-      if (a.search(/^[^/]+html$/i)>=0)
+      if (/^[^/]+\.html$/i.test(a))
         pages.append('<li><a href="'+a+'">'+a+"</a>");
   });
+  // point href to futon database view
+  $("#futon-db-link").prop('href', "/_utils/database.html?"+window.location.pathname.split('/')[1]);
 });
 </script>
 
@@ -25,6 +27,7 @@ $(document).ready(function() {
 
   <h1> Übersicht </h1>
   <ul id="pages"></ul>
-  Diese CouchApp bei <a target="_blank" href="https://github.com/oreinecke/lsh_ddocs">GitHub</a>
+  Quelltext-Verwaltung bei <a target="_blank" href="https://github.com/oreinecke/lsh_ddocs">GitHub</a><br>
+  Datenbank im <a href="/_utils/" id="futon-db-link">Futon</a> anschauen
   </body>
 </html>
