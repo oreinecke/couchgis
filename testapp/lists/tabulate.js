@@ -79,7 +79,15 @@ function(head, req) {
     if (expressions.length) matches_expression=function(doc) {
       for (var e=0;e<expressions.length;e++) {
         // YES THIS IS SUPER SAFE!!!!
-        if (!eval(expressions[e])) return false;
+        if (!function(expression) {
+          // Provide these useful variable names for the user!!!
+          var e, time_matches, type_matches, defines_field, matches_value,
+          contains_keyword, matches_expression, pass, keywords, non_nulls,
+          fields, values, cuts, options, send_separator, expressions,
+          send_fields, row, start, send, getRow, head, req, require;
+          try { return eval(expression); }
+          catch(e) { return false; }
+        }(expressions[e])) return false;
       }
       return true;
     };
