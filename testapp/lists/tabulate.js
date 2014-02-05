@@ -20,7 +20,10 @@ function(head, req) {
       return range.intersects(time, doc_time);
     };
   }
-  var content_matches=pass;
+  var defines_field=pass;
+  var matches_value=pass;
+  var contains_keyword=pass;
+  var matches_expression=pass;
   if ('cuts' in options) {
     var keywords=[];
     var non_nulls=[];
@@ -42,7 +45,7 @@ function(head, req) {
         values.push(new RegExp(cuts[c].value, 'im'));
         // value should be somewhere in the document
       } else keywords.push(new RegExp(cuts[c].value, 'im'));
-    content_matches=function(doc) {
+    if (non_nulls.length) defines_field=function(doc) {
       for (var f=0;f<non_nulls.length;f++) {
         var field=non_nulls[f];
         var value=doc;
@@ -51,6 +54,9 @@ function(head, req) {
           if (value==null) return false;
         }
       }
+      return true;
+    };
+    if (fields.length) matches_value=function(doc) {
       for (var f=0;f<fields.length;f++) {
         var field=fields[f];
         var value=doc;
@@ -60,16 +66,21 @@ function(head, req) {
         if (typeof(value)==="number") value=String(value);
         if (!values[f].test(value)) return false;
       }
-      for (var e=0;e<expressions.length;e++) {
-        // YES THIS IS SUPER SAFE!!!!
-        if (!eval(expressions[e])) return false;
-      }
-      if (!keywords.length) return true;
+      return true;
+    };
+    if (keywords.length) contains_keyword=function(doc) {
       var content="";
       for (var prop in doc)
         if (prop!=="time" && prop!=="type") content+=doc[prop]+'\n';
       for (var k=0;k<keywords.length;k++)
         if (!keywords[k].test(content)) return false;
+      return true;
+    };
+    if (expressions.length) matches_expression=function(doc) {
+      for (var e=0;e<expressions.length;e++) {
+        // YES THIS IS SUPER SAFE!!!!
+        if (!eval(expressions[e])) return false;
+      }
       return true;
     };
   }
@@ -85,7 +96,10 @@ function(head, req) {
     if (!doc) continue;
     if (!type_matches(doc.type)) continue;
     if (!time_matches(doc.time)) continue;
-    if (!content_matches(doc)) continue;
+    if (!defines_field(doc)) continue;
+    if (!matches_value(doc)) continue;
+    if (!contains_keyword(doc)) continue;
+    if (!matches_expression(doc)) continue;
     send_separator();
     send_fields();
   }
