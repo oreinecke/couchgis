@@ -122,7 +122,7 @@ $(document).ready(function() {
   $("#modify").submit(function(e) {e.preventDefault();});
   // check/uncheck all
   $("#modify [name='all']").change(function() {
-    $("#modify [name='include']").prop('checked', $("#modify [name='all']").prop('checked'));
+    $("#modify [name='include']").prop('checked', $(this).prop('checked'));
     $("#modify [name='include']").change();
   });
   $("#modify [name='prev']").click(function() {
@@ -187,6 +187,7 @@ $(document).ready(function() {
     Datensatz <a>1</a>
     <input type="button" name="next" value=">">
     <div></div>
+    <input type="checkbox" name="all" checked> Alle Felder auswählen
     <input type="button" name="prev" value="<">
     Datensatz <a>1</a>
     <input type="button" name="next" value=">">
