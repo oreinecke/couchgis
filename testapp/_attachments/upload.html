@@ -45,9 +45,15 @@ $(document).ready(function() {
         change:function() {$(this).change();}
       });
     });
+    // Suggest that our new documents should also have
+    // a field named <doc.type> but do not enforce it.
+    $("#description-field").html($(this).val()||undefined);
   // In case type already has a value; FireFox
   // 26.0 does not clear inputs on page reload.
   }).change();
+  $("#description-include").change( function() {
+    $("#description-value").prop('disabled', !$(this).prop('checked'));
+  });
   function show_feature(f) {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
@@ -157,6 +163,9 @@ $(document).ready(function() {
       // preserve document field order
       for (var f=0;f<ordered_fields.length;f++)
         doc[ordered_fields[f]]=undefined;
+      // save document description as doc[doc.type]
+      if ($("#description-include").prop('checked') && doc.type)
+        doc[doc.type]=$("#description-value").val() || undefined;
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
@@ -226,7 +235,10 @@ $(document).ready(function() {
     <span><input type="checkbox" name="all" checked> Alle Felder auswählen</span>
     <span><input type="button" name="prev" value="<">
       Datensatz <a>1</a>
-      <input type="button" name="next" value=">"></span>
+      <input type="button" name="next" value=">"></span><br>
+    <input id="description-include" type="checkbox" checked>
+    <b id="description-field">&lt;Datensatz-Typ&gt;</b><b>:</b>
+    <input id="description-value" type="text">
     <div></div>
     <span><input type="checkbox" name="all" checked> Alle Felder auswählen</span>
     <span><input type="button" name="prev" value="<">
