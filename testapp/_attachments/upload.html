@@ -13,8 +13,11 @@
 $(document).ready(function() {
   var GeoJSON, crs, features=[];
   var submit=$("#upload :submit");
+  var revert=$("#upload :button");
   var fields={};
   var values={};
+  // doc ids and revisions from _bulk_docs response
+  var uploaded_docs;
   $.getJSON("_view/types-fields?group_level=1", function(data) {
     var source=[];
     while (data.rows.length)
@@ -162,9 +165,32 @@ $(document).ready(function() {
       docs.push(doc);
     }
     $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).bulkSave(
-      {docs:docs, all_or_nothing:true}, {success:function() {submit.val("Fertig!");} }
-    );
+    { docs:docs, all_or_nothing:true }, {
+      success:function(data) {
+        submit.hide();
+        revert.show();
+        uploaded_docs=data;
+      }
+    });
     e.preventDefault();
+  });
+  revert.click(function() {
+    // stage docs for deletion
+    for (var d=0;d<uploaded_docs.length;d++) {
+      var doc=uploaded_docs[d];
+      uploaded_docs[d]={
+        _id:doc.id,
+        _rev:doc.rev,
+        _deleted:true
+      };
+    }
+    $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).bulkSave(
+    { docs:uploaded_docs, all_or_nothing:true }, {
+      success:function(data) {
+        submit.show();
+        revert.hide();
+      }
+    });
   });
 });
 </script>
@@ -176,7 +202,9 @@ $(document).ready(function() {
 
   <h1> GeoJSON Upload </h1>
   <form id="upload" action="">
-    <input type="file"> <input type="submit" value="Los!" disabled><br>
+    <input type="file">
+    <input type="submit" value="Los!" disabled>
+    <input type="button" value="Rückgängig" style="display:none"><br>
     <b></b>
   </form>
   <form id="modify" action="" style="display:none">
