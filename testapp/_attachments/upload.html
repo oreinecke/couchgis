@@ -39,7 +39,7 @@ $(document).ready(function() {
     $.getJSON("_view/types-fields?group_level=1&key="+key, function(data) {
       if (data.rows.length) ordered_fields=data.rows[0].value;
       else ordered_fields=[];
-      if (data.rows.length) source=source.concat(data.rows[0].value);
+      source=source.concat(ordered_fields);
       $("#modify [name='field']").autocomplete({
         minLength:0, source:source,
         change:function() {$(this).change();}
@@ -145,7 +145,6 @@ $(document).ready(function() {
     show_feature(f-1);
   });
   $("#upload").submit(function(e) {
-    submit.prop('disabled', true);
     var type=$("#modify [name='type']").val();
     var time=$("#modify [name='time']").val();
     var docs=[];
