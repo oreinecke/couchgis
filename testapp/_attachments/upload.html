@@ -131,7 +131,7 @@ $(document).ready(function() {
   $("#modify").submit(function(e) {e.preventDefault();});
   // check/uncheck all
   $("#modify [name='all']").change(function() {
-    $("#modify [name='include']").prop('checked', $(this).prop('checked'));
+    $("#modify :checkbox").prop('checked', $(this).prop('checked'));
     $("#modify [name='include']").change();
   });
   $("#modify [name='prev']").click(function() {
