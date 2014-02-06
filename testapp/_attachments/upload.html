@@ -114,7 +114,7 @@ $(document).ready(function() {
               if (field.val()!=prop) title+='als "'+field.val()+'" ';
               title+='übernehmen';
             }
-            checkbox.attr({title:title});
+            checkbox.prop('title',title);
           };
         }(checkbox, field, value, prop));
         checkbox.change();
