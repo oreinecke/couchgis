@@ -16,6 +16,8 @@ $(document).ready(function() {
   var revert=$("#upload :button");
   var fields={};
   var values={};
+  // ordered fields array from _view/types-fields
+  var ordered_fields=[];
   // doc ids and revisions from _bulk_docs response
   var uploaded_docs;
   $.getJSON("_view/types-fields?group_level=1", function(data) {
@@ -35,6 +37,8 @@ $(document).ready(function() {
       { label:"Zeitraum", value:"time" }
     ];
     $.getJSON("_view/types-fields?group_level=1&key="+key, function(data) {
+      if (data.rows.length) ordered_fields=data.rows[0].value;
+      else ordered_fields=[];
       if (data.rows.length) source=source.concat(data.rows[0].value);
       $("#modify [name='field']").autocomplete({
         minLength:0, source:source,
@@ -149,6 +153,9 @@ $(document).ready(function() {
       // set doc-type and time
       doc.type=type || undefined;
       doc.time=time || undefined;
+      // preserve document field order
+      for (var f=0;f<ordered_fields.length;f++)
+        doc[ordered_fields[f]]=undefined;
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
