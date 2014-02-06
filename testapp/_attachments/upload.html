@@ -45,7 +45,9 @@ $(document).ready(function() {
         change:function() {$(this).change();}
       });
     });
-  });
+  // In case type already has a value; FireFox
+  // 26.0 does not clear inputs on page reload.
+  }).change();
   function show_feature(f) {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
