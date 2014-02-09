@@ -161,8 +161,8 @@ $(document).ready(function() {
       doc.type=type || undefined;
       doc.time=time || undefined;
       // preserve document field order
-      for (var f=0;f<ordered_fields.length;f++)
-        doc[ordered_fields[f]]=undefined;
+      for (var g=0;g<ordered_fields.length;g++)
+        doc[ordered_fields[g]]=undefined;
       // save document description as doc[doc.type]
       if ($("#description-include").prop('checked') && doc.type)
         doc[doc.type]=$("#description-value").val() || undefined;
