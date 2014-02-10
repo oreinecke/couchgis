@@ -35,7 +35,7 @@ $(document).ready(function() {
     var login={
       name:     $("#login :text").val(),
       password: $("#login :password").val(),
-      success:function(resp) {
+      success:function() {
         log.success({userCtx:{name:this.name}});
       },
       error:function() {
