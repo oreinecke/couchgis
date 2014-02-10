@@ -4,7 +4,7 @@
 function(doc) {
   fields = [];
   for (var field in doc)
-    if (field.search(/^[A-Z]/)!=-1 && field.search(/^GeoJSON/)==-1)
+    if (field.search(/^[A-ZÄÖÜ]/)!=-1 && field.search(/^GeoJSON/)==-1)
       fields.push(field);
   emit(doc.type, fields);
 }
