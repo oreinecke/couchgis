@@ -34,10 +34,20 @@ function(head, req) {
     // sort cuts into these handy arrays:
     for (var c=0;c<cuts.length;c++)
       // eval()'d expression must be true
-      if (cuts[c].field==="_expression")
-        expressions.push(cuts[c].value);
+      if (cuts[c].field==="_expression") {
+        var parts=cuts[c].value.match(/"[^"]*"|([\wäöüÄÖÜß]+|'[^']+')(\s*\.\s*([\wäöüÄÖÜß]+|'[^']+'))*|\W/g);
+        log({parts:parts});
+        var expression="";
+        for (var part; (part=parts.shift())!=null; expression+=part ) {
+          if (/^"[^"]*"$/.test(part)) continue;
+          if (/^\W*$/.test(part)) continue;
+          if (!/[A-ZÄÖÜ]/.test(part[0])) continue;
+          part='doc["'+part.match(/'[^']+'|[^\s.]+/g).join('"]["').replace(/'/g,'')+'"]';
+        }
+        log({expression:expression});
+        expressions.push(expression);
       // value should be somewhere in the document
-      else if (cuts[c].field==="_keyword")
+      } else if (cuts[c].field==="_keyword")
         keywords.push(new RegExp(cuts[c].value, 'im'));
       // ignore value but require field to be non-null
       else if (cuts[c].field && !cuts[c].value)
