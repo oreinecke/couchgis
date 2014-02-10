@@ -735,8 +735,8 @@ $(document).ready(function() {
     <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
     <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
     <span>als: <select name="field">
-      <option title="Dokumenttext durchsuchen" value="_keyword">Text</option>
-      <option title="JavaScript-Ausdruck" value="_expression">JavaScript</option>
+      <option value="_keyword">Text</option>
+      <option value="_expression">Funktion</option>
       <optgroup name="fields" label="Felder"></optgroup>
     </select></span>
     <ol id="cuts">
@@ -752,7 +752,7 @@ $(document).ready(function() {
       <li style="display:none" id="field-is">
         <input type="button" value="x" title="löschen"> <b></b> <a></a></li>
       <li style="display:none" id="expression">
-        <input type="button" value="x" title="löschen"> <b>JavaScript:</b> <a></a></li>
+        <input type="button" value="x" title="löschen"> <b>erfüllt</b> <a></a></li>
     </ol>
   </form>
   <table id="table">
