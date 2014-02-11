@@ -35,32 +35,33 @@ function(head, req) {
     for (var c=0;c<cuts.length;c++)
       // eval()'d expression must be true
       if (cuts[c].field==="_expression") {
-        // Transform 'field name'. 'nested field' into doc['variable
-        // name']['nested field']: the first match uses descending greedyness
-        // (to the right) to group expression into the following substrings:
+        // Transform Field_Näme . 'nested .field' into doc["Field_Näme"]
+        // ["nested field"]: the first match employs greediness to split
+        // expression into the following substrings:
         //
-        //                       "string expression"    Field_Name . 'nested field'             anything else
+        //                       "string expression"    Field_Näme . 'nested .field'            anything else
         //                             v.....v v.....................................................v v..v
         var parts=cuts[c].value.match(/"[^"]*"|([\wäöüÄÖÜß]+|'[^']+')(\s*\.\s*([\wäöüÄÖÜß]+|'[^']+'))*|\W/g);
         var expression="";
         for (var part; (part=parts.shift())!=null; expression+=part ) {
-          // Real strings are attached as-is to expression.
+          // Double-quoted parts are attached as-is to expression.
           if (/^"[^"]*"$/.test(part)) continue;
           // This is equivalent to 'anything else'.
-          if (/^\W*$/.test(part)) continue;
-          // Ignore lower-case internal members and js keywords.
-          if (!/[A-ZÄÖÜ]/.test(part[0])) continue;
+          if (/^\W$/.test(part)) continue;
+          // (Unquoted) field names start with a capital by convention.
+          if (!/['A-ZÄÖÜ]/.test(part[0])) continue;
           // See explanation below for parts as tagged here:
           //     (a)                     (b)                (c)            (d)      (e)
           part='doc["'+part.match(/'[^']+'|[^\s.]+/g).join('"]["').replace(/'/g,'')+'"]';
-          // a) All fields are referenced from doc.
+          // a) All fields are fetched from doc.
           // b) I might encounter a dot inside a field name and therefore
-          //    refrain from using a simple part.split('.'). Again, the
-          //    greediest pattern is the left one, which fetches the variable
-          //    string. Then follows - with lower priority - a pattern that
-          //    fetches unquoted field names (and skips over white-spaces).
-          // c) Done accessing the field and re-opening the next.
-          // d) Here I remove quotes from quoted field names.
+          //    cannot use a simple part.split('.'). Again, the greediest
+          //    pattern is the left one, which fetches the variable string. It
+          //    takes precedende over a second pattern fetcheing unquoted field
+          //    names (white-spaces are ignored).
+          // c) Done accessing this field, re-opening the next one.
+          // d) Here I remove quotes from quoted field names. There is no
+          //    look-behind RegExp support, so I am using kind-of a hack here.
           // e) This closes the last field access.
         }
         expressions.push(expression);
