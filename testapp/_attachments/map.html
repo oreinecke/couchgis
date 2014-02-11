@@ -18,6 +18,33 @@ $(document).ready(function() {
   var LatLng=Maps.LatLng;
   var LatLngBounds=Maps.LatLngBounds;
 
+  // add GeoJSON MultiLineString support
+  function MultiLineString(options) {
+    var shapes=[];
+    var paths=options.paths;
+    delete options.paths;
+    for (var p=0;p<paths.length;p++) {
+      options.path=paths[p];
+      shapes.push(new Maps.Polyline(options));
+    }
+    this.setOptions=function(options) {
+      paths=options.paths;
+      delete options.paths;
+      for (var s=0;s<shapes.length;s++) {
+        if (paths) options.path=paths[s];
+        shapes[s].setOptions(options);
+      }
+    };
+    this.setMap=function(map) {
+      for (var s=0;s<shapes.length;s++)
+        shapes[s].setMap(map);
+    };
+    this.addListener=function(name, handler) {
+      for (var s=0;s<shapes.length;s++)
+        shapes[s].addListener(name, handler);
+    };
+  }
+
   var map = new Maps.Map($('#map')[0], {
     zoom: 12,
     mapTypeId: Maps.MapTypeId.SATELLITE,
@@ -167,12 +194,13 @@ $(document).ready(function() {
                 if (type=="Point") return new Maps.Marker(options);
                 if (type=="Polygon") return new Maps.Polygon(options);
                 if (type=="LineString") return new Maps.Polyline(options);
+                if (type=="MultiLineString") return new MultiLineString(options);
                 // remind myself that this needs work!!!
                 alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
               }(GeoJSON.type);
               // Select link if user clicks on shape and decrease
               // zIndex to give access to obstructed shapes.
-              Maps.event.addListener(shape, 'click', function(tr) {
+              shape.addListener('click', function(tr) {
                 return function() {
                   this.setOptions({zIndex:-new Date().getTime()});
                   $("#table tbody").prepend(tr);
