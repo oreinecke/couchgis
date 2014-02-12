@@ -93,7 +93,7 @@ exports.toWGS84=function(GeoJSON) {
       3397:"+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel +units=m +no_defs",
       31467:"+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel "
            +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs",
-      31468:"+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel "
+      31468:"+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4499879 +y_0=-139 +ellps=bessel "
            +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs",
       31469:"+proj=tmerc +lat_0=0 +lon_0=15 +k=1 +x_0=5499873 +y_0=-133 +ellps=bessel "
            +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs"
