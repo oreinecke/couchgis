@@ -16,14 +16,12 @@ $(document).ready(function() {
   var revert=$("#upload :button");
   var fields={};
   var values={};
-  // ordered fields array from _view/types-fields
-  var ordered_fields=[];
   // doc ids and revisions from _bulk_docs response
   var uploaded_docs;
-  $.getJSON("_view/types-fields?group_level=1", function(data) {
+  $.getJSON("_view/fields-values?group_level=1", function(data) {
     var source=[];
     while (data.rows.length)
-      source.push(data.rows.shift().key);
+      source.push(data.rows.shift().key[0]);
     $("#modify [name='type']").autocomplete({
       source:source, minLength:0,
       change:function() {$(this).change();}
@@ -31,15 +29,16 @@ $(document).ready(function() {
     $("#modify [name='type']").autocomplete({ source:source, minLength:0 });
   });
   $("#modify [name='type']").change( function() {
-    var key=encodeURIComponent(JSON.stringify($(this).val()));
+    var key="start_key="+encodeURIComponent(JSON.stringify([$(this).val()])) +
+             "&end_key="+encodeURIComponent(JSON.stringify([$(this).val()+' ']));
+    // Suggest these common field names:
     var source=[
       { label:"Datensatz-Typ", value:"type", mixed:true },
       { label:"Zeitraum", value:"time" }
     ];
-    $.getJSON("_view/types-fields?group_level=1&key="+key, function(data) {
-      if (data.rows.length) ordered_fields=data.rows[0].value;
-      else ordered_fields=[];
-      source=source.concat(ordered_fields);
+    $.getJSON("_view/fields-values?group_level=2&"+key, function(data) {
+      while (data.rows.length)
+        source.push(data.rows.shift()[1]);
       $("#modify [name='field']").autocomplete({
         minLength:0, source:source,
         change:function() {$(this).change();}
@@ -160,9 +159,6 @@ $(document).ready(function() {
       // set doc-type and time
       doc.type=type || undefined;
       doc.time=time || undefined;
-      // preserve document field order
-      for (var g=0;g<ordered_fields.length;g++)
-        doc[ordered_fields[g]]=undefined;
       // save document description as doc[doc.type]
       if ($("#description-include").prop('checked') && doc.type)
         doc[doc.type]=$("#description-value").val() || undefined;

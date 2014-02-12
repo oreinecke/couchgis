@@ -482,23 +482,26 @@ $(document).ready(function() {
       }, "json");
     });
     // get doc types and set colors
-    $.getJSON("_view/types-fields?group_level=1", function(data) {
-      // This is one rare advantage of javascripts 'phony' arrays:
-      // I can use fillColors first as a set and then assign keys
-      // to each element!! How nice!!!
-      var span=$("#filter .types");
+    $.getJSON("_view/fields-values?group_level=2", function(data) {
       var options={};
-      for (var row=0;row<data.rows.length;row++) {
-        var type=data.rows[row].key;
-        filters[0].types.push(type);
-        fillColors[type]=fillColors.shift();
-        span.append('<input type="checkbox" name="'+type+'">'+type);
-        var fields=data.rows[row].value;
-        while (fields.length) options[fields.shift()]=null;
+      var inputs={};
+      while (data.rows.length) {
+        var key=data.rows.shift().key;
+        options[key[1]]=null;
+        inputs[key[0]]=null;
       }
       var optgroup=$("[name='fields']");
       for (var field in options)
         optgroup.append('<option>'+field+'</option>');
+      var span=$("#filter .types");
+      for (var type in inputs) {
+        span.append('<input type="checkbox" name="'+type+'">'+type);
+        filters[0].types.push(type);
+        // This is one rare advantage of javascripts 'phony' arrays:
+        // I can use fillColors first as a set and then assign keys
+        // to each element!! How nice!!!
+        fillColors[type]=fillColors.shift();
+      }
     });
     // Refine document list if date has changed.
     $("#filter [name='time']").change( function() {
@@ -526,13 +529,12 @@ $(document).ready(function() {
       if (!types.length) types=filters[0].types;
       // Update the list of fields to show only those
       // that are available by the given type selection.
-      $.getJSON("_view/types-fields?group_level=1&group=true" +
-                "&keys="+encodeURIComponent(JSON.stringify(types)), function(data) {
+      $.getJSON("_view/fields-values?group_level=2&group=true", function(data) {
         var options={};
         while (data.rows.length) {
-          var fields=data.rows.shift().value;
-          while (fields.length)
-            options[fields.shift()]=null;
+          var key=data.rows.shift().key;
+          if (types.indexOf(key[0])===-1) continue;
+          options[key[1]]=null;
         }
         var optgroup=$("#filter [name='fields']");
         var val=$("#filter [name='field']").val();
