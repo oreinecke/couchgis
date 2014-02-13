@@ -102,7 +102,7 @@ function(head, req) {
     if (keywords.length) contains_keyword=function(doc) {
       var content="";
       for (var prop in doc)
-        if (prop!=="time" && prop!=="type") content+=doc[prop]+'\n';
+        if (prop!=="time" && prop!=="_id") content+=doc[prop]+'\n';
       for (var k=0;k<keywords.length;k++)
         if (!keywords[k].test(content)) return false;
       return true;
