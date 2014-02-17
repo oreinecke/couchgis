@@ -294,7 +294,7 @@ $(document).ready(function() {
     var SW=map.getBounds().getSouthWest();
     var options={
       limit:parseFloat($("#settings [name='limit']").val()),
-      error:error || (NE.lat()-SW.lat())/100,
+      error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
       bbox:[
         SW.lng()-offset[0], SW.lat()-offset[1],
         NE.lng()-offset[0], NE.lat()-offset[1]
