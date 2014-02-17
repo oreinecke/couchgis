@@ -61,6 +61,35 @@ function MultiPolygon(options) {
   };
 }
 
+// It is very likely that the oftentimes inexperienced user clicks and
+// scrolls the map like an ape (on adderall). Then, event handler callbacks
+// will be fired all over the place and the interface probably won't react
+// anymore. It should be smarter than that; It should wait a couple of
+// seconds, then wait for the last ajax to complete, then do the next thing
+// that needs to be done.
+var call={
+  now:null, next:null,
+  this_one_next:function(what) {
+    // We might as well do the closure here, because this
+    // is used only for event handler registration anyway.
+    return function() {
+      if (call.now!==null) call.next=what;
+      else (call.now=what)();
+    }
+  },
+  that_last_one:function() {
+    window.setTimeout(function() {
+      call.now=call.next;
+      call.next=null;
+      if (call.now!==null) call.now();
+    }, 500);
+  },
+  no_one:function() {
+    call.now=null;
+    call.next=null;
+  }
+};
+
 // call _list/bbox-filter/<view> with some useful options
 function list(list, options, success) {
   var keys=options.keys;
