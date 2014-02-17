@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="de">
+<html lang="de" style="height:100%">
   <head>
     <title>GeoJSON Upload</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
@@ -8,10 +8,13 @@
     <script src="script/jquery-1.10.2.js"></script>
     <script src="script/jquery-ui-1.10.4.custom.js"></script>
     <script src="script/jquery.couch.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="script/google.maps.js"></script>
 
 <script>
 $(document).ready(function() {
-  var GeoJSON, crs, features=[];
+  var map;
+  var crs, features=[];
   var submit=$("#upload :submit");
   var revert=$("#upload :button");
   var fields={};
@@ -61,12 +64,14 @@ $(document).ready(function() {
   }
   $("#upload :file").change(function(e) {
     $("#modify").hide();
+    $("#reduce [name='show']").show();
+    $("#reduce span").hide();
     submit.prop('disabled', true);
     $("#upload b").html("");
     var reader=new FileReader();
     reader.onload=function(evt) {
       try {
-        GeoJSON=JSON.parse(evt.target.result);
+        var GeoJSON=JSON.parse(evt.target.result);
         if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
         else if (GeoJSON.type=="Feature") features=[GeoJSON];
         else throw{message:"Useless GeoJSON type!"};
@@ -173,13 +178,21 @@ $(document).ready(function() {
         doc[fields[prop].val()]=feature.properties[prop];
       }
       // store geometry as GeoJSON
-      doc.GeoJSON=feature.geometry;
-      doc.GeoJSON.crs=crs;
+      if (!(doc.GeoJSON_clone=feature.GeoJSON_clone)) {
+        doc.GeoJSON=feature.geometry;
+        doc.GeoJSON.crs=crs;
+      }
       docs.push(doc);
     }
     $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).bulkSave(
     { docs:docs, all_or_nothing:true }, {
       success:function(data) {
+        $("#modify").hide();
+        $("#reduce").show();
+        map = map || new Maps.Map($('#map')[0], {
+          zoom: 17, mapTypeId: Maps.MapTypeId.SATELLITE,
+          center: new LatLng(50.83730534254573, 13.938310197234163)
+        });
         submit.hide();
         revert.show();
         uploaded_docs=data;
@@ -202,19 +215,127 @@ $(document).ready(function() {
       success:function(data) {
         submit.show();
         revert.hide();
+        $("#modify").show();
+        $("#reduce").hide();
       }
     });
   });
+  function show_geometry(f) {
+    // remove previous shapes from map canvas
+    var doc=features[parseInt($("#show-suggestions a").html())-1];
+    if (doc && doc.shape) {
+      doc.shape.setMap();
+      for (var id in doc.items)
+        doc.items[id].shape.setMap();
+    }
+    $("#show-suggestions a").html(f+1);
+    var keys=[];
+    doc=features[f];
+    keys.push([uploaded_docs[f].id, 0]);
+    if (doc.items) for (var id in doc.items)
+      keys.push([id, 0]);
+    $("#reduce :button").prop('disabled', true);
+    $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
+      $("#reduce :button").prop('disabled', false);
+      data=JSON.parse(data);
+      var GeoJSON=data.rows.shift().value.GeoJSON;
+      var shape=create_shape(GeoJSON.type, expand_options({
+        map:map,
+        fillColor:"#00FF00",
+        coordinates: GeoJSON.coordinates
+      }));
+      var bbox=GeoJSON.bbox;
+      map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
+                               (bbox[2]+bbox[0])/2.0+offset[0]));
+      function select_me(GeoJSON_clone) {
+        return function() {
+          doc.GeoJSON_clone=GeoJSON_clone;
+          shape.setOptions({strokeColor:"#000000"});
+          this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
+          shape=this;
+          $("#clone-from b").html(GeoJSON_clone);
+          var spans={ true: $("#clone-from"), false: $("#create-new") };
+          spans[!GeoJSON_clone].hide();
+          spans[!!GeoJSON_clone].show();
+        };
+      }
+      shape.addListener('click', select_me());
+      doc.shape=shape;
+      while (data.rows.length) {
+        var row=data.rows.shift();
+        GeoJSON=row.value.GeoJSON;
+        shape=create_shape(GeoJSON.type, expand_options({
+          map:map,
+          fillColor:"#0000FF",
+          coordinates: GeoJSON.coordinates
+        }));
+        shape.addListener('click', select_me(row.key[0]));
+        doc.items[row.key[0]].shape=shape;
+      }
+      if (doc.GeoJSON_clone==null) shape=doc.shape;
+      else shape=doc.items[doc.GeoJSON_clone].shape;
+      select_me(doc.GeoJSON_clone).apply(shape);
+    });
+  }
+  // skip to next/previous document with similar geometry
+  $("#reduce [name='next']").click(function() {
+    var f=parseInt($("#show-suggestions a").html())-1, g=f;
+    do f=(f+1)%features.length;
+    while (!features[f].items && f!=g);
+    show_geometry(f);
+  });
+  $("#reduce [name='prev']").click(function() {
+    var f=parseInt($("#show-suggestions a").html())-1, g=f;
+    do f=(f+features.length-1)%features.length;
+    while (!features[f].items && f!=g);
+    show_geometry(f);
+  });
+  // query for similar geometry
+  $("#reduce [name='show']").click(function() {
+    $(this).hide();
+    $("#show-suggestions").show();
+    var keys=[];
+    for (var d=0;d<uploaded_docs.length;d++)
+      keys.push(uploaded_docs[d].id);
+    $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
+      for (var i=0;i<keys.length;i++) {
+        var feature=features[i];
+        feature.bbox=data[uploaded_docs[i].id].GeoJSON.bbox;
+        var options=encodeURIComponent(JSON.stringify({
+          bbox:feature.bbox,
+          similarity:0.0001
+        }));
+        // call this as soon as a geometry suggestion emerged
+        var found_geometry=function() {
+          $("#reduce :button").prop('disabled', false);
+          $("#reduce [name='next']").click();
+          found_geometry=function() {};
+        }
+        $.getJSON("_list/bbox-filter/bbox?options="+options, function(j) {
+          return function(data) {
+            delete data[uploaded_docs[j].id];
+            // This leaves doc.items undefined if data is empty.
+            for (var id in data) {
+              features[j].items=data;
+              found_geometry();
+              return;
+            }
+          };
+        }(i));
+      }
+    });
+  });
+
 });
 </script>
 
 <style>
-  span {white-space:nowrap}
+  #modify span {white-space:nowrap}
   #modify div span {white-space:normal}
 </style>
 
   </head>
-  <body>
+  <body style="height:100%">
 
   <iframe src="login_bar.htm" style="width:100%; height:1.6em; border:0;"></iframe>
 
@@ -222,7 +343,7 @@ $(document).ready(function() {
   <form id="upload" action="">
     <input type="file">
     <input type="submit" value="Los!" disabled>
-    <input type="button" value="Rückgängig" style="display:none"><br>
+    <input type="button" value="Rückgängig" name="revert" style="display:none"><br>
     <b></b>
   </form>
   <form id="modify" action="" style="display:none">
@@ -240,6 +361,18 @@ $(document).ready(function() {
     <span><input type="button" name="prev" value="<">
       Datensatz <a>1</a>
       <input type="button" name="next" value=">"></span>
+  </form>
+  <form id="reduce" action="" style="display:none;height:50%">
+    <input type="button" name="show" value="Ähnliche Geometrien suchen">
+    <span id="show-suggestions" style="display:none">
+      Ähnliche Geometrien für
+      <input type="button" name="prev" value="<" disabled>
+      Datensatz <a>0</a>
+      <input type="button" name="next" value=">" disabled>
+    </span>
+    <div id="map" style="height:100%"></div>
+    <span id="create-new" style="display:none">Geometrie wird neu angelegt.</span>
+    <span id="clone-from" style="display:none">Geometrie von Datensatz <b></b> verwenden.</span>
   </form>
   </body>
 </html>
