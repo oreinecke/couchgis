@@ -38,7 +38,7 @@ $(document).ready(function() {
     ];
     $.getJSON("_view/fields-values?group_level=2&"+key, function(data) {
       while (data.rows.length)
-        source.push(data.rows.shift()[1]);
+        source.push(data.rows.shift().key[1]);
       $("#modify [name='field']").autocomplete({
         minLength:0, source:source,
         change:function() {$(this).change();}
