@@ -187,7 +187,9 @@ $(document).ready(function() {
               return function() {
                 this.setOptions({zIndex:-new Date().getTime()});
                 $("#table tbody").prepend(tr);
-                tr.find('a').last().focus();
+                // IE-10.0 loses this <a>'s focus because the map was clicked
+                // once before. It works just fine if we delay it by 1ms.
+                window.setTimeout(function() { tr.find('a').last().focus(); }, 1);
               };
             }(item.tr));
           } else item.shape.setOptions(options);
