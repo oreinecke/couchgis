@@ -9,18 +9,18 @@
 
 <script>
 $(document).ready(function() {
-  var host=window.location.hostname;
   // for now our central couch installation is located here
-  var centralhost="http://192.168.120.27:5984";
+  var centralhost="http://lsh1908.selfhost.eu:5984";
   // in case I want to rename db/app/replicator.html
   // they are obtained from window.location here
-  var parts=window.location.pathname.match(/[^/]+/g);
-  var db=parts[0];
-  var app=parts[1]+'/'+parts[2];
-  var page=parts[3];
+  var parts=window.location.pathname.split('/');
+  var db=parts[1];
+  var app=parts[2]+'/'+parts[3];
+  var page=parts[4];
   $("#localapp").attr({href:"http://localhost:5984/"+db+'/'+app+'/'+page});
   $("#centralapp").attr({href:centralhost+'/'+db+'/'+app+'/'+page});
-  if (host=="localhost" || host=="127.0.0.1") {
+  if (window.location.hostname=="lsh1908.selfhost.eu") $("div").show();
+  else {
     form=$("form");
     form.show();
     form.submit(function (e) {
@@ -63,7 +63,7 @@ $(document).ready(function() {
       $("#replicate :submit").prop('disabled', true);
       e.preventDefault();
     });
-  } else $("div").show();
+  }
   // enable login if 2nd option is checked
   function enable_log() {
     var pull=$("#pull").prop('checked');
