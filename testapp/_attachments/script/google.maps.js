@@ -63,8 +63,10 @@ var offset=[-0.00178,-0.00121];
 // Replace all 2-element arrays inside GeoJSON.coordinates with
 // LatLngs; This is written with extra-ugly comma operators and
 // multiple vars inside the for loop to increase performance.
-function create_options(c) {
+function expand_options(options) {
   var ofs0=offset[0], ofs1=offset[1];
+  var c=options.coordinates;
+  delete options.coordinates;
   if (typeof(c[0])=="number") c=new LatLng(c[1]+ofs1,c[0]+ofs0);
   else if (typeof(c[0][0])=="number")
     for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1]+ofs1,ci[0]+ofs0);
@@ -75,11 +77,10 @@ function create_options(c) {
     for (var i=0, ci; ci=c[i], i<c.length; i++)
     for (var j=0, cij; cij=ci[j], j<ci.length; j++)
     for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+ofs1,cijk[0]+ofs0);
-  return {
-    position:c, path:c, paths:c,
-    fillOpacity: 0.25,
-    icon:"svg/marker.svg"
-  };
+  options.position=options.path=options.paths=c;
+  if (!'fillOpacity' in options) options.fillOpacity=0.25;
+  if (!'icon' in options) options.icon="svg/marker.svg";
+  return options;
 }
 
 function create_shape(type, options) {
