@@ -3,7 +3,7 @@
 
 function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
-  var options=JSON.parse(req.query.options);
+  var options=(req.query.options?JSON.parse(req.query.options):{});
   // initialize to false if none provided
   var bbox=false;
   if ('bbox' in options) bbox=options.bbox;
