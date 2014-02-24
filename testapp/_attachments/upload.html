@@ -222,20 +222,20 @@ $(document).ready(function() {
   });
   function show_geometry(f) {
     // remove previous shapes from map canvas
-    var doc=features[parseInt($("#show-suggestions a").html())-1];
-    if (doc && doc.shape) {
-      doc.shape.setMap();
-      delete doc.shape;
-      for (var id in doc.items) {
-        doc.items[id].shape.setMap();
-        delete doc.items[id].shape;
+    var feature=features[parseInt($("#show-suggestions a").html())-1];
+    if (feature) {
+      if (feature.shape) feature.shape.setMap();
+      delete feature.shape;
+      for (var id in feature.items) {
+        if (feature.items[id].shape) feature.items[id].shape.setMap();
+        delete feature.items[id].shape;
       }
     }
     $("#show-suggestions a").html(f+1);
     var keys=[];
-    doc=features[f];
+    feature=features[f];
     keys.push([uploaded_docs[f].id, 0]);
-    if (doc.items) for (var id in doc.items)
+    if (feature.items) for (var id in feature.items)
       keys.push([id, 0]);
     $("#reduce :button").prop('disabled', true);
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
@@ -243,7 +243,7 @@ $(document).ready(function() {
       data=JSON.parse(data);
       function select_me(GeoJSON_clone) {
         return function() {
-          doc.GeoJSON_clone=GeoJSON_clone;
+          feature.GeoJSON_clone=GeoJSON_clone;
           shape.setOptions({strokeColor:"#000000"});
           this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
           shape=this;
@@ -264,14 +264,14 @@ $(document).ready(function() {
           map:map, coordinates: GeoJSON.coordinates
         }));
         shape.addListener('click', select_me(GeoJSON_clone));
-        if (GeoJSON_clone) doc.items[row.key[0]].shape=shape;
-        else doc.shape=shape;
+        if (GeoJSON_clone) feature.items[row.key[0]].shape=shape;
+        else feature.shape=shape;
       }
-      map.setCenter(new LatLng((doc.bbox[3]+doc.bbox[1])/2.0+offset[1],
-                               (doc.bbox[2]+doc.bbox[0])/2.0+offset[0]));
-      if (doc.GeoJSON_clone==null) shape=doc.shape;
-      else shape=doc.items[doc.GeoJSON_clone].shape;
-      select_me(doc.GeoJSON_clone).apply(shape);
+      map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0+offset[1],
+                               (feature.bbox[2]+feature.bbox[0])/2.0+offset[0]));
+      if (feature.GeoJSON_clone==null) shape=feature.shape;
+      else shape=feature.items[feature.GeoJSON_clone].shape;
+      select_me(feature.GeoJSON_clone).apply(shape);
     });
   }
   // skip to next/previous document with similar geometry
