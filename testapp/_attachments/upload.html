@@ -225,8 +225,11 @@ $(document).ready(function() {
     var doc=features[parseInt($("#show-suggestions a").html())-1];
     if (doc && doc.shape) {
       doc.shape.setMap();
-      for (var id in doc.items)
+      delete doc.shape;
+      for (var id in doc.items) {
         doc.items[id].shape.setMap();
+        delete doc.items[id].shape;
+      }
     }
     $("#show-suggestions a").html(f+1);
     var keys=[];
@@ -238,15 +241,6 @@ $(document).ready(function() {
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
       $("#reduce :button").prop('disabled', false);
       data=JSON.parse(data);
-      var GeoJSON=data.rows.shift().value.GeoJSON;
-      var shape=create_shape(GeoJSON.type, expand_options({
-        map:map,
-        fillColor:"#00FF00",
-        coordinates: GeoJSON.coordinates
-      }));
-      var bbox=GeoJSON.bbox;
-      map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
-                               (bbox[2]+bbox[0])/2.0+offset[0]));
       function select_me(GeoJSON_clone) {
         return function() {
           doc.GeoJSON_clone=GeoJSON_clone;
@@ -259,19 +253,22 @@ $(document).ready(function() {
           spans[!!GeoJSON_clone].show();
         };
       }
-      shape.addListener('click', select_me());
-      doc.shape=shape;
       while (data.rows.length) {
         var row=data.rows.shift();
-        GeoJSON=row.value.GeoJSON;
-        shape=create_shape(GeoJSON.type, expand_options({
-          map:map,
-          fillColor:"#0000FF",
-          coordinates: GeoJSON.coordinates
+        var GeoJSON_clone=row.key[0];
+        if (row.key[0]===uploaded_docs[f].id)
+          GeoJSON_clone=undefined;
+        var GeoJSON=row.value.GeoJSON;
+        var shape=create_shape(GeoJSON.type, expand_options({
+          fillColor:GeoJSON_clone?"#0000FF":"#00FF00",
+          map:map, coordinates: GeoJSON.coordinates
         }));
-        shape.addListener('click', select_me(row.key[0]));
-        doc.items[row.key[0]].shape=shape;
+        shape.addListener('click', select_me(GeoJSON_clone));
+        if (GeoJSON_clone) doc.items[row.key[0]].shape=shape;
+        else doc.shape=shape;
       }
+      map.setCenter(new LatLng((doc.bbox[3]+doc.bbox[1])/2.0+offset[1],
+                               (doc.bbox[2]+doc.bbox[0])/2.0+offset[0]));
       if (doc.GeoJSON_clone==null) shape=doc.shape;
       else shape=doc.items[doc.GeoJSON_clone].shape;
       select_me(doc.GeoJSON_clone).apply(shape);
