@@ -9,68 +9,10 @@
     <script src="script/jquery-ui-1.10.4.custom.js"></script>
     <script src="script/require.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="script/google.maps.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
-
-  // stash frequently used objects here
-  var Maps=google.maps;
-  var LatLng=Maps.LatLng;
-  var LatLngBounds=Maps.LatLngBounds;
-
-  // add GeoJSON MultiLineString support
-  function MultiLineString(options) {
-    var shapes=[];
-    var paths=options.paths;
-    delete options.paths;
-    for (var p=0;p<paths.length;p++) {
-      options.path=paths[p];
-      shapes.push(new Maps.Polyline(options));
-    }
-    this.setOptions=function(options) {
-      paths=options.paths;
-      delete options.paths;
-      for (var s=0;s<shapes.length;s++) {
-        if (paths) options.path=paths[s];
-        shapes[s].setOptions(options);
-      }
-    };
-    this.setMap=function(map) {
-      for (var s=0;s<shapes.length;s++)
-        shapes[s].setMap(map);
-    };
-    this.addListener=function(name, handler) {
-      for (var s=0;s<shapes.length;s++)
-        shapes[s].addListener(name, handler);
-    };
-  }
-
-  // add GeoJSON MultiPolygon support
-  function MultiPolygon(options) {
-    var shapes=[];
-    var paths=options.paths;
-    delete options.paths;
-    for (var p=0;p<paths.length;p++) {
-      options.path=paths[p];
-      shapes.push(new Maps.Polygon(options));
-    }
-    this.setOptions=function(options) {
-      paths=options.paths;
-      delete options.paths;
-      for (var s=0;s<shapes.length;s++) {
-        if (paths) options.path=paths[s];
-        shapes[s].setOptions(options);
-      }
-    };
-    this.setMap=function(map) {
-      for (var s=0;s<shapes.length;s++)
-        shapes[s].setMap(map);
-    };
-    this.addListener=function(name, handler) {
-      for (var s=0;s<shapes.length;s++)
-        shapes[s].addListener(name, handler);
-    };
-  }
 
   var map = new Maps.Map($('#map')[0], {
     zoom: 12,
@@ -79,8 +21,6 @@ $(document).ready(function() {
   });
 
   var range=require('views/lib/range');
-  // correct for small shift in Google Maps aerials of unknown reason
-  var offset=[-0.00178,-0.00121];
 
   // some nice colors for different types
   var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
@@ -179,7 +119,7 @@ $(document).ready(function() {
     }
     ajax();
     // Even more sad: I need to add this timer
-    // because Chrome does not call 'complete'
+    // because Chrome does not call 'complete'.
     window.setTimeout(function() { if (!successful) ajax(); }, 3000);
     function success(data) {
       successful=true;
@@ -190,52 +130,17 @@ $(document).ready(function() {
           var row=data.rows.shift();
           var item=items[row.key[0]];
           if (row.value.GeoJSON) {
-            var GeoJSON=row.value.GeoJSON;
-            // Replace all 2-element arrays inside GeoJSON.coordinates with
-            // LatLngs; This is written with extra-ugly comma operators and
-            // multiple vars inside the for loop to increase performance.
-            var c=GeoJSON.coordinates;
-            if (typeof(c[0])=="number") GeoJSON.coordinates=new LatLng(c[1]+offset[1],c[0]+offset[0]);
-            else if (typeof(c[0][0])=="number")
-              for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1]+offset[1],ci[0]+offset[0]);
-            else if (typeof(c[0][0][0])=="number")
-              for (var i=0, ci; ci=c[i], i<c.length; i++)
-              for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1]+offset[1],cij[0]+offset[0]);
-            else if (typeof(c[0][0][0][0])=="number")
-              for (var i=0, ci; ci=c[i], i<c.length; i++)
-              for (var j=0, cij; cij=ci[j], j<ci.length; j++)
-              for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+offset[1],cijk[0]+offset[0]);
-            var options={
-              map:map,
-              position:GeoJSON.coordinates,
-              path:GeoJSON.coordinates,
-              paths:GeoJSON.coordinates,
-              fillOpacity: 0.25,
-              icon:"svg/marker.svg"
-            };
-            if (item.shape) item.shape.setOptions(options);
-            else {
-              var shape=function(type) {
-                // yes this is the new switch
-                if (type=="Point") return new Maps.Marker(options);
-                if (type=="Polygon") return new Maps.Polygon(options);
-                if (type=="LineString") return new Maps.Polyline(options);
-                if (type=="MultiPolygon") return new MultiPolygon(options);
-                if (type=="MultiLineString") return new MultiLineString(options);
-                // remind myself that this needs work!!!
-                alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
-              }(GeoJSON.type);
-              // Select link if user clicks on shape and decrease
-              // zIndex to give access to obstructed shapes.
-              shape.addListener('click', function(tr) {
+            var options=expand_options({ coordinates:row.value.GeoJSON.coordinates, map:map});
+            if (item.shape==null) {
+              item.shape=create_shape(row.value.GeoJSON.type, options);
+              item.shape.addListener('click', function(tr) {
                 return function() {
                   this.setOptions({zIndex:-new Date().getTime()});
                   $("#table tbody").prepend(tr);
                   tr.find('a').last().focus();
                 };
               }(item.tr));
-              item.shape=shape;
-            }
+            } else item.shape.setOptions(options);
           } else {
             data.rows.unshift(row);
             var tr=item.tr;
