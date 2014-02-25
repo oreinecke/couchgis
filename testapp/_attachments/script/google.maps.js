@@ -78,8 +78,8 @@ function expand_options(options) {
     for (var j=0, cij; cij=ci[j], j<ci.length; j++)
     for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+ofs1,cijk[0]+ofs0);
   options.position=options.path=options.paths=c;
-  if (!'fillOpacity' in options) options.fillOpacity=0.25;
-  if (!'icon' in options) options.icon="svg/marker.svg";
+  if (options.fillOpacity==null) options.fillOpacity=0.25;
+  if (options.icon==null) options.icon="svg/marker.svg";
   return options;
 }
 
