@@ -678,7 +678,7 @@ $(document).ready(function() {
     // Provide a permanent link if the URI is small. 
     keys=encodeURIComponent(JSON.stringify(keys));
     if (keys.length<=4096) {
-      window.open(url+"&keys="+keys, "_blank");
+      window.open(url+"&keys="+keys, "_self");
       return;
     }
     // Otherwise employ the hacky key compression scheme.

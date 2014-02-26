@@ -9,12 +9,10 @@ function(head, req) {
     print=parseInt(compressed_keys.shift());
     skip=parseInt(compressed_keys.shift());
   }
-//   Re-enable Content-Disposition as soon as debugging is finished!!!
-//start({'headers':{
-//  'Content-Type':'application/json;charset=utf-8',
-//  'Content-Disposition':'attachment;filename="'+filename+'.geojson"'
-//}});
-  start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
+  start({'headers':{
+    'Content-Type':'application/json;charset=utf-8',
+    'Content-Disposition':'attachment;filename="'+filename+'.geojson"'
+  }});
   var features=[];
   var row=getRow();
   while (row) {
