@@ -2,16 +2,18 @@
 
 function(head, req) {
   var filename=req.query.filename || "export";
-  start({'headers':{
-    'Content-Type':'application/json;charset=utf-8',
-    'Content-Disposition':'attachment;filename="'+filename+'.geojson"'
-  }});
+//   Re-enable Content-Disposition as soon as debugging is finished!!!
+//start({'headers':{
+//  'Content-Type':'application/json;charset=utf-8',
+//  'Content-Disposition':'attachment;filename="'+filename+'.geojson"'
+//}});
+  start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
   var features=[];
   var row=getRow();
   while (row) {
     while (row && row.value.GeoJSON && row.value.GeoJSON.error!==0.0)
       row=getRow();
-    var geometry=row.value.GeoJSON;
+    var geometry=row.value.GeoJSON || {};
     delete geometry.error;
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
