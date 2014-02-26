@@ -337,13 +337,13 @@ $(document).ready(function() {
   <iframe src="login_bar.htm" style="width:100%; height:1.6em; border:0;"></iframe>
 
   <h1> GeoJSON Upload </h1>
-  <form id="upload" action="">
+  <form id="upload">
     <input type="file">
     <input type="submit" value="Los!" disabled>
     <input type="button" value="Rückgängig" name="revert" style="display:none"><br>
     <b></b>
   </form>
-  <form id="modify" action="" style="display:none">
+  <form id="modify" style="display:none">
     <span>Datensatz-Typ: <input type="text" name="type" size="10" value=""></span>
     <span>Zeitraum: <input type="text" name="time" size="15" value="06/2010-10.4.2012"></span><br>
     <span><input type="checkbox" name="all" checked> Alle Felder auswählen</span>
@@ -359,7 +359,7 @@ $(document).ready(function() {
       Datensatz <a>1</a>
       <input type="button" name="next" value=">"></span>
   </form>
-  <form id="reduce" action="" style="display:none;height:50%">
+  <form id="reduce" style="display:none;height:50%">
     <input type="button" name="show" value="Ähnliche Geometrien suchen">
     <span id="show-suggestions" style="display:none">
       Ähnliche Geometrien für
