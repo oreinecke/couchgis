@@ -2,6 +2,13 @@
 
 function(head, req) {
   var filename=req.query.filename || "export";
+  var compressed_keys=req.query.compressed_keys;
+  var print=Infinity, skip=0;
+  if (compressed_keys) {
+    compressed_keys=compressed_keys.split('-');
+    print=parseInt(compressed_keys.shift());
+    skip=parseInt(compressed_keys.shift());
+  }
 //   Re-enable Content-Disposition as soon as debugging is finished!!!
 //start({'headers':{
 //  'Content-Type':'application/json;charset=utf-8',
@@ -18,11 +25,18 @@ function(head, req) {
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
-      features.push({
-        type:"Feature",
-        geometry:geometry,
-        properties:row.value.doc
-      });
+      if (print) {
+        features.push({
+          type:"Feature",
+          geometry:geometry,
+          properties:row.value.doc
+        });
+        print--;
+      } else skip--;
+      if (!print && !skip) {
+        print=parseInt(compressed_keys.shift());
+        skip=parseInt(compressed_keys.shift());
+      }
       row=getRow();
     }
   }
