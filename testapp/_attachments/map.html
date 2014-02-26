@@ -681,6 +681,29 @@ $(document).ready(function() {
       window.open(url+"&keys="+keys, "_blank");
       return;
     }
+    // Otherwise employ the hacky key compression scheme.
+    $.getJSON("_view/geojson-doc", function(data) {
+      keys=data.rows;
+      // get document order identical to _view/geojson
+      for (var row=0;row<keys.length;row++)
+        keys[row]=keys[row].id;
+      // tag unfiltered documents
+      for (var d=0;d<documents.length;d++) {
+        var index=keys.indexOf(documents[d][1]);
+        if (index===-1) continue;
+        keys[index]=null;
+      }
+      // count consecuive null/non-null elements
+      var prepend_zero=(keys[0]!==null);
+      for (var index=0;index<keys.length;index++) {
+        var filtered=keys[index]!==null, count=1;
+        while (index+count<keys.length && (filtered ^ keys[index+count]===null))
+          count++;
+        keys.splice(index, count, count);
+      }
+      if (prepend_zero) keys.unshift(0);
+      window.open(url+"&compressed_keys="+keys.join('-'), "_self");
+    });
   });
 
 });
