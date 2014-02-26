@@ -9,11 +9,12 @@ function(head, req) {
   var features=[];
   var row=getRow();
   while (row) {
-    while (row.key[1]!==0.0) row=getRow();
+    while (row && row.value.GeoJSON && row.value.GeoJSON.error!==0.0)
+      row=getRow();
     var geometry=row.value.GeoJSON;
     delete geometry.error;
     delete geometry.crs;
-    while (!row.value.doc) row=getRow();
+    while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
       features.push({
         type:"Feature",
