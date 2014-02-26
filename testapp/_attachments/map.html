@@ -129,19 +129,7 @@ $(document).ready(function() {
         while (data.rows.length) {
           var row=data.rows.shift();
           var item=items[row.key[0]];
-          if (row.value.GeoJSON) {
-            var options=expand_options({ coordinates:row.value.GeoJSON.coordinates, map:map});
-            if (item.shape==null) {
-              item.shape=create_shape(row.value.GeoJSON.type, options);
-              item.shape.addListener('click', function(tr) {
-                return function() {
-                  this.setOptions({zIndex:-new Date().getTime()});
-                  $("#table tbody").prepend(tr);
-                  tr.find('a').last().focus();
-                };
-              }(item.tr));
-            } else item.shape.setOptions(options);
-          } else {
+          if (row.value.doc) {
             data.rows.unshift(row);
             var tr=item.tr;
             tr.html('');
@@ -183,7 +171,19 @@ $(document).ready(function() {
               item.shape.setOptions({fillColor:fillColor});
             else item.shape.setOptions({strokeColor:fillColor});
             item.keep_documents=true;
+            continue;
           }
+          var options=expand_options({ coordinates:row.value.GeoJSON.coordinates, map:map});
+          if (item.shape==null) {
+            item.shape=create_shape(row.value.GeoJSON.type, options);
+            item.shape.addListener('click', function(tr) {
+              return function() {
+                this.setOptions({zIndex:-new Date().getTime()});
+                $("#table tbody").prepend(tr);
+                tr.find('a').last().focus();
+              };
+            }(item.tr));
+          } else item.shape.setOptions(options);
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
           return;
