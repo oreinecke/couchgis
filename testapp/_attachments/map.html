@@ -664,6 +664,25 @@ $(document).ready(function() {
     $("form").submit( function(e) {e.preventDefault();} );
   });
 
+  $("#export").submit( function(e) {
+    var filename=$(this).find(":input").val();
+    var url="_list/export/geojson?filename="+filename;
+    var documents=filters[filters.length-1].documents;
+    var keys=[], id=null;
+    for (var d=0;d<documents.length;d++) {
+      var key=documents[d];
+      if (id!==key[0]) keys.push([key[0],0]);
+      keys.push(key);
+      id=key[0];
+    }
+    // Provide a permanent link if the URI is small. 
+    keys=encodeURIComponent(JSON.stringify(keys));
+    if (keys.length<=4096) {
+      window.open(url+"&keys="+keys, "_blank");
+      return;
+    }
+  });
+
 });
 </script>
 
@@ -733,6 +752,9 @@ $(document).ready(function() {
     </tr></thead>
     <tbody></tbody>
   </table>
-  <br>
+  <form id="export">
+    Auswahl als <input type="text" value="export">.geojson
+    <input type="submit" value="exportieren">
+  </form>
   </body>
 </html>
