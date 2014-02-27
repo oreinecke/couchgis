@@ -21,6 +21,7 @@ $(document).ready(function() {
   });
 
   var range=require('views/lib/range');
+  var indexes=require('views/lib/indexes');
 
   // some nice colors for different types
   var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
@@ -675,34 +676,24 @@ $(document).ready(function() {
       keys.push(key);
       id=key[0];
     }
-    // Provide a permanent link if the URI is small. 
+    // Provide a permanent link if the URI is small.
     keys=encodeURIComponent(JSON.stringify(keys));
     if (keys.length<=4096) {
       window.open(url+"&keys="+keys, "_self");
       return;
     }
-    // Otherwise employ the hacky key compression scheme.
+    // Otherwise employ index compression.
     $.getJSON("_view/geojson-doc", function(data) {
-      keys=data.rows;
       // get document order identical to _view/geojson
-      for (var row=0;row<keys.length;row++)
-        keys[row]=keys[row].id;
-      // tag unfiltered documents
-      for (var d=0;d<documents.length;d++) {
-        var index=keys.indexOf(documents[d][1]);
-        if (index===-1) continue;
-        keys[index]=null;
-      }
-      // count consecuive null/non-null elements
-      var prepend_zero=(keys[0]!==null);
-      for (var index=0;index<keys.length;index++) {
-        var filtered=keys[index]!==null, count=1;
-        while (index+count<keys.length && (filtered ^ keys[index+count]===null))
-          count++;
-        keys.splice(index, count, count);
-      }
-      if (prepend_zero) keys.unshift(0);
-      window.open(url+"&compressed_keys="+keys.join('-'), "_self");
+      keys=data.rows;
+      var list=[];
+      // Replace each key with its string representation,
+      for (var k=0;k<keys.length;k++)
+        keys[k]=JSON.stringify([keys[k].key, keys[k].id]);
+      // in order to get a valid result from Array.indexOf().
+      for (var d=0;d<documents.length;d++)
+        list.push(keys.indexOf(JSON.stringify(documents[d])));
+      window.open(url+"&compressed_keys="+indexes.compress(list), "_self");
     });
   });
 
