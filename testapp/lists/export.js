@@ -26,7 +26,7 @@ function(head, req) {
           geometry:geometry,
           properties:row.value.doc
         });
-        indexes.shift();
+        if (indexes) indexes.shift();
       }
       row=getRow();
       index++;
