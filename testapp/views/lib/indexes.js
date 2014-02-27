@@ -3,7 +3,7 @@
 // efficient pattern that reads 0-2-1-1-3-1-1-2-1.
 
 exports.compress=function(list) {
-  list.sort();
+  list.sort(function(a,b) {return a-b;});
   var prefix=(list[0]?[0,list[0]]:[]);
   for (var index=0;index<list.length;index+=2) {
     var count=0, skip=0;
