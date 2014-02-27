@@ -2,13 +2,10 @@
 
 function(head, req) {
   var filename=req.query.filename || "export";
-  var compressed_keys=req.query.compressed_keys;
-  var print=Infinity, skip=0;
-  if (compressed_keys) {
-    compressed_keys=compressed_keys.split('-');
-    print=parseInt(compressed_keys.shift());
-    skip=parseInt(compressed_keys.shift());
-  }
+  var indexes=req.query.compressed_keys;
+  if (indexes)
+    indexes=require('views/lib/indexes').decompress(indexes);
+  var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
     'Content-Disposition':'attachment;filename="'+filename+'.geojson"'
@@ -23,19 +20,16 @@ function(head, req) {
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
-      if (print) {
+      if (!indexes || index===indexes[0]) {
         features.push({
           type:"Feature",
           geometry:geometry,
           properties:row.value.doc
         });
-        print--;
-      } else skip--;
-      if (!print && !skip) {
-        print=parseInt(compressed_keys.shift());
-        skip=parseInt(compressed_keys.shift());
+        indexes.shift();
       }
       row=getRow();
+      index++;
     }
   }
   return JSON.stringify({
