@@ -436,234 +436,246 @@ $(document).ready(function() {
         fillColors[type]=fillColors.shift();
       }
     });
-    // Refine document list if date has changed.
-    $("#filter [name='time']").change( function() {
-      filter_documents({ time: $(this).val() });
-      var li=$("#time-is");
-      // This way the filter shows up at the end of the list instead of at
-      // the beginning. It is completely useless but I certainly like it.
-      if (li.css("display")==="none")
-        $("#cuts").append(li.show());
-      li.find('a').html($(this).val());
-      li.find(':button').off().click(function() {
-        filter_documents({time:""});
-        $("#filter [name='time']").val('');
-        li.hide();
-      });
-    });
-    // Refine document list if types have changed.
-    $("#filter .types").change( function() {
-      var types=[];
-      $("#filter .types :checked").each(function() {
-        types.push($(this).prop('name'));
-      });
-      // If no types are selected we might as well select all of
-      // them, because no-one really wants to see an empty list.
-      if (!types.length) types=filters[0].types;
-      // Update the list of fields to show only those
-      // that are available by the given type selection.
-      $.getJSON("_view/fields-values?group_level=2&group=true", function(data) {
-        var options={};
-        while (data.rows.length) {
-          var key=data.rows.shift().key;
-          if (types.indexOf(key[0])===-1) continue;
-          options[key[1]]=null;
-        }
-        var optgroup=$("#filter [name='fields']");
-        var val=$("#filter [name='field']").val();
-        $("[name='fields']").html('');
-        for (var field in options)
-          optgroup.append('<option>'+field+'</option>');
-        // The selected option was destroyed three
-        // lines above, so I just re-select it here.
-        $("#filter [name='field']").val(val);
-        // Remove options that are in the 'columns' <optgroup> already.
-        $("#table [name='columns'] option").each( function() {
-          delete options[$(this).val()];
-        });
-        // Fill 'fields' optgroup with reduced set of options.
-        var optgroup=$("#table [name='fields']");
-        for (var field in options)
-          optgroup.append('<option>'+field+'</option>');
-      });
-      filter_documents({types:types});
-      // It sure would be nice to see the new filter appear
-      // in the list, and I am in a good mood right now.
-      var li=$("#type-is");
-      li.find('a').html(types.join('/'));
-      // append filter item at the end instead of inserting it
-      if (li.css("display")==="none")
-        $("#cuts").append(li.show());
-      // hide filter item if it displays every type anyway
-      if (types.length===filters[0].types.length)
-        li.hide();
-      li.find(':button').off().click( function() {
-        // Remove all the type checkboxes and run it again.
-        $("#filter .types :checked").prop('checked', false);
-        $("#filter .types").change();
-      });
-    });
-    // Add content-filter on <enter> key press.
-    $("#filter [name='content']").keypress( function(e) {
-      if (e.which!==13) return;
-      var cut={
-        field:$("#filter [name='field']").val(),
-        value:$(this).val().replace(/(^\s+|\s+$)/g,'') || undefined
-      };
-      // I've made template filter items at the bottom of the
-      // page for the following field/value combinations.
-      var id=function(field, value) {
-        if (field==="_keyword" && value) return "#contains";
-        if (field==="_expression" && value) return "#expression";
-        if (field && value) return "#field-is";
-        if (field[0]!=='_') return "#has-defined";
-      }(cut.field, cut.value);
-      if (!id) return;
-      filter_documents({cuts:[cut]});
-      var li=$(id).clone();
-      li.show().prop('id',"");
-      li.find('a').html(cut.value);
-      li.find('b').html(cut.field[0]==='_'?undefined:cut.field);
-      $("#cuts").append(li);
-      li.find(':button').click(function() {
-        // Tell filter_documents() to remove cut from the queue and set form
-        // fields to its parameters; it is likely that the filter had a
-        // spelling error, so I should provide an easy way to correct it.
-        $("#filter [name='field']").val( cut.field || "" );
-        // update autocomplete source array
-        $("#filter [name='field']").change();
-        $("#filter [name='content']").val( cut.value || "" );
-        cut.remove_me=true;
-        filter_documents({cuts:[cut]});
-        li.remove();
-      });
-      $("#cuts").append(li);
-    });
-    // Update autocomplete source array.
-    $("#filter [name='field']").change( function() {
-      // clear text input on field change.
-      var input=$("#filter [name='content']");
-      input.val('');
-      var options={ minLength:0, maxItems:50, source:[] };
-      var field=$(this).val();
-      if (!$(this).find("[name='fields'] :selected").length) {
-        input.autocomplete(options);
-        return;
-      }
-      var types=$("#filter .types :checked");
-      if (!types.length) types=$("#filter .types :checkbox");
-      types.each(function() {
-        var type=$(this).prop('name');
-        var start_key=encodeURIComponent(JSON.stringify([type, field]));
-        var end_key=encodeURIComponent(JSON.stringify([type, field+' ']));
-        var url="_view/fields-values?group=true&inclusive_end=false&group=true";
-        url+="&start_key="+start_key+"&end_key="+end_key;
-        // Store labels as {label:null}.
-        var labels={};
-        $.getJSON(url, function(data) {
-          while (data.rows.length) {
-            var row=data.rows.shift();
-            // Do not suggest numbers or objects right now.
-            if (row.value.type!=="string") continue;
-            var label=row.key[2];
-            var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-            // Suppress duplicate suggestions.
-            if (labels[label]===null) continue;
-            options.source.push({label:label, value:value});
-            labels[label]=null;
-          }
-          input.autocomplete(options);
-        });
-      });
-    });
-    // Add or remove column to #table.
-    $("#table [name='field']").change( function() {
-      var select=$(this);
-      // Get selected option and find out in wich <optgroup> it belongs.
-      var option=select.find(":selected");
-      if (select.find("[name='columns']").find(option).length) {
-        // remove th from #table
-        $("#table thead .field").each( function() {
-          var th=$(this);
-          if (th.html()!==option.val()) return;
-          th.remove();
-          return false;
-        });
-        // move option back to the fields optgroup
-        select.find("[name='fields']").prepend(option);
-      } else {
-      var last=$("#table thead th").last();
-      $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
-      // move column selection to the right
-      $("#table thead tr").append(last);
-        var select=$(this);
-        // move option to the columns optgroup
-        select.find("[name='columns']").append(option);
-      }
-      // unselect column
-      select.val('');
-      for (var id in items) items[id].keep_documents=false;
-      call.this_one_next(update_geometry)();
-    });
-    // cycle through geometric detail mode:
-    // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
-    $("#settings [name='refine']").click( function() {
-      $("#settings [name='refine']").hide();
-      $("#settings [name='precise']").show();
-      // show refined geometry once, and
-      for (var id in items) {
-        items[id].keep_shape=(items[id].keys[0][1]===0);
-        items[id].keys[0][1]=0;
-      }
-      call.this_one_next(update_geometry)();
-      // revert to 'refine', if viewport was moved
-      Maps.event.addListenerOnce(map, 'bounds_changed', function() {
-        $("#settings [name='precise']").hide();
-        $("#settings [name='refine']").show();
-      });
-    });
-    $("#settings [name='precise']").click( function() {
-      $("#settings [name='precise']").hide();
-      $("#settings [name='simplified']").show();
-      Maps.event.clearListeners(map, 'bounds_changed');
-      Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
-    });
-    $("#settings [name='simplified']").click( function() {
-      $("#settings [name='simplified']").hide();
-      $("#settings [name='refine']").show();
-      Maps.event.clearListeners(map, 'bounds_changed');
-      Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-      Maps.event.trigger(map, 'bounds_changed');
-    });
-    // increase limit to next higher [1,2,5,10,20,50,etc]
-    $("#settings [name='more']").click( function() {
-      var limit=parseFloat($("#settings [name='limit']").val());
-      var new_limit=10;
-      while (new_limit<=limit) new_limit*=10;
-      if (new_limit>5*limit) new_limit/=5;
-      if (new_limit>2*limit) new_limit/=2;
-      $("#settings [name='limit']").val(new_limit);
-      Maps.event.trigger(map, 'bounds_changed');
-    });
-    // decrease limit to next lower [1,2,5,10,20,50,etc]
-    $("#settings [name='less']").click( function() {
-      var limit=parseFloat($("#settings [name='limit']").val());
-      var new_limit=1;
-      while (new_limit*10<limit) new_limit*=10;
-      if (new_limit*5<limit) new_limit*=5;
-      if (new_limit*2<limit) new_limit*=2;
-      $("#settings [name='limit']").val(new_limit);
-      // remove populated-viewport-notification
-      viewports[viewports.length-1].populated=false;
-      Maps.event.trigger(map, 'bounds_changed');
-    });
-    // Suppress page load if user presses enter in any
-    // text input and update map if anything changed.
-    $("#settings").change( function() {
-      Maps.event.trigger(map, 'bounds_changed');
-    });
-    $("form").submit( function(e) {e.preventDefault();} );
   });
+
+  // Refine document list if date has changed.
+  $("#filter [name='time']").change( function() {
+    filter_documents({ time: $(this).val() });
+    var li=$("#time-is");
+    // This way the filter shows up at the end of the list instead of at
+    // the beginning. It is completely useless but I certainly like it.
+    if (li.css("display")==="none")
+      $("#cuts").append(li.show());
+    li.find('a').html($(this).val());
+    li.find(':button').off().click(function() {
+      filter_documents({time:""});
+      $("#filter [name='time']").val('');
+      li.hide();
+    });
+  });
+
+  // Refine document list if types have changed.
+  $("#filter .types").change( function() {
+    var types=[];
+    $("#filter .types :checked").each(function() {
+      types.push($(this).prop('name'));
+    });
+    // If no types are selected we might as well select all of
+    // them, because no-one really wants to see an empty list.
+    if (!types.length) types=filters[0].types;
+    // Update the list of fields to show only those
+    // that are available by the given type selection.
+    $.getJSON("_view/fields-values?group_level=2&group=true", function(data) {
+      var options={};
+      while (data.rows.length) {
+        var key=data.rows.shift().key;
+        if (types.indexOf(key[0])===-1) continue;
+        options[key[1]]=null;
+      }
+      var optgroup=$("#filter [name='fields']");
+      var val=$("#filter [name='field']").val();
+      $("[name='fields']").html('');
+      for (var field in options)
+        optgroup.append('<option>'+field+'</option>');
+      // The selected option was destroyed three
+      // lines above, so I just re-select it here.
+      $("#filter [name='field']").val(val);
+      // Remove options that are in the 'columns' <optgroup> already.
+      $("#table [name='columns'] option").each( function() {
+        delete options[$(this).val()];
+      });
+      // Fill 'fields' optgroup with reduced set of options.
+      var optgroup=$("#table [name='fields']");
+      for (var field in options)
+        optgroup.append('<option>'+field+'</option>');
+    });
+    filter_documents({types:types});
+    // It sure would be nice to see the new filter appear
+    // in the list, and I am in a good mood right now.
+    var li=$("#type-is");
+    li.find('a').html(types.join('/'));
+    // append filter item at the end instead of inserting it
+    if (li.css("display")==="none")
+      $("#cuts").append(li.show());
+    // hide filter item if it displays every type anyway
+    if (types.length===filters[0].types.length)
+      li.hide();
+    li.find(':button').off().click( function() {
+      // Remove all the type checkboxes and run it again.
+      $("#filter .types :checked").prop('checked', false);
+      $("#filter .types").change();
+    });
+  });
+
+  // Add content-filter on <enter> key press.
+  $("#filter [name='content']").keypress( function(e) {
+    if (e.which!==13) return;
+    var cut={
+      field:$("#filter [name='field']").val(),
+      value:$(this).val().replace(/(^\s+|\s+$)/g,'') || undefined
+    };
+    // I've made template filter items at the bottom of the
+    // page for the following field/value combinations.
+    var id=function(field, value) {
+      if (field==="_keyword" && value) return "#contains";
+      if (field==="_expression" && value) return "#expression";
+      if (field && value) return "#field-is";
+      if (field[0]!=='_') return "#has-defined";
+    }(cut.field, cut.value);
+    if (!id) return;
+    filter_documents({cuts:[cut]});
+    var li=$(id).clone();
+    li.show().prop('id',"");
+    li.find('a').html(cut.value);
+    li.find('b').html(cut.field[0]==='_'?undefined:cut.field);
+    $("#cuts").append(li);
+    li.find(':button').click(function() {
+      // Tell filter_documents() to remove cut from the queue and set form
+      // fields to its parameters; it is likely that the filter had a
+      // spelling error, so I should provide an easy way to correct it.
+      $("#filter [name='field']").val( cut.field || "" );
+      // update autocomplete source array
+      $("#filter [name='field']").change();
+      $("#filter [name='content']").val( cut.value || "" );
+      cut.remove_me=true;
+      filter_documents({cuts:[cut]});
+      li.remove();
+    });
+    $("#cuts").append(li);
+  });
+
+  // Update autocomplete source array.
+  $("#filter [name='field']").change( function() {
+    // clear text input on field change.
+    var input=$("#filter [name='content']");
+    input.val('');
+    var options={ minLength:0, maxItems:50, source:[] };
+    var field=$(this).val();
+    if (!$(this).find("[name='fields'] :selected").length) {
+      input.autocomplete(options);
+      return;
+    }
+    var types=$("#filter .types :checked");
+    if (!types.length) types=$("#filter .types :checkbox");
+    types.each(function() {
+      var type=$(this).prop('name');
+      var start_key=encodeURIComponent(JSON.stringify([type, field]));
+      var end_key=encodeURIComponent(JSON.stringify([type, field+' ']));
+      var url="_view/fields-values?group=true&inclusive_end=false&group=true";
+      url+="&start_key="+start_key+"&end_key="+end_key;
+      // Store labels as {label:null}.
+      var labels={};
+      $.getJSON(url, function(data) {
+        while (data.rows.length) {
+          var row=data.rows.shift();
+          // Do not suggest numbers or objects right now.
+          if (row.value.type!=="string") continue;
+          var label=row.key[2];
+          var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+          // Suppress duplicate suggestions.
+          if (labels[label]===null) continue;
+          options.source.push({label:label, value:value});
+          labels[label]=null;
+        }
+        input.autocomplete(options);
+      });
+    });
+  });
+
+  // Add or remove column to #table.
+  $("#table [name='field']").change( function() {
+    var select=$(this);
+    // Get selected option and find out in wich <optgroup> it belongs.
+    var option=select.find(":selected");
+    if (select.find("[name='columns']").find(option).length) {
+      // remove th from #table
+      $("#table thead .field").each( function() {
+        var th=$(this);
+        if (th.html()!==option.val()) return;
+        th.remove();
+        return false;
+      });
+      // move option back to the fields optgroup
+      select.find("[name='fields']").prepend(option);
+    } else {
+    var last=$("#table thead th").last();
+    $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
+    // move column selection to the right
+    $("#table thead tr").append(last);
+      var select=$(this);
+      // move option to the columns optgroup
+      select.find("[name='columns']").append(option);
+    }
+    // unselect column
+    select.val('');
+    for (var id in items) items[id].keep_documents=false;
+    call.this_one_next(update_geometry)();
+  });
+
+  // cycle through geometric detail mode:
+  // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
+  $("#settings [name='refine']").click( function() {
+    $("#settings [name='refine']").hide();
+    $("#settings [name='precise']").show();
+    // show refined geometry once, and
+    for (var id in items) {
+      items[id].keep_shape=(items[id].keys[0][1]===0);
+      items[id].keys[0][1]=0;
+    }
+    call.this_one_next(update_geometry)();
+    // revert to 'refine', if viewport was moved
+    Maps.event.addListenerOnce(map, 'bounds_changed', function() {
+      $("#settings [name='precise']").hide();
+      $("#settings [name='refine']").show();
+    });
+  });
+
+  $("#settings [name='precise']").click( function() {
+    $("#settings [name='precise']").hide();
+    $("#settings [name='simplified']").show();
+    Maps.event.clearListeners(map, 'bounds_changed');
+    Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
+  });
+
+  $("#settings [name='simplified']").click( function() {
+    $("#settings [name='simplified']").hide();
+    $("#settings [name='refine']").show();
+    Maps.event.clearListeners(map, 'bounds_changed');
+    Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+    Maps.event.trigger(map, 'bounds_changed');
+  });
+
+  // increase limit to next higher [1,2,5,10,20,50,etc]
+  $("#settings [name='more']").click( function() {
+    var limit=parseFloat($("#settings [name='limit']").val());
+    var new_limit=10;
+    while (new_limit<=limit) new_limit*=10;
+    if (new_limit>5*limit) new_limit/=5;
+    if (new_limit>2*limit) new_limit/=2;
+    $("#settings [name='limit']").val(new_limit);
+    Maps.event.trigger(map, 'bounds_changed');
+  });
+
+  // decrease limit to next lower [1,2,5,10,20,50,etc]
+  $("#settings [name='less']").click( function() {
+    var limit=parseFloat($("#settings [name='limit']").val());
+    var new_limit=1;
+    while (new_limit*10<limit) new_limit*=10;
+    if (new_limit*5<limit) new_limit*=5;
+    if (new_limit*2<limit) new_limit*=2;
+    $("#settings [name='limit']").val(new_limit);
+    // remove populated-viewport-notification
+    viewports[viewports.length-1].populated=false;
+    Maps.event.trigger(map, 'bounds_changed');
+  });
+
+  // Suppress page load if user presses enter in any
+  // text input and update map if anything changed.
+  $("#settings").change( function() {
+    Maps.event.trigger(map, 'bounds_changed');
+  });
+
+  $("form").submit( function(e) {e.preventDefault();} );
 
   $("#export :button").click( function() {
     var filename=$("#export [name='filename']").val();
