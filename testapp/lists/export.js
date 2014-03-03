@@ -2,11 +2,12 @@
 
 function(head, req) {
   var filename=req.query.filename || "export";
-  var download=false || req.query.download==="true";
+  var download=req.query.download==="true";
   var indexes=req.query.compressed_keys;
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes);
   var range=require('views/lib/range');
+  var include_revision=req.query.include_revision==="true";
   var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
@@ -23,7 +24,12 @@ function(head, req) {
     while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
       if (!indexes || index===indexes[0]) {
-        row.value.doc.time=range.toString(row.value.doc.time) || undefined;
+        var doc=row.value.doc;
+        doc.time=range.toString(doc.time) || undefined;
+        if (!include_revision) {
+          delete doc._rev;
+          delete doc._id;
+        }
         features.push({
           type:"Feature",
           geometry:geometry,
