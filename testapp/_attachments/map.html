@@ -678,8 +678,7 @@ $(document).ready(function() {
   $("form").submit( function(e) {e.preventDefault();} );
 
   $("#export :button").click( function() {
-    var filename=$("#export [name='filename']").val();
-    var url="_list/export/geojson?filename="+filename;
+    var url="_list/export/geojson?filename="+$("#export [name='filename']").val();
     var documents=filters[filters.length-1].documents;
     var keys=[], id=null;
     for (var d=0;d<documents.length;d++) {
