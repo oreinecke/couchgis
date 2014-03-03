@@ -24,17 +24,16 @@ $(document).ready(function() {
     form=$("form");
     form.show();
     form.submit(function (e) {
-      // to be read as 'are we (localhost) the source??'
-      var source=$("#push").prop('checked');
-      var target=!source;
       var username=$("#replicate :text").val();
       var password=$("#replicate :password").val();
       var login="";
-      if (source && username!="") login=username+'@';
-      if (source && password!="") login=username+':'+password+'@';
-      // did not want to split up centralhost any more
+      if (username!="") login=username+'@';
+      if (password!="") login=username+':'+password+'@';
+      // to be read as 'are we (localhost) the source??'
+      var source=$("#push").prop('checked');
+      // insert username:password@ into centralhost
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
-      var settings={
+      $.couch.replicate(addr[source], addr[!source], {
         success:function(data) { 
           $("#replicate :submit").prop('disabled', false);
           // display some replication results
@@ -57,21 +56,13 @@ $(document).ready(function() {
           $("#replicate :submit").prop('disabled', false);
           $("#response").html("Fehler: <b>"+error+"</b>");
         }
-      }
-      $.couch.replicate(addr[source], addr[target], settings,
-       { continuous: $("#replicate :checkbox").prop('checked') } );
+      }, {
+        continuous: $("#replicate :checkbox").prop('checked')
+      });
       $("#replicate :submit").prop('disabled', true);
       e.preventDefault();
     });
   }
-  // enable login if 2nd option is checked
-  function enable_log() {
-    var pull=$("#pull").prop('checked');
-    $("#replicate :text").prop('disabled', pull);
-    $("#replicate :password").prop('disabled', pull);
-  }
-  $("#push").change(enable_log);
-  $("#pull").change(enable_log);
 });
 </script>
 
@@ -84,8 +75,8 @@ $(document).ready(function() {
   <form style="display:none" id="replicate">
     <input type="radio" id="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
     <input type="radio" id="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
-    Benutzername: <input type="text" size="7" disabled>
-    Kennwort: <input type="password" size="7" disabled><br>
+    Benutzername: <input type="text" size="7">
+    Kennwort: <input type="password" size="7"><br>
     <input type="checkbox"> Fortlaufend <input type="submit" value="Los!"><br>
     <div id="response"></div>
     <a href="#" id="centralapp">Zur zentralen Datenbank wechseln</a>
