@@ -688,14 +688,16 @@ $(document).ready(function() {
       keys.push(key);
       id=key[0];
     }
-    var translate_url=function(url) { window.open(url, "_self"); };
-    if ($(this).prop('name')==="get-url") translate_url=function(url) {
-      url=window.location.origin+'/'+list.db+'/_design/'+list.app+'/'+url;
-      // hide download button
-      $("#export [name='get-url']").hide();
-      // display the url in a selected text input
-      $("#export [name='url']").val(url).show().focus().select();
-    };
+    var translate_url=({
+      'download':function(url) { window.open(url+"&download=true", "_self"); },
+      'get-url':function(url) {
+        url=window.location.origin+'/'+list.db+'/_design/'+list.app+'/'+url;
+        // hide download button
+        $("#export [name='get-url']").hide();
+        // display the url in a selected text input
+        $("#export [name='url']").val(url).show().focus().select();
+      }
+    })[$(this).prop('name')];
     // Provide a permanent link if the URI is small.
     keys=encodeURIComponent(JSON.stringify(keys));
     if (keys.length<=4096) {

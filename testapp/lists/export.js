@@ -2,6 +2,7 @@
 
 function(head, req) {
   var filename=req.query.filename || "export";
+  var download=false || req.query.download==="true";
   var indexes=req.query.compressed_keys;
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes);
@@ -9,7 +10,7 @@ function(head, req) {
   var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
-    'Content-Disposition':'attachment;filename="'+filename+'.geojson"'
+    'Content-Disposition':download?'attachment;filename="'+filename+'.geojson"':undefined
   }});
   var features=[];
   var row=getRow();
