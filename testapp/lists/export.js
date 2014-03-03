@@ -2,12 +2,12 @@
 
 function(head, req) {
   var filename=req.query.filename || "export";
-  var download=req.query.download==="true";
+  var download='download' in req.query;
   var indexes=req.query.compressed_keys;
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes);
   var range=require('views/lib/range');
-  var include_revision=req.query.include_revision==="true";
+  var include_revision='include_revision' in req.query;
   var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
