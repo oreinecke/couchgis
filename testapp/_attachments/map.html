@@ -688,7 +688,7 @@ $(document).ready(function() {
       id=key[0];
     }
     var translate_url=({
-      'download':function(url) { window.open(url+"&download=true", "_self"); },
+      'download':function(url) { window.open(url+"&download", "_self"); },
       'get-url':function(url) {
         url=window.location.origin+'/'+list.db+'/_design/'+list.app+'/'+url;
         // hide download button
