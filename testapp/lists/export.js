@@ -9,6 +9,7 @@ function(head, req) {
   var range=require('views/lib/range');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
+  var include_geojson_id='include_geojson_id' in req.query;
   var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
@@ -38,6 +39,8 @@ function(head, req) {
           if (fields.search(field)!==-1) continue;
           delete doc[field];
         }
+        if (include_geojson_id)
+          doc.GeoJSON_clone=row.key[0];
         features.push({
           type:"Feature",
           geometry:geometry,
