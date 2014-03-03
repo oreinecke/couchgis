@@ -8,6 +8,7 @@ function(head, req) {
     indexes=require('views/lib/indexes').decompress(indexes);
   var range=require('views/lib/range');
   var include_revision='include_revision' in req.query;
+  var fields=req.query.fields;
   var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
@@ -29,6 +30,13 @@ function(head, req) {
         if (!include_revision) {
           delete doc._rev;
           delete doc._id;
+        }
+        for (var field in doc) {
+          if (fields==null) break;
+          if (field[0].search(/[A-ZÄÖÜ]/)!=0) continue;
+          if (field.search(/^GeoJSON/)==0) continue;
+          if (fields.search(field)!==-1) continue;
+          delete doc[field];
         }
         features.push({
           type:"Feature",
