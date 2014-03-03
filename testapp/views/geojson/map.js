@@ -28,7 +28,7 @@ function(doc) {
     }
   }
   var range=require('views/lib/range');
-  var val={doc:{_id:doc._id, type:doc.type, time:range.toRange(doc.time)}};
+  var val={doc:{_id:doc._id, _rev:doc._rev, type:doc.type, time:range.toRange(doc.time)}};
   for (var field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
     if (field[0].search(/[A-ZÄÖÜ]/)!=0) continue;
