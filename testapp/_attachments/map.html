@@ -699,7 +699,7 @@ $(document).ready(function() {
       }
     })[$(this).prop('name')];
     // Provide a permanent link if the URI is small.
-    keys=encodeURIComponent(JSON.stringify(keys));
+    keys=JSON.stringify(keys);
     if (keys.length<=4096) {
       translate_url(url+"&keys="+keys);
       return;
