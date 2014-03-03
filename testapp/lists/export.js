@@ -5,6 +5,7 @@ function(head, req) {
   var indexes=req.query.compressed_keys;
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes);
+  var range=require('views/lib/range');
   var index=0;
   start({'headers':{
     'Content-Type':'application/json;charset=utf-8',
@@ -21,6 +22,7 @@ function(head, req) {
     while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
       if (!indexes || index===indexes[0]) {
+        row.value.doc.time=range.toString(row.value.doc.time) || undefined;
         features.push({
           type:"Feature",
           geometry:geometry,
