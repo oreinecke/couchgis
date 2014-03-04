@@ -678,7 +678,9 @@ $(document).ready(function() {
   $("form").submit( function(e) {e.preventDefault();} );
 
   $("#export :button").click( function() {
-    var url="_list/export/geojson?filename="+$("#export [name='filename']").val();
+    var url="_list/export/geojson";
+    url+="?filename="+$("#export [name='filename']").val();
+    url+="&filetype="+$("#export [name='filetype']:checked").val();
     var documents=filters[filters.length-1].documents;
     var keys=[], id=null;
     for (var d=0;d<documents.length;d++) {
@@ -803,14 +805,18 @@ $(document).ready(function() {
     <tbody></tbody>
   </table>
   <form id="export">
-    <span>Auswahl als <input type="text" value="export" name="filename">.geojson</span>
-    <span><input type="button" value="speichern" name="download">
-      <input type="button" value="URL erzeugen" name="get-url">
-      <input type="text" name="url" style="display:none"></span>
+    <span>Auswahl als <input type="text" value="export" name="filename"></span>
+    <span>
+      <input type="radio" name="filetype" value="geojson" checked>.geojson
+      <input type="radio" name="filetype" value="xml">.xml-Tabelle</span>
+    <input type="button" value="speichern" name="download">
+    <input type="button" value="URL erzeugen" name="get-url">
+    <input type="text" name="url" style="display:none">
     <span>
       <input type="radio" name="select-fields" checked>alle
       <input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</span>
-    <span><input type="checkbox" name="include-revision" checked>_id, _rev
+    <span>
+      <input type="checkbox" name="include-revision" checked>_id, _rev
       <input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</span>
   </form>
   </body>
