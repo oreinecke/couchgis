@@ -30,7 +30,7 @@ $(document).ready(function() {
       if (username!="") login=username+'@';
       if (password!="") login=username+':'+password+'@';
       // to be read as 'are we (localhost) the source??'
-      var source=$("#push").prop('checked');
+      var source=$("#replicate [name='mode']:checked").val()==="push");
       // insert username:password@ into centralhost
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
       $.couch.replicate(addr[source], addr[!source], {
@@ -73,8 +73,8 @@ $(document).ready(function() {
 
   <h1> Datenbank-Replikation </h1>
   <form style="display:none" id="replicate">
-    <input type="radio" id="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
-    <input type="radio" id="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
+    <input type="radio" value="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
+    <input type="radio" value="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
     Benutzername: <input type="text" size="7">
     Kennwort: <input type="password" size="7"><br>
     <input type="checkbox"> Fortlaufend <input type="submit" value="Los!"><br>

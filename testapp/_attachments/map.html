@@ -691,7 +691,7 @@ $(document).ready(function() {
       url+="&include_revision";
     if ($("#export [name='include-geojson-id']").prop('checked'))
       url+="&include_geojson_id";
-    if ($("#export #from-table").prop('checked')) {
+    if ($("#export [name='select-fields']:checked").val()==="from-table") {
       var fields=[];
       $("#table thead .field").each(function() { fields.push($(this).html()); });
       url+="&fields="+fields.join(':');
@@ -807,8 +807,9 @@ $(document).ready(function() {
     <span><input type="button" value="speichern" name="download">
       <input type="button" value="URL erzeugen" name="get-url">
       <input type="text" name="url" style="display:none"></span>
-    <span><input type="radio" name="fields" checked>alle
-      <input type="radio" name="fields" id="from-table">ausgewählte Spalten</span>
+    <span>
+      <input type="radio" name="select-fields" checked>alle
+      <input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</span>
     <span><input type="checkbox" name="include-revision" checked>_id, _rev
       <input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</span>
   </form>
