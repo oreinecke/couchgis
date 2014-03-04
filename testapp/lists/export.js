@@ -36,7 +36,7 @@ function(head, req) {
           if (fields==null) break;
           if (field[0].search(/[A-ZÄÖÜ]/)!=0) continue;
           if (field.search(/^GeoJSON/)==0) continue;
-          if (fields.search(field)!==-1) continue;
+          if (fields.search('(^|:)'+field+'(:|$)')!==-1) continue;
           delete doc[field];
         }
         if (include_geojson_id)
