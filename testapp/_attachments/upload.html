@@ -2,7 +2,7 @@
 
 <html lang="de" style="height:100%">
   <head>
-    <title>GeoJSON Upload</title>
+    <title>XML/GeoJSON-Upload</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <link href="css/jquery-ui-1.10.4.custom.css" rel="stylesheet">
     <script src="script/jquery-1.10.2.js"></script>
@@ -69,14 +69,86 @@ $(document).ready(function() {
     submit.prop('disabled', true);
     $("#upload b").html("");
     var reader=new FileReader();
+    // get file type and be flexible about extensions
+    var filetype=e.target.files[0].name.match(/[^.]*$/)[0];
+    if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
+    if (/^xml$/i.test(filetype)) filetype="xml";
     reader.onload=function(evt) {
       try {
-        var GeoJSON=JSON.parse(evt.target.result);
-        if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
-        else if (GeoJSON.type=="Feature") features=[GeoJSON];
-        else throw{message:"Useless GeoJSON type!"};
-        crs=GeoJSON.crs;
-        if (!crs) throw{message:"No top-level CRS defined!"};
+        if (filetype==="geojson") {
+          var GeoJSON;
+          // reformat JSON.parse error merrages
+          try { GeoJSON=JSON.parse(evt.target.result); }
+          catch (err) { throw{message:"JSON.parse: "+err.message}; }
+          if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
+          else if (GeoJSON.type=="Feature") features=[GeoJSON];
+          else throw{message:"Unknown or useless GeoJSON type: "+GeoJSON.type};
+          crs=GeoJSON.crs;
+          if (!crs) throw{message:"No top-level CRS defined"};
+        } else if (filetype==="xml") {
+          // divide xml recursively into <Tag>..</Tag> objects
+          var tables=(function parse(xml, tags) {
+            if (typeof tags==="object") {
+              if (!tags.length) return xml;
+              var tag=tags[0];
+              var elements=parse(xml, tag);
+              for (var i=0;i<elements.length;i++)
+                elements[i].xml=parse(elements[i].xml, tags.slice(1));
+              return elements;
+            }
+            var elements=[], tag=tags, m;
+            do {
+              // match opening <Tag> or singular <Tag/>
+              if (!(m=xml.match('<\\s*'+tag+'(/?>|\\s[^>]*>)')))
+                continue;
+              // parse tag attributes
+              var attribs=m[0].match(/[\w:]+="[^"]*"/g);
+              var element={};
+              while (attribs && attribs.length) {
+                var attrib=attribs.shift().match(/([\w:]+)="([^"]*)"/);
+                element[attrib[1]]=attrib[2];
+              }
+              if (m[0].search('/>$')===-1) {
+                // strip matched tag from xml
+                xml=xml.substring(m.index+m[0].length);
+                // match closing </Tag>
+                if (!(m=xml.match('</\\s*'+tag+'\\s*>')))
+                  throw({message:"XML.parse: Missing </"+tag+">"});
+                // add xml between <Tag>..</Tag>
+                element.xml=xml.substring(0,m.index);
+              // add empty xml if <Tag/> is singular
+              } else element.xml="";
+              elements.push(element);
+              // strip processed xml and continue
+              xml=xml.substring(m.index+m[0].length);
+            } while (m);
+            return elements;
+          })(evt.target.result, ["Table","Row","Cell","Data"]);
+          while (tables.length) {
+            var rows=tables.shift().xml;
+            // insert empty xml if ss:Index is set
+            function normalize(xml) {
+              for (var i=0;i<xml.length;i++)
+                while ( i+1 < (xml[i]['ss:Index'] || 0) )
+                  xml.splice(i++, 0, {xml:[]});
+              return xml;
+            }
+            var columns=normalize(rows.shift().xml);
+            while (rows.length) {
+              var row=normalize(rows.shift().xml);
+              var feature={properties:{}};
+              var properties={};
+              for (var c=0;c<row.length;c++) {
+                if (!columns[c].xml.length) continue;
+                var data=row[c].xml[0] || {xml:""};
+                if (data['ss:Type']==="Number") data.xml=parseFloat(data.xml);
+                if (data['ss:Type']==="Boolean") data.xml=(data.xml==="1");
+                properties[columns[c].xml[0].xml]=data.xml;
+              }
+              features.push({properties:properties});
+            }
+          }
+        } else throw{message:"Unknown extension: ."+filetype};
       } catch(err) {
         $("#upload b").html(err.message+"<br>");
         return;
@@ -104,7 +176,7 @@ $(document).ready(function() {
               v=JSON.parse(v);
               input.val(v);
             // if that fails just write it as a string
-            } catch(e) {}
+            } catch(err) {}
             features[$("#modify a").html()-1].properties[prop]=v;
           };
         }(value, prop));
@@ -336,7 +408,7 @@ $(document).ready(function() {
 
   <iframe src="login_bar.htm" style="width:100%; height:1.6em; border:0;"></iframe>
 
-  <h1> GeoJSON Upload </h1>
+  <h1> XML/GeoJSON-Upload </h1>
   <form id="upload">
     <input type="file">
     <input type="submit" value="Los!" disabled>
