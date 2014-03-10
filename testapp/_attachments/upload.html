@@ -254,7 +254,7 @@ $(document).ready(function() {
         doc[fields[prop].val()]=feature.properties[prop];
       }
       // store geometry as GeoJSON
-      if (!(doc.GeoJSON_clone=feature.GeoJSON_clone)) {
+      if (!(doc.GeoJSON_clone=feature.GeoJSON_clone||feature.properties.GeoJSON_clone)) {
         doc.GeoJSON=feature.geometry;
         doc.GeoJSON.crs=crs;
       }
