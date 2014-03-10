@@ -105,7 +105,7 @@ $(document).ready(function() {
               input.val(v);
             // if that fails just write it as a string
             } catch(e) {}
-            features[parseInt($("#modify a").html())-1].properties[prop]=v;
+            features[$("#modify a").html()-1].properties[prop]=v;
           };
         }(value, prop));
         values[prop]=value;
@@ -145,12 +145,12 @@ $(document).ready(function() {
     $("#modify [name='include']").change();
   });
   $("#modify [name='prev']").click(function() {
-    var f=parseInt($("#modify a").html());
+    var f=$("#modify a").html();
     if (--f<1) f=features.length;
     show_feature(f-1);
   });
   $("#modify [name='next']").click(function() {
-    var f=parseInt($("#modify a").html());
+    var f=$("#modify a").html();
     if (++f>features.length) f=1;
     show_feature(f-1);
   });
@@ -222,7 +222,7 @@ $(document).ready(function() {
   });
   function show_geometry(f) {
     // remove previous shapes from map canvas
-    var feature=features[parseInt($("#show-suggestions a").html())-1];
+    var feature=features[$("#show-suggestions a").html()-1];
     if (feature) {
       if (feature.shape) feature.shape.setMap();
       delete feature.shape;
@@ -276,13 +276,13 @@ $(document).ready(function() {
   }
   // skip to next/previous document with similar geometry
   $("#reduce [name='next']").click(function() {
-    var f=parseInt($("#show-suggestions a").html())-1, g=f;
+    var f=$("#show-suggestions a").html()-1, g=f;
     do f=(f+1)%features.length;
     while (!features[f].items && f!=g);
     show_geometry(f);
   });
   $("#reduce [name='prev']").click(function() {
-    var f=parseInt($("#show-suggestions a").html())-1, g=f;
+    var f=$("#show-suggestions a").html()-1, g=f;
     do f=(f+features.length-1)%features.length;
     while (!features[f].items && f!=g);
     show_geometry(f);
