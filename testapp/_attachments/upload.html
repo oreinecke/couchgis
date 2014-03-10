@@ -136,7 +136,6 @@ $(document).ready(function() {
             var columns=normalize(rows.shift().xml);
             while (rows.length) {
               var row=normalize(rows.shift().xml);
-              var feature={properties:{}};
               var properties={};
               for (var c=0;c<row.length;c++) {
                 if (!columns[c].xml.length) continue;
@@ -153,6 +152,11 @@ $(document).ready(function() {
         $("#upload b").html(err.message+"<br>");
         return;
       }
+      // condense union of properties into the first feature
+      for (var f=1;f<features.length;f++)
+        for (var prop in features[f].properties)
+          if (features[0].properties[prop]==null)
+            features[0].properties[prop]=undefined;
       submit.prop('disabled', false);
       submit.val("Los!");
       var div=$("#modify div");
