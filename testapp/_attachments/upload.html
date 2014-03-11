@@ -13,6 +13,7 @@
 
 <script>
 $(document).ready(function() {
+  var db=window.location.pathname.match(/[^/]+/)[0];
   var map;
   var crs, features=[];
   var submit=$("#upload :submit");
@@ -260,8 +261,7 @@ $(document).ready(function() {
       }
       docs.push(doc);
     }
-    $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).bulkSave(
-    { docs:docs, all_or_nothing:true }, {
+    $.couch.db(db).bulkSave( {docs:docs, all_or_nothing:true}, {
       success:function(data) {
         $("#modify").hide();
         $("#reduce").show();
@@ -286,8 +286,7 @@ $(document).ready(function() {
         _deleted:true
       };
     }
-    $.couch.db(window.location.pathname.match(/[^/]+/g)[0]).bulkSave(
-    { docs:uploaded_docs, all_or_nothing:true }, {
+    $.couch.db(db).bulkSave( {docs:uploaded_docs, all_or_nothing:true}, {
       success:function(data) {
         submit.show();
         revert.hide();
@@ -398,8 +397,7 @@ $(document).ready(function() {
               return;
             }
           };
-        }(id, i));
-        i++;
+        }(id, i++));
       }
     });
   });
