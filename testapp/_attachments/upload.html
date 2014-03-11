@@ -369,11 +369,11 @@ $(document).ready(function() {
     $("#show-suggestions").show();
     var keys=[];
     for (var d=0;d<uploaded_docs.length;d++)
-      keys.push(uploaded_docs[d].id);
+      keys.push(features[d].properties.GeoJSON_clone || uploaded_docs[d].id);
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
       for (var i=0;i<keys.length;i++) {
         var feature=features[i];
-        feature.bbox=data[uploaded_docs[i].id].GeoJSON.bbox;
+        feature.bbox=data[features[i].properties.GeoJSON_clone || uploaded_docs[i].id].GeoJSON.bbox;
         var options=encodeURIComponent(JSON.stringify({
           bbox:feature.bbox,
           similarity:0.0001
