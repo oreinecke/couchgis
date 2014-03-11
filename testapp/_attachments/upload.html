@@ -371,30 +371,35 @@ $(document).ready(function() {
     for (var d=0;d<uploaded_docs.length;d++)
       keys.push(features[d].properties.GeoJSON_clone || uploaded_docs[d].id);
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
-      for (var i=0;i<keys.length;i++) {
+      var i=0;
+      for (var id in data) {
         var feature=features[i];
-        feature.bbox=data[features[i].properties.GeoJSON_clone || uploaded_docs[i].id].GeoJSON.bbox;
+        feature.bbox=data[id].GeoJSON.bbox;
         var options=encodeURIComponent(JSON.stringify({
           bbox:feature.bbox,
           similarity:0.0001
         }));
-        // call this as soon as a geometry suggestion emerged
         var found_geometry=function() {
           $("#reduce :button").prop('disabled', false);
           $("#reduce [name='next']").click();
           found_geometry=function() {};
         }
-        $.getJSON("_list/bbox-filter/bbox?options="+options, function(j) {
+        $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, i) {
           return function(data) {
-            delete data[uploaded_docs[j].id];
-            // This leaves doc.items undefined if data is empty.
-            for (var id in data) {
-              features[j].items=data;
+            // remove from items if geometry is new
+            if (id===uploaded_docs[i].id)
+              delete data[id];
+            // This leaves doc.items undefined if data is
+            // empty or consists only of the cloned geometry.
+            for (var id2 in data) {
+              if (id2===id) continue;
+              features[i].items=data;
               found_geometry();
               return;
             }
           };
-        }(i));
+        }(id, i));
+        i++;
       }
     });
   });
