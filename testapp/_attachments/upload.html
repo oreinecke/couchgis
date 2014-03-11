@@ -245,7 +245,7 @@ $(document).ready(function() {
     var docs=[];
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
-      var doc={};
+      var doc=uploaded_docs[feature._id] || {};
       // set doc-type and time
       doc.type=type || undefined;
       doc.time=time || undefined;
@@ -257,10 +257,9 @@ $(document).ready(function() {
         if (fields[prop].prop('disabled')) continue;
         if (fields[prop].val()=="") continue;
         // and ignore useless undefined fields
-        if (feature.properties[prop]==null) continue;
-        if (feature.properties[prop]=="null") continue;
-        if (feature.properties[prop]=="") continue;
-        doc[fields[prop].val()]=feature.properties[prop];
+        if ([null, "", "null", "undefined"].indexOf(feature.properties[prop])===-1)
+          doc[fields[prop].val()]=undefined;
+        else doc[fields[prop].val()]=feature.properties[prop];
       }
       // store geometry as GeoJSON
       if (!(doc.GeoJSON_clone=feature.properties.GeoJSON_clone)) {
