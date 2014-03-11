@@ -149,15 +149,23 @@ $(document).ready(function() {
             }
           }
         } else throw{message:"Unknown extension: ."+filetype};
+        uploaded_docs={};
+        for (var f=0;f<features.length;f++) {
+          var properties=features[f].properties;
+          // store previous version of existing document
+          if (properties._id) $.getJSON('/'+db+'/'+properties._id, function(data) {
+            uploaded_docs[data._id]=data;
+          });
+          // condense union of properties into the first feature
+          if (!f) continue;
+          for (var prop in properties)
+            if (!(prop in properties))
+              features[0].properties[prop]=undefined;
+        }
       } catch(err) {
         $("#upload b").html(err.message+"<br>");
         return;
       }
-      // condense union of properties into the first feature
-      for (var f=1;f<features.length;f++)
-        for (var prop in features[f].properties)
-          if (features[0].properties[prop]==null)
-            features[0].properties[prop]=undefined;
       submit.prop('disabled', false);
       submit.val("Los!");
       var div=$("#modify div");
