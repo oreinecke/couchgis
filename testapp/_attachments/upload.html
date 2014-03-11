@@ -254,7 +254,7 @@ $(document).ready(function() {
         doc[fields[prop].val()]=feature.properties[prop];
       }
       // store geometry as GeoJSON
-      if (!(doc.GeoJSON_clone=feature.GeoJSON_clone||feature.properties.GeoJSON_clone)) {
+      if (!(doc.GeoJSON_clone=feature.properties.GeoJSON_clone)) {
         doc.GeoJSON=feature.geometry;
         doc.GeoJSON.crs=crs;
       }
@@ -319,7 +319,7 @@ $(document).ready(function() {
       data=JSON.parse(data);
       function select_me(GeoJSON_clone) {
         return function() {
-          feature.GeoJSON_clone=GeoJSON_clone;
+          feature.properties.GeoJSON_clone=GeoJSON_clone;
           shape.setOptions({strokeColor:"#000000"});
           this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
           shape=this;
@@ -345,9 +345,9 @@ $(document).ready(function() {
       }
       map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0+offset[1],
                                (feature.bbox[2]+feature.bbox[0])/2.0+offset[0]));
-      if (feature.GeoJSON_clone==null) shape=feature.shape;
-      else shape=feature.items[feature.GeoJSON_clone].shape;
-      select_me(feature.GeoJSON_clone).apply(shape);
+      if (feature.properties.GeoJSON_clone==null) shape=feature.shape;
+      else shape=feature.items[feature.properties.GeoJSON_clone].shape;
+      select_me(feature.properties.GeoJSON_clone).apply(shape);
     });
   }
   // skip to next/previous document with similar geometry
