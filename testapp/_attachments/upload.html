@@ -239,33 +239,37 @@ $(document).ready(function() {
     if (++f>features.length) f=1;
     show_feature(f-1);
   });
+  // compile fearures into document array
   $("#upload").submit(function(e) {
     var type=$("#modify [name='type']").val();
     var time=$("#modify [name='time']").val();
     var docs=[];
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
-      var doc=uploaded_docs[feature._id] || {};
+      var doc=uploaded_docs[feature.properties._id] || {};
       // set doc-type and time
-      doc.type=type || undefined;
-      doc.time=time || undefined;
+      doc.type=type || doc.type || undefined;
+      doc.time=time || doc.time || undefined;
       // save document description as doc[doc.type]
       if ($("#description-include").prop('checked') && doc.type)
-        doc[doc.type]=$("#description-value").val() || undefined;
+        doc[doc.type]=$("#description-value").val() || doc[doc.type] || undefined;
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
         if (fields[prop].val()=="") continue;
         // and ignore useless undefined fields
-        if ([null, "", "null", "undefined"].indexOf(feature.properties[prop])===-1)
+        if ([null, "", "null", "undefined"].indexOf(feature.properties[prop])!==-1)
           doc[fields[prop].val()]=undefined;
         else doc[fields[prop].val()]=feature.properties[prop];
       }
-      // store geometry as GeoJSON
-      if (!(doc.GeoJSON_clone=feature.properties.GeoJSON_clone)) {
+      // Use either the newly defined GeoJSON_clone or the previous
+      // one. Update the geometry itself only if none is referenced.
+      if (!doc.GeoJSON_clone) {
         doc.GeoJSON=feature.geometry;
         doc.GeoJSON.crs=crs;
       }
+      // Remove GeoJSON_clone if it references itself.
+      if (doc.GeoJSON_clone===doc._id) delete doc.GeoJSON_clone;
       docs.push(doc);
     }
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
