@@ -268,19 +268,17 @@ $(document).ready(function() {
       }
       docs.push(doc);
     }
-    $.couch.db(db).bulkSave( {docs:docs, all_or_nothing:true}, {
-      success:function(data) {
-        $("#modify").hide();
-        $("#reduce").show();
-        map = map || new Maps.Map($('#map')[0], {
-          zoom: 17, mapTypeId: Maps.MapTypeId.SATELLITE,
-          center: new LatLng(50.83730534254573, 13.938310197234163)
-        });
-        submit.hide();
-        revert.show();
-        uploaded_docs=data;
-      }
-    });
+    $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
+      $("#modify").hide();
+      $("#reduce").show();
+      map = map || new Maps.Map($('#map')[0], {
+        zoom: 17, mapTypeId: Maps.MapTypeId.SATELLITE,
+        center: new LatLng(50.83730534254573, 13.938310197234163)
+      });
+      submit.hide();
+      revert.show();
+      uploaded_docs=data;
+    }});
     e.preventDefault();
   });
   revert.click(function() {
@@ -293,14 +291,12 @@ $(document).ready(function() {
         _deleted:true
       };
     }
-    $.couch.db(db).bulkSave( {docs:uploaded_docs, all_or_nothing:true}, {
-      success:function(data) {
-        submit.show();
-        revert.hide();
-        $("#modify").show();
-        $("#reduce").hide();
-      }
-    });
+    $.couch.db(db).bulkSave( {docs:uploaded_docs}, { success:function(data) {
+      submit.show();
+      revert.hide();
+      $("#modify").show();
+      $("#reduce").hide();
+    }});
   });
   function show_geometry(f) {
     // remove previous shapes from map canvas
