@@ -253,6 +253,8 @@ $(document).ready(function() {
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
       var doc=uploaded_docs[feature.properties._id] || {};
+      // detach doc from uploaded_docs
+      doc=JSON.parse(JSON.stringify(doc));
       // set doc-type and time
       doc.type=type || doc.type || undefined;
       doc.time=time || doc.time || undefined;
