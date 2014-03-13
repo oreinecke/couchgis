@@ -150,18 +150,24 @@ $(document).ready(function() {
           }
         } else throw{message:"Unknown extension: ."+filetype};
         uploaded_docs={};
+        var keys=[];
         for (var f=0;f<features.length;f++) {
           var properties=features[f].properties;
-          // store previous version of existing document
-          if (properties._id) $.getJSON('/'+db+'/'+properties._id, function(data) {
-            uploaded_docs[data._id]=data;
-          });
+          if (properties._id) keys.push(properties._id);
           // condense union of properties into the first feature
           if (!f) continue;
           for (var prop in properties)
             if (!(prop in features[0].properties))
               features[0].properties[prop]=undefined;
         }
+        // store previous document revision
+        $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
+          data=JSON.parse(data);
+          while (data.rows.length) {
+            var row=data.rows.shift();
+            uploaded_docs[row.id]=row.doc;
+          }
+        });
       } catch(err) {
         $("#upload b").html(err.message+"<br>");
         return;
