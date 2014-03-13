@@ -42,6 +42,19 @@ function(head, req) {
         }
         if (include_geojson_id)
           doc.GeoJSON_clone=row.key[0];
+        // create flat column names from nested objects
+        (function flatten(obj, fields) {
+          if (obj && typeof(obj)!=="object") {
+            // quote field names with dots in it
+            for (var f=0;f<fields.length;f++)
+              if (/\./.test(fields[f])) fields[f]="'"+fields[f]+"'";
+            doc[fields.join('.')]=obj;
+          } else for (var prop in obj) {
+            var obj2=obj[prop];
+            delete obj[prop];
+            flatten(obj2, fields.concat([prop]));
+          }
+        })(doc, []);
         for (var field in doc) {
           if (fields==null) break;
           if (field[0].search(/[A-ZÄÖÜ]/)!=0) continue;
