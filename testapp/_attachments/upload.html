@@ -289,7 +289,14 @@ $(document).ready(function() {
       });
       submit.hide();
       revert.show();
-      uploaded_docs=data;
+      // update id and revision
+      while (data.length) {
+        var item=data.pop();
+        if (!item.ok) continue;
+        features[data.length].id=item.id;
+        if (!uploaded_docs[item.id]) continue;
+        uploaded_docs[item.id]._rev=item.rev;
+      }
     }});
     e.preventDefault();
   });
