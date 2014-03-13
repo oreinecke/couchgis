@@ -57,8 +57,8 @@ function(head, req) {
         })(doc, []);
         for (var field in doc) {
           if (fields==null) break;
-          if (field[0].search(/[A-ZÄÖÜ]/)!=0) continue;
-          if (field.search(/^GeoJSON/)==0) continue;
+          if (!/^[A-ZÄÖÜ]/.test(field) continue;
+          if (/^GeoJSON/.test(field)) continue;
           if (fields.search('(^|:)'+field+'(:|$)')!==-1) continue;
           delete doc[field];
         }
@@ -84,12 +84,12 @@ function(head, req) {
   case "xml":
     if (fields==null) {
       fields=[];
+      // move _id, _rev, GeoJSON_clone to the left
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
       if (include_revision) fields=["_id", "_rev"].concat(fields);
       for (var f=0;f<features.length;f++)
       for (var prop in features[f].properties)
         if (fields.indexOf(prop)===-1) fields.push(prop);
-      // push GeoJSON_clone to the left
     } else {
       fields=["type", "time"].concat(fields.split(':'));
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
@@ -133,6 +133,6 @@ function(head, req) {
     }
     send('</Table>');
     send('</Worksheet>');
-    send('</Workbook>');
+    return '</Workbook>';
   }
 }
