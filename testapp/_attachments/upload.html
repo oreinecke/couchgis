@@ -159,7 +159,7 @@ $(document).ready(function() {
           // condense union of properties into the first feature
           if (!f) continue;
           for (var prop in properties)
-            if (!(prop in properties))
+            if (!(prop in features[0].properties))
               features[0].properties[prop]=undefined;
         }
       } catch(err) {
