@@ -331,7 +331,7 @@ $(document).ready(function() {
     $("#show-suggestions a").html(f+1);
     var keys=[];
     feature=features[f];
-    keys.push([uploaded_docs[f].id, 0]);
+    keys.push([feature.id, 0]);
     if (feature.items) for (var id in feature.items)
       keys.push([id, 0]);
     $("#reduce :button").prop('disabled', true);
@@ -353,7 +353,7 @@ $(document).ready(function() {
       while (data.rows.length) {
         var row=data.rows.shift();
         var GeoJSON_clone=row.key[0];
-        if (row.key[0]===uploaded_docs[f].id)
+        if (row.key[0]===feature.id)
           GeoJSON_clone=undefined;
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({
@@ -389,12 +389,12 @@ $(document).ready(function() {
     $(this).hide();
     $("#show-suggestions").show();
     var keys=[];
-    for (var d=0;d<uploaded_docs.length;d++)
-      keys.push(features[d].properties.GeoJSON_clone || uploaded_docs[d].id);
+    for (var f=0;f<features.length;f++)
+      keys.push(features[f].properties.GeoJSON_clone || features[f].id)
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
       var i=0;
       for (var id in data) {
-        var feature=features[i];
+        var feature=features[i++];
         feature.bbox=data[id].GeoJSON.bbox;
         var options=encodeURIComponent(JSON.stringify({
           bbox:feature.bbox,
@@ -405,21 +405,21 @@ $(document).ready(function() {
           $("#reduce [name='next']").click();
           found_geometry=function() {};
         }
-        $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, i) {
+        $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, feature) {
           return function(data) {
             // remove from items if geometry is new
-            if (id===uploaded_docs[i].id)
+            if (id===feature.id)
               delete data[id];
             // This leaves doc.items undefined if data is
             // empty or consists only of the cloned geometry.
             for (var id2 in data) {
               if (id2===id) continue;
-              features[i].items=data;
+              feature.items=data;
               found_geometry();
               return;
             }
           };
-        }(id, i++));
+        }(id, feature));
       }
     });
   });
