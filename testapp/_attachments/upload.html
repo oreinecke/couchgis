@@ -264,7 +264,7 @@ $(document).ready(function() {
       }
       // Use either the newly defined GeoJSON_clone or the previous
       // one. Update the geometry itself only if none is referenced.
-      if (!doc.GeoJSON_clone) {
+      if (!doc.GeoJSON_clone && feature.geometry) {
         doc.GeoJSON=feature.geometry;
         doc.GeoJSON.crs=crs;
       }
