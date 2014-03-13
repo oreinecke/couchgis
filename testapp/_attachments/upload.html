@@ -301,20 +301,28 @@ $(document).ready(function() {
     e.preventDefault();
   });
   revert.click(function() {
-    // stage docs for deletion
-    for (var d=0;d<uploaded_docs.length;d++) {
-      var doc=uploaded_docs[d];
-      uploaded_docs[d]={
-        _id:doc.id,
-        _rev:doc.rev,
-        _deleted:true
-      };
+    var docs=[];
+    // delete or upload previous revision
+    for (var f=0;f<features.length;f++) {
+      var feature=features[f];
+      docs.push( uploaded_docs[feature.id] || {
+        _deleted:true,
+        _id:feature.id,
+        _rev:feature.rev
+      });
     }
-    $.couch.db(db).bulkSave( {docs:uploaded_docs}, { success:function(data) {
+    $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       submit.show();
       revert.hide();
       $("#modify").show();
       $("#reduce").hide();
+      while (data.length) {
+        var item=data.pop();
+        if (!item.ok) continue;
+        // updat rev in case we want to upload again
+        if (uploaded_docs[item.id])
+          features[data.length].properties._rev=item.rev;
+      }
     }});
   });
   function show_geometry(f) {
