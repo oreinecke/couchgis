@@ -415,15 +415,14 @@ $(document).ready(function() {
     $(this).hide();
     $("#show-suggestions").show();
     // forward GeoJSON_clone property to show_fields()
-    features[0].properties.GeoJSON_clone=undefined;
+    features[0].properties.GeoJSON_clone=features[0].properties.GeoJSON_clone || undefined;
     var keys=[];
     for (var f=0;f<features.length;f++)
       keys.push(features[f].properties.GeoJSON_clone || features[f].id)
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
-      var i=0;
-      for (var id in data) {
-        var feature=features[i++];
-        feature.bbox=data[id].GeoJSON.bbox;
+      for (var f=0;f<features.length;f++) {
+        var feature=features[f];
+        feature.bbox=data[keys[f]].GeoJSON.bbox;
         var options=encodeURIComponent(JSON.stringify({
           bbox:feature.bbox,
           similarity:0.0001
@@ -447,7 +446,7 @@ $(document).ready(function() {
               return;
             }
           };
-        }(id, feature));
+        }(keys[f], feature));
       }
     });
   });
