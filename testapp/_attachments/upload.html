@@ -317,7 +317,7 @@ $(document).ready(function() {
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       submit.show();
       revert.hide();
-      $("#modify").show();
+      build_modify();
       $("#reduce").hide();
       while (data.length) {
         var item=data.pop();
@@ -399,6 +399,8 @@ $(document).ready(function() {
   $("#reduce [name='show']").click(function() {
     $(this).hide();
     $("#show-suggestions").show();
+    // forward GeoJSON_clone property to build_modify()
+    features[0].properties.GeoJSON_clone=undefined;
     var keys=[];
     for (var f=0;f<features.length;f++)
       keys.push(features[f].properties.GeoJSON_clone || features[f].id)
