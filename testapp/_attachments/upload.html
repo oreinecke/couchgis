@@ -32,6 +32,7 @@ $(document).ready(function() {
     });
     $("#modify [name='type']").autocomplete({ source:source, minLength:0 });
   });
+
   $("#modify [name='type']").change( function() {
     var key="start_key="+encodeURIComponent(JSON.stringify([$(this).val()])) +
              "&end_key="+encodeURIComponent(JSON.stringify([$(this).val()+' ']));
@@ -54,16 +55,19 @@ $(document).ready(function() {
   // In case type already has a value; FireFox
   // 26.0 does not clear inputs on page reload.
   }).change();
+
   $("#description-include").change( function() {
     $("#description-value").prop('disabled', !$(this).prop('checked'));
   });
+
   function show_feature(f) {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
     for (var prop in properties)
       values[prop].val(properties[prop]).attr('title', properties[prop]);
   }
-  function build_modify() {
+
+  function show_fields() {
     fields={};
     values={};
     var div=$("#modify div");
@@ -117,6 +121,7 @@ $(document).ready(function() {
     show_feature(0);
     $("#modify").show();
   }
+
   $("#upload :file").change(function(e) {
     $("#modify").hide();
     $("#reduce [name='show']").show();
@@ -227,26 +232,31 @@ $(document).ready(function() {
         return;
       }
       submit.prop('disabled', false);
-      build_modify()
+      show_fields()
     };
     reader.readAsText(e.target.files[0]);
   });
+
   $("#modify").submit(function(e) {e.preventDefault();});
+
   // check/uncheck all
   $("#modify [name='all']").change(function() {
     $("#modify :checkbox").prop('checked', $(this).prop('checked'));
     $("#modify [name='include']").change();
   });
+
   $("#modify [name='prev']").click(function() {
     var f=$("#modify a").html();
     if (--f<1) f=features.length;
     show_feature(f-1);
   });
+
   $("#modify [name='next']").click(function() {
     var f=$("#modify a").html();
     if (++f>features.length) f=1;
     show_feature(f-1);
   });
+
   // compile fearures into document array
   $("#upload").submit(function(e) {
     var type=$("#modify [name='type']").val();
@@ -303,6 +313,7 @@ $(document).ready(function() {
     }});
     e.preventDefault();
   });
+
   revert.click(function() {
     var docs=[];
     // delete or upload previous revision
@@ -317,7 +328,7 @@ $(document).ready(function() {
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       submit.show();
       revert.hide();
-      build_modify();
+      show_fields();
       $("#reduce").hide();
       while (data.length) {
         var item=data.pop();
@@ -328,6 +339,7 @@ $(document).ready(function() {
       }
     }});
   });
+
   function show_geometry(f) {
     // remove previous shapes from map canvas
     var feature=features[$("#show-suggestions a").html()-1];
@@ -382,6 +394,7 @@ $(document).ready(function() {
       select_me(feature.properties.GeoJSON_clone).apply(shape);
     });
   }
+
   // skip to next/previous document with similar geometry
   $("#reduce [name='next']").click(function() {
     var f=$("#show-suggestions a").html()-1, g=f;
@@ -389,17 +402,19 @@ $(document).ready(function() {
     while (!features[f].items && f!=g);
     show_geometry(f);
   });
+
   $("#reduce [name='prev']").click(function() {
     var f=$("#show-suggestions a").html()-1, g=f;
     do f=(f+features.length-1)%features.length;
     while (!features[f].items && f!=g);
     show_geometry(f);
   });
+
   // query for similar geometry
   $("#reduce [name='show']").click(function() {
     $(this).hide();
     $("#show-suggestions").show();
-    // forward GeoJSON_clone property to build_modify()
+    // forward GeoJSON_clone property to show_fields()
     features[0].properties.GeoJSON_clone=undefined;
     var keys=[];
     for (var f=0;f<features.length;f++)
