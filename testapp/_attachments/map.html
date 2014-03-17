@@ -150,8 +150,11 @@ $(document).ready(function() {
                 if (cl==="document")
                 // Link to Futon for the lack of a better interface
                 // and set link text to a useful item explanation.
-                  td.append('<a target="_blank" href="/_utils/document.html?'+list.db+'/'+doc._id+'">'
-                                              +doc[doc.type]+' ('+range.toString(doc.time)+')</a><br>');
+                  td.append($("<a>").attr({
+                    href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
+                  }).html(doc[doc.type]||doc.type)
+                    .append(' ('+range.toString(doc.time)+')'))
+                    .append("<br>");
                 // Fill in custom values
                 else if (cl==="field") td.append(doc[th.html()]+'<br>');
                 if (cl!=="geometry") return;
