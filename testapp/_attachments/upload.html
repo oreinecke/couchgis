@@ -63,6 +63,60 @@ $(document).ready(function() {
     for (var prop in properties)
       values[prop].val(properties[prop]).attr('title', properties[prop]);
   }
+  function build_modify() {
+    fields={};
+    values={};
+    var div=$("#modify div");
+    div.html('');
+    // expect all property sets to be identical to the first one
+    for (var prop in features[0].properties) {
+      var row=$("<span>");
+      // render field: value input pair
+      var checkbox=$('<input type="checkbox" name="include" checked>');
+      var field=$('<input type="text" name="field">');
+      var value=$('<input type="text" name="value">');
+      row.append(checkbox).append(field).append(': ').append(value).append('<br>');
+      // write new value to selected data set
+      value.change(function(input, prop) {
+        return function() {
+          var v=input.val();
+          // try to parse new value as number
+          try {
+            v=JSON.parse(v);
+            input.val(v);
+          // if that fails just write it as a string
+          } catch(err) {}
+          features[$("#modify a").html()-1].properties[prop]=v;
+        };
+      }(value, prop));
+      values[prop]=value;
+      field.val(prop);
+      fields[prop]=field;
+      // disable input fields on row if unchecked
+      checkbox.change(function(checkbox, field, value, prop) {
+        return function() {
+          var disabled=!checkbox.prop('checked');
+          field.prop('disabled', disabled);
+          value.prop('disabled', disabled);
+          // set a nice and helpful tooltip
+          var title=prop+' '
+          if (disabled) title+='ignorieren';
+          else {
+            if (field.val()!=prop) title+='als "'+field.val()+'" ';
+            title+='übernehmen';
+          }
+          checkbox.prop('title',title);
+        };
+      }(checkbox, field, value, prop));
+      checkbox.change();
+      field.change(function(checkbox) {
+        return function() { checkbox.change(); };
+      }(checkbox));
+      div.append(row);
+    }
+    show_feature(0);
+    $("#modify").show();
+  }
   $("#upload :file").change(function(e) {
     $("#modify").hide();
     $("#reduce [name='show']").show();
@@ -173,59 +227,7 @@ $(document).ready(function() {
         return;
       }
       submit.prop('disabled', false);
-      submit.val("Los!");
-      var div=$("#modify div");
-      fields={};
-      values={};
-      div.html("");
-      // expect all property sets to be identical to the first one
-      for (var prop in features[0].properties) {
-        var row=$("<span>");
-        // render field: value input pair
-        var checkbox=$('<input type="checkbox" name="include" checked>');
-        var field=$('<input type="text" name="field">');
-        var value=$('<input type="text" name="value">');
-        row.append(checkbox).append(field).append(': ').append(value).append('<br>');
-        // write new value to selected data set
-        value.change(function(input, prop) {
-          return function() {
-            var v=input.val();
-            // try to parse new value as number
-            try {
-              v=JSON.parse(v);
-              input.val(v);
-            // if that fails just write it as a string
-            } catch(err) {}
-            features[$("#modify a").html()-1].properties[prop]=v;
-          };
-        }(value, prop));
-        values[prop]=value;
-        field.val(prop);
-        fields[prop]=field;
-        // disable input fields on row if unchecked
-        checkbox.change(function(checkbox, field, value, prop) {
-          return function() {
-            var disabled=!checkbox.prop('checked');
-            field.prop('disabled', disabled);
-            value.prop('disabled', disabled);
-            // set a nice and helpful tooltip
-            var title=prop+' '
-            if (disabled) title+='ignorieren';
-            else {
-              if (field.val()!=prop) title+='als "'+field.val()+'" ';
-              title+='übernehmen';
-            }
-            checkbox.prop('title',title);
-          };
-        }(checkbox, field, value, prop));
-        checkbox.change();
-        field.change(function(checkbox) {
-          return function() { checkbox.change(); };
-        }(checkbox));
-        div.append(row);
-      }
-      show_feature(0);
-      $("#modify").show();
+      build_modify()
     };
     reader.readAsText(e.target.files[0]);
   });
