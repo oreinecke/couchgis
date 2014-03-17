@@ -31,7 +31,7 @@ function(doc) {
   var val={doc:{_id:doc._id, _rev:doc._rev, type:doc.type, time:range.toRange(doc.time)}};
   for (var field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
-    if (!/^[A-ZÄÖÜ]/.test(field) continue;
+    if (!/^[A-ZÄÖÜ]/.test(field)) continue;
     if (/^GeoJSON/.test(field)) continue;
     val.doc[field]=doc[field];
   }
