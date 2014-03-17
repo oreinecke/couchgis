@@ -294,6 +294,7 @@ $(document).ready(function() {
         var item=data.pop();
         if (!item.ok) continue;
         features[data.length].id=item.id;
+        features[data.length].rev=item.rev;
         if (!uploaded_docs[item.id]) continue;
         uploaded_docs[item.id]._rev=item.rev;
       }
