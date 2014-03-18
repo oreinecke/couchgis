@@ -44,14 +44,13 @@ function(head, req) {
           doc.GeoJSON_clone=row.key[0];
         // create flat column names from nested objects
         (function flatten(obj, fields) {
-          if (typeof obj!=="object") {
-            // quote field names with dots in it
-            for (var f=0;f<fields.length;f++)
-              if (/\./.test(fields[f])) fields[f]="'"+fields[f]+"'";
+          if (!obj || typeof obj!=="object")
             doc[fields.join('.')]=obj;
-          } else for (var prop in obj) {
+          else for (var prop in obj) {
             var obj2=obj[prop];
             delete obj[prop];
+            // quote field names with dots in it
+            if (/\./.test(prop)) prop="'"+prop+"'";
             flatten(obj2, fields.concat([prop]));
           }
         })(doc, []);
