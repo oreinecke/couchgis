@@ -686,9 +686,11 @@ $(document).ready(function() {
     url+="&filetype="+$("#export [name='filetype']:checked").val();
     var documents=filters[filters.length-1].documents;
     var keys=[], id=null;
+    // ignore geometry keys for xml
+    var include_geometry=$("#export [name='filetype']:checked").val()!=="xml";
     for (var d=0;d<documents.length;d++) {
       var key=documents[d];
-      if (id!==key[0]) keys.push([key[0],0]);
+      if (include_geometry && id!==key[0]) keys.push([key[0],0]);
       keys.push(key);
       id=key[0];
     }
