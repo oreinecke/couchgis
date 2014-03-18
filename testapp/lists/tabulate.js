@@ -117,7 +117,7 @@ function(head, req) {
           fields, values, cuts, options, send_separator, expressions,
           send_fields, row, start, send, getRow, head, req, require;
           try { return eval(expression); }
-          catch(e) { return false; }
+          catch(err) { return false; }
         }(expressions[e])) return false;
       }
       return true;
