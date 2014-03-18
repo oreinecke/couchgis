@@ -277,10 +277,16 @@ $(document).ready(function() {
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
         if (fields[prop].val()=="") continue;
-        // and ignore useless undefined fields
+        // extract object path
+        var path=fields[prop].val().match(/'[^']+'|[^.\s]+/g);
+        var obj=doc, field;
+        // build nested object from path
+        while ((field=path.shift().replace(/'/g,"")) && path.length)
+          obj=obj[field]||(obj[field]={});
+        // remove undefined fields
         if ([null, "", "null", "undefined"].indexOf(feature.properties[prop])!==-1)
-          doc[fields[prop].val()]=undefined;
-        else doc[fields[prop].val()]=feature.properties[prop];
+          obj[field]=undefined;
+        else obj[field]=feature.properties[prop];
       }
       // Use either the newly defined GeoJSON_clone or the previous
       // one. Update the geometry itself only if none is referenced.
