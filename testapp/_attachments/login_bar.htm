@@ -18,7 +18,7 @@ $(document).ready(function() {
         href.text(resp.userCtx.name||"Administrator (keine Benutzer festgelegt)");
         // link to futon user doc
         if (resp.userCtx.name)
-          href.attr({href:"/_utils/document.html?_users/org.couchdb.user:"+href.text()});
+          href.prop('href',"/_utils/document.html?_users/org.couchdb.user:"+href.text());
         else
           $("#logout :submit").hide();
         $("#login").hide();
