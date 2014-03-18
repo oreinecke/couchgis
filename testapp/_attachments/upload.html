@@ -284,10 +284,28 @@ $(document).ready(function() {
         while ((field=path.shift().replace(/'/g,"")) && path.length)
           obj=obj[field]||(obj[field]={});
         // remove undefined fields
-        if ([null, "", "null", "undefined"].indexOf(feature.properties[prop])!==-1)
-          obj[field]=undefined;
-        else obj[field]=feature.properties[prop];
+        obj[field]=feature.properties[prop];
       }
+      // clean up redundant JSON recursively
+      (function empty(obj) {
+        // There is no semantic difference between
+        // these values and a missing property.
+        if ([null,"","null","undefined"].indexOf(obj)!==-1)
+          return true;
+        if (typeof obj!=="object") return false;
+        var result=true;
+        // Arrays need to be spliced.
+        if (Array.isArray(obj)) {
+          for (var p=0; p<obj.length; p++)
+            if (empty(obj[p])) obj.splice(p--, 1);
+            else result=false;
+          return result;
+        }
+        for (var p in obj)
+          if (p==="GeoJSON" && obj===doc || !empty(obj[p])) result=false;
+          else delete obj[p];
+        return result;
+      })(doc);
       // Use either the newly defined GeoJSON_clone or the previous
       // one. Update the geometry itself only if none is referenced.
       if (!doc.GeoJSON_clone && feature.geometry) {
