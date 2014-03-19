@@ -30,18 +30,18 @@ function(head, req) {
     var fields=[];
     var values=[];
     var expressions=[];
-    var cuts=options.cuts;
     // sort cuts into these handy arrays:
-    for (var c=0;c<cuts.length;c++)
+    while (options.cuts.length) {
+      var cut=options.cuts.shift();
       // eval()'d expression must be true
-      if (cuts[c].field==="_expression") {
+      if (cut.field==="_expression") {
         // Transform Field_Näme . 'nested .field' into doc["Field_Näme"]
         // ["nested field"]: the first match employs greediness to split
         // expression into the following substrings:
         //
         //                       "string expression"    Field_Näme . 'nested .field'            anything else
         //                             v.....v v.....................................................v v..v
-        var parts=cuts[c].value.match(/"[^"]*"|([\wäöüÄÖÜß]+|'[^']+')(\s*\.\s*([\wäöüÄÖÜß]+|'[^']+'))*|\W/g);
+        var parts=cut.value.match(/"[^"]*"|([\wäöüÄÖÜß]+|'[^']+')(\s*\.\s*([\wäöüÄÖÜß]+|'[^']+'))*|\W/g);
         var expression="";
         for (var part; (part=parts.shift())!=null; expression+=part ) {
           // Double-quoted parts are attached as-is to expression.
@@ -52,7 +52,7 @@ function(head, req) {
           if (!/['A-ZÄÖÜ]/.test(part[0])) continue;
           // See explanation below for parts as tagged here:
           //     (a)                     (b)                (c)            (d)      (e)
-          part='doc["'+part.match(/'[^']+'|[^\s.]+/g).join('"]["').replace(/'/g,'')+'"]';
+          part='doc["'+part.match(/'[^']+'|[^\s.]+/g).join('"]["').replace(/'/g,"")+'"]';
           // a) All fields are fetched from doc.
           // b) I might encounter a dot inside a field name and therefore
           //    cannot use a simple part.split('.'). Again, the greediest
@@ -76,6 +76,7 @@ function(head, req) {
         fields.push(cuts[c].field.split('.'));
         values.push(new RegExp(cuts[c].value, 'im'));
       }
+    }
     if (non_nulls.length) defines_field=function(doc) {
       for (var f=0;f<non_nulls.length;f++) {
         var field=non_nulls[f];
@@ -114,8 +115,8 @@ function(head, req) {
           // Provide these useful variable names for the user!!!
           var e, time_matches, type_matches, defines_field, matches_value,
           contains_keyword, matches_expression, pass, keywords, non_nulls,
-          fields, values, cuts, options, send_separator, expressions,
-          send_fields, row, start, send, getRow, head, req, require;
+          fields, values, options, send_separator, expressions, send_fields,
+          row, start, send, getRow, head, req, require;
           try { return eval(expression); }
           catch(err) { return false; }
         }(expressions[e])) return false;
