@@ -74,9 +74,8 @@ $(document).ready(function() {
       var row=$("<span>");
       // render field: value input pair
       var checkbox=$('<input type="checkbox" name="include" checked>');
-      var field=$('<input type="text" name="field">');
       var value=$('<input type="text" name="value">');
-      row.append(checkbox).append(field).append(': ').append(value).append('<br>');
+      var field=$('<input type="text" name="field">').val(prop);
       // write new value to selected data set
       value.change(function(input, prop) {
         return function() {
@@ -91,8 +90,9 @@ $(document).ready(function() {
         };
       }(value, prop));
       values[prop]=value;
-      field.val(prop);
       fields[prop]=field;
+      row.append(checkbox).append(field).append(': ').append(value).append('<br>');
+      $("#modify div").append(row);
       // disable input fields on row if unchecked
       checkbox.change(function(checkbox, field, value, prop) {
         return function() {
@@ -113,7 +113,6 @@ $(document).ready(function() {
       field.change(function(checkbox) {
         return function() { checkbox.change(); };
       }(checkbox));
-      $("#modify div").append(row);
     }
     show_feature(0);
     $("#modify").show();
