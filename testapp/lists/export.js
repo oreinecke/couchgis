@@ -123,7 +123,9 @@ function(head, req) {
         if (typeof data==="number")
           send('<Cell><Data ss:Type="Number">'+data+'</Data></Cell>');
         else if (typeof data==="string")
-          send('<Cell><Data ss:Type="String">'+data+'</Data></Cell>');
+          send('<Cell><Data ss:Type="String">'+data.replace(/&/g,'&amp;')
+                                                   .replace(/</g,'&lt;')
+                                                   .replace(/>/g,'&gt;')+'</Data></Cell>');
         else if (typeof data==="boolean")
           send('<Cell><Data ss:Type="Boolean">'+data?1:0+'</Data></Cell>');
         else send('<Cell/>');

@@ -197,6 +197,9 @@ $(document).ready(function() {
               for (var c=0;c<row.length;c++) {
                 if (!columns[c].xml.length) continue;
                 var data=row[c].xml[0] || {xml:""};
+                if (data['ss:Type']==="String") data.xml=data.xml.replace(/&amp;/g,'&')
+                                                                 .replace(/&lt;/g,'<')
+                                                                 .replace(/&gt;/g,'>');
                 if (data['ss:Type']==="Number") data.xml=parseFloat(data.xml);
                 if (data['ss:Type']==="Boolean") data.xml=(data.xml==="1");
                 properties[columns[c].xml[0].xml]=data.xml;
