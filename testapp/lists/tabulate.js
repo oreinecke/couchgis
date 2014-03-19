@@ -65,16 +65,21 @@ function(head, req) {
           // e) This closes the last field access.
         }
         expressions.push(expression);
-      // value should be somewhere in the document
-      } else if (cuts[c].field==="_keyword")
-        keywords.push(new RegExp(cuts[c].value, 'im'));
-      // ignore value but require field to be non-null
-      else if (cuts[c].field && !cuts[c].value)
-        non_nulls.push(cuts[c].field.split('.'));
-      // value must match
-      else {
-        fields.push(cuts[c].field.split('.'));
-        values.push(new RegExp(cuts[c].value, 'im'));
+      } else {
+        cut.value=cut.value && new RegExp(cut.value, 'im');
+        // extract object path (identical to (b))
+        cut.field=cut.field.match(/'[^']+'|[^\s.]+/g);
+        // remove quotes (identical to (d))
+        for (var f=0;f<cut.field.length;f++)
+          cut.field[f].replace(/'/g,"");
+        // value should be somewhere in the document
+        if (cut.field[0]==="_keyword") keywords.push(cut.value);
+        // value must match
+        else if (cut.value) {
+          fields.push(cut.field);
+          values.push(cut.value);
+        // ignore value but require field to be non-null
+        } else non_nulls.push(cut.field);
       }
     }
     if (non_nulls.length) defines_field=function(doc) {
