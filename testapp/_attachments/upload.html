@@ -71,11 +71,14 @@ $(document).ready(function() {
     // expect all property sets to be identical to the first one
     for (var prop in features[0].properties) {
       if (fields[prop]) continue;
+      // Special fields have non-editable field names.
+      var special = (prop==="GeoJSON_clone"||prop==="_id"||prop==="_rev");
       var row=$("<span>");
       // render field: value input pair
-      var checkbox=$('<input type="checkbox" name="include" checked>');
-      var value=$('<input type="text" name="value">');
+      var checkbox=$('<input type="checkbox" name="include" checked>').prop('disabled',special);
       var field=$('<input type="text" name="field">').val(prop);
+      if (special) field=$('<b>').html(prop).prop('value',prop).prop('disabled',false);
+      var value=$('<input type="text" name="value">').prop('disabled',special);
       // write new value to selected data set
       value.change(function(input, prop) {
         return function() {
@@ -93,6 +96,7 @@ $(document).ready(function() {
       fields[prop]=field;
       row.append(checkbox).append(field).append(': ').append(value).append('<br>');
       $("#modify div").append(row);
+      if (special) continue;
       // disable input fields on row if unchecked
       checkbox.change(function(checkbox, field, value, prop) {
         return function() {
