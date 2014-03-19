@@ -244,7 +244,7 @@ $(document).ready(function() {
 
   // check/uncheck all
   $("#modify [name='all']").change(function() {
-    $("#modify :checkbox").prop('checked', $(this).prop('checked'));
+    $("#modify :checkbox:enabled").prop('checked', $(this).prop('checked'));
     $("#modify [name='include']").change();
   });
 
