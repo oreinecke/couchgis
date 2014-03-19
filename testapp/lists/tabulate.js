@@ -61,7 +61,7 @@ function(head, req) {
           //    names (white-spaces are ignored).
           // c) Done accessing this field, re-opening the next one.
           // d) Here I remove quotes from quoted field names. There is no
-          //    look-behind RegExp support, so I am using kind-of a hack here.
+          //    look-behind RegExp support, so I have to resort to kind a hack.
           // e) This closes the last field access.
         }
         expressions.push(expression);
@@ -108,7 +108,8 @@ function(head, req) {
     if (keywords.length) contains_keyword=function(doc) {
       var content="";
       for (var prop in doc)
-        if (prop!=="time" && prop!=="_id") content+=doc[prop]+'\n';
+        if (prop!=="time" && prop!=="_id")
+          content+=JSON.stringify(doc[prop])+'\n';
       for (var k=0;k<keywords.length;k++)
         if (!keywords[k].test(content)) return false;
       return true;
