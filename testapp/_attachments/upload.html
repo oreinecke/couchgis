@@ -68,12 +68,9 @@ $(document).ready(function() {
   }
 
   function show_fields() {
-    fields={};
-    values={};
-    var div=$("#modify div");
-    div.html('');
     // expect all property sets to be identical to the first one
     for (var prop in features[0].properties) {
+      if (fields[prop]) continue;
       var row=$("<span>");
       // render field: value input pair
       var checkbox=$('<input type="checkbox" name="include" checked>');
@@ -116,7 +113,7 @@ $(document).ready(function() {
       field.change(function(checkbox) {
         return function() { checkbox.change(); };
       }(checkbox));
-      div.append(row);
+      $("#modify div").append(row);
     }
     show_feature(0);
     $("#modify").show();
@@ -232,7 +229,10 @@ $(document).ready(function() {
         return;
       }
       submit.prop('disabled', false);
-      show_fields()
+      fields={};
+      values={};
+      $("#modify div").html('');
+      show_fields();
     };
     reader.readAsText(e.target.files[0]);
   });
