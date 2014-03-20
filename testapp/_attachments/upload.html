@@ -77,7 +77,7 @@ $(document).ready(function() {
       // render field: value input pair
       var checkbox=$('<input type="checkbox" name="include" checked>').prop('disabled',special);
       var field=$('<input type="text" name="field">').val(prop);
-      if (special) field=$('<b>').html(prop).prop('value',prop).prop('disabled',false);
+      if (special) field=$('<b>').addClass('special').html(prop).prop('value',prop);
       var value=$('<input type="text" name="value">').prop('disabled',special);
       // write new value to selected data set
       value.change(function(input, prop) {
@@ -487,6 +487,7 @@ $(document).ready(function() {
 <style>
   #modify span {white-space:nowrap}
   #modify div span {white-space:normal}
+  .special { display:inline-block; min-width:7em;}
 </style>
 
   </head>
