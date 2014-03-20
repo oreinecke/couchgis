@@ -398,7 +398,8 @@ $(document).ready(function() {
           shape.setOptions({strokeColor:"#000000"});
           this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
           shape=this;
-          $("#clone-from b").html(GeoJSON_clone);
+          $("#clone-from a").html(GeoJSON_clone)
+                            .prop('href',"/_utils/document.html?"+db+'/'+GeoJSON_clone);
           var spans={ true: $("#clone-from"), false: $("#create-new") };
           spans[!GeoJSON_clone].hide();
           spans[!!GeoJSON_clone].show();
@@ -529,7 +530,8 @@ $(document).ready(function() {
     </span>
     <div id="map" style="height:100%"></div>
     <span id="create-new" style="display:none">Geometrie wird neu angelegt.</span>
-    <span id="clone-from" style="display:none">Geometrie von Datensatz <b></b> verwenden.</span>
+    <span id="clone-from" style="display:none">Geometrie
+      von Datensatz <a target="_blank"></a> verwenden.</span>
   </form>
   </body>
 </html>
