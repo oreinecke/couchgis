@@ -10,6 +10,7 @@
     <script src="script/require.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.15&sensor=false"></script>
     <script src="script/google.maps.js"></script>
+    <script src="script/fillColors.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -22,9 +23,6 @@ $(document).ready(function() {
 
   var range=require('views/lib/range');
   var indexes=require('views/lib/indexes');
-
-  // some nice colors for different types
-  var fillColors=['#00FF80','#8000FF','#80FF00','#FF8000','#0080FF'];
 
   // call _list/bbox-filter/<view> with some useful options
   function list(list, options, success) {
@@ -436,7 +434,7 @@ $(document).ready(function() {
         // This is one rare advantage of javascripts 'phony' arrays:
         // I can use fillColors first as a set and then assign keys
         // to each element!! How nice!!!
-        fillColors[type]=fillColors.shift();
+        fillColors[type] = fillColors[type] || fillColors.shift();
       }
     });
   });
