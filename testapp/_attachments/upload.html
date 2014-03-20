@@ -320,6 +320,7 @@ $(document).ready(function() {
       }
       // Remove GeoJSON_clone if it references itself.
       if (doc.GeoJSON_clone===doc._id) delete doc.GeoJSON_clone;
+      else if (doc.GeoJSON_clone) delete doc.GeoJSON;
       docs.push(doc);
     }
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
