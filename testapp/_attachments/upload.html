@@ -407,22 +407,18 @@ $(document).ready(function() {
       }
       while (data.rows.length) {
         var row=data.rows.shift();
-        var GeoJSON_clone=row.key[0];
-        if (row.key[0]===feature.id)
-          GeoJSON_clone=undefined;
+        var GeoJSON_clone=feature.items[row.key[0]] && row.key[0];
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({
           fillColor:GeoJSON_clone?"#0000FF":"#00FF00",
           map:map, coordinates: GeoJSON.coordinates
         }));
         shape.addListener('click', select_me(GeoJSON_clone));
-        if (GeoJSON_clone) feature.items[row.key[0]].shape=shape;
-        else feature.shape=shape;
+        (feature.items[row.key[0]] || feature).shape=shape;
       }
       map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0+offset[1],
                                (feature.bbox[2]+feature.bbox[0])/2.0+offset[0]));
-      if (feature.properties.GeoJSON_clone==null) shape=feature.shape;
-      else shape=feature.items[feature.properties.GeoJSON_clone].shape;
+      shape = (feature.items[feature.properties.GeoJSON_clone] || feature).shape
       select_me(feature.properties.GeoJSON_clone).apply(shape);
     });
   }
@@ -467,7 +463,7 @@ $(document).ready(function() {
         $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, feature) {
           return function(data) {
             // remove from items if geometry is new
-            if (id===feature.id)
+            if (id===feature.id && !feature.GeoJSON_clone)
               delete data[id];
             // This leaves doc.items undefined if data is
             // empty or consists only of the cloned geometry.
