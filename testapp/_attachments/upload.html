@@ -378,7 +378,7 @@ $(document).ready(function() {
       if (feature.shape) feature.shape.setMap();
       delete feature.shape;
       for (var id in feature.items) {
-        if (feature.items[id].shape) feature.items[id].shape.setMap();
+        feature.items[id].shape.setMap();
         delete feature.items[id].shape;
       }
     }
@@ -386,8 +386,7 @@ $(document).ready(function() {
     var keys=[];
     feature=features[f];
     keys.push([feature.id, 0]);
-    if (feature.items) for (var id in feature.items)
-      keys.push([id, 0]);
+    for (var id in feature.items) keys.push([id, 0]);
     $("#reduce :button").prop('disabled', true);
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
       $("#reduce :button").prop('disabled', false);
