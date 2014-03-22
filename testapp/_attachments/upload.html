@@ -284,7 +284,7 @@ $(document).ready(function() {
         if (fields[prop].prop('disabled')) continue;
         if (fields[prop].val()=="") continue;
         // extract object path
-        var path=fields[prop].val().match(/'[^']+'|[^.\s]+/g);
+        var path=fields[prop].val().match(/'[^']+'|[^.]+/g);
         var obj=doc, field;
         // build nested object from path
         while ((field=path.shift().replace(/'/g,"")) && path.length)
