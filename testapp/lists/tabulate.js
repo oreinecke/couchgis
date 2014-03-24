@@ -68,7 +68,7 @@ function(head, req) {
       } else {
         cut.value=cut.value && new RegExp(cut.value, 'im');
         // extract object path (identical to (b))
-        cut.field=cut.field.match(/'[^']+'|[^\s.]+/g);
+        cut.field=cut.field.match(/'[^']+'|[^.]+/g);
         // remove quotes (identical to (d))
         for (var f=0;f<cut.field.length;f++)
           cut.field[f].replace(/'/g,"");
