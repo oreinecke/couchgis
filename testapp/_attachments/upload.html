@@ -462,7 +462,7 @@ $(document).ready(function() {
         $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, feature) {
           return function(data) {
             // remove from items if geometry is new
-            if (id===feature.id && !feature.GeoJSON_clone)
+            if (id===feature.id && !feature.properties.GeoJSON_clone)
               delete data[id];
             // This leaves doc.items undefined if data is
             // empty or consists only of the cloned geometry.
