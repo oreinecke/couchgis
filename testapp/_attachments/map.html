@@ -153,8 +153,12 @@ $(document).ready(function() {
                   }).html(doc[doc.type]||doc.type)
                     .append(' ('+range.toString(doc.time)+')'))
                     .append("<br>");
-                // Fill in custom values
-                else if (cl==="field") td.append(doc[th.html()]+'<br>');
+                // evaluate columns
+                else if (cl==="field") {
+                  var m=th.html().match(/'[^']+'|[^.]+/g), f=doc;
+                  while (m.length && f!=null) f=f[m.shift().replace(/'/g,"")];
+                  td.append(f+'<br>');
+                }
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.
                 td.html('<a href="#settings" style="font-weight:900">&bull;</a>');
