@@ -71,7 +71,7 @@ function(head, req) {
         cut.field=cut.field.match(/'[^']+'|[^.]+/g);
         // remove quotes (identical to (d))
         for (var f=0;f<cut.field.length;f++)
-          cut.field[f].replace(/'/g,"");
+          cut.field[f]=cut.field[f].replace(/'/g,"");
         // value should be somewhere in the document
         if (cut.field[0]==="_keyword") keywords.push(cut.value);
         // value must match
