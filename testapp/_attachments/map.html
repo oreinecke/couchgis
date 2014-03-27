@@ -603,10 +603,10 @@ $(document).ready(function() {
       // move option back to the fields optgroup
       select.find("[name='fields']").prepend(option);
     } else {
-    var last=$("#table thead th").last();
-    $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
-    // move column selection to the right
-    $("#table thead tr").append(last);
+      var last=$("#table thead th").last();
+      $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
+      // move column selection to the right
+      $("#table thead tr").append(last);
       var select=$(this);
       // move option to the columns optgroup
       select.find("[name='columns']").append(option);
