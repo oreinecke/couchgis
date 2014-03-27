@@ -8,11 +8,13 @@
     <script src="script/jquery-1.10.2.js"></script>
     <script src="script/jquery-ui-1.10.4.custom.js"></script>
     <script src="script/jquery.couch.js"></script>
+    <script src="script/require.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.15&sensor=false"></script>
     <script src="script/google.maps.js"></script>
 
 <script>
 $(document).ready(function() {
+  var path=require('views/lib/path');
   var db=window.location.pathname.match(/[^/]+/)[0];
   var map;
   var crs, features=[];
@@ -283,11 +285,10 @@ $(document).ready(function() {
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
         if (fields[prop].val()=="") continue;
-        // extract object path
-        var path=fields[prop].val().match(/'[^']+'|[^.]+/g);
         var obj=doc, field;
-        // build nested object from path
-        while ((field=path.shift().replace(/'/g,"")) && path.length)
+        var components=path.decode(fields[prop].val());
+        // build nested object from field components
+        while ((field=components.shift()) && components.length)
           obj=obj[field]||(obj[field]={});
         // remove undefined fields
         obj[field]=feature.properties[prop];

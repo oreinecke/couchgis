@@ -1,6 +1,7 @@
 // Sample values of fields for auto-completion.
 
 function(doc) {
+  var path=require('views/lib/path');
   if (doc.type==null) return;
   for (var field in doc) {
     if (!/^[A-ZÄÖÜ]/.test(field)) continue;
@@ -13,12 +14,9 @@ function(doc) {
           summary.max=obj;
           obj=null;
         }
-        emit([doc.type, fields.join('.'), obj], summary);
-      } else for (var field in obj) {
-        var obj2=obj[field];
-        if (/\./.test(field)) field="'"+field+"'";
-        flat_fields(obj2, fields.concat([field]));
-      }
+        emit([doc.type, path.encode(fields), obj], summary);
+      } else for (var field in obj)
+        flat_fields(obj[field], fields.concat([field]));
     })(doc[field], [field]);
   }
 }

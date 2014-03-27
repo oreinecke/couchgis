@@ -21,6 +21,7 @@ $(document).ready(function() {
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
+  var path=require('views/lib/path');
   var range=require('views/lib/range');
   var indexes=require('views/lib/indexes');
 
@@ -155,9 +156,9 @@ $(document).ready(function() {
                     .append("<br>");
                 // evaluate columns
                 else if (cl==="field") {
-                  var m=th.html().match(/'[^']+'|[^.]+/g), f=doc;
-                  while (m.length && f!=null) f=f[m.shift().replace(/'/g,"")];
-                  td.append(f+'<br>');
+                  var fields=path.decode(th.html()), value=doc;
+                  while (fields.length && value!=null) value=field[fields.shift()];
+                  td.append(value+'<br>');
                 }
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.

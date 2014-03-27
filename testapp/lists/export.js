@@ -10,6 +10,7 @@ function(head, req) {
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes);
   var range=require('views/lib/range');
+  var path=require('views/lib/path');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
@@ -45,12 +46,10 @@ function(head, req) {
         // create flat column names from nested objects
         (function flatten(obj, fields) {
           if (!obj || typeof obj!=="object")
-            doc[fields.join('.')]=obj;
+            doc[path.encode(fields)]=obj;
           else for (var prop in obj) {
             var obj2=obj[prop];
             delete obj[prop];
-            // quote field names with dots in it
-            if (/\./.test(prop)) prop="'"+prop+"'";
             flatten(obj2, fields.concat([prop]));
           }
         })(doc, []);

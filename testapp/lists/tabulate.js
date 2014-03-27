@@ -30,6 +30,7 @@ function(head, req) {
     var fields=[];
     var values=[];
     var expressions=[];
+    var path=require('views/lib/path');
     // sort cuts into these handy arrays:
     while (options.cuts.length) {
       var cut=options.cuts.shift();
@@ -67,11 +68,7 @@ function(head, req) {
         expressions.push(expression);
       } else {
         cut.value=cut.value && new RegExp(cut.value, 'im');
-        // extract object path (identical to (b))
-        cut.field=cut.field.match(/'[^']+'|[^.]+/g);
-        // remove quotes (identical to (d))
-        for (var f=0;f<cut.field.length;f++)
-          cut.field[f]=cut.field[f].replace(/'/g,"");
+        cut.field=path.decode(cut.field);
         // value should be somewhere in the document
         if (cut.field[0]==="_keyword") keywords.push(cut.value);
         // value must match
