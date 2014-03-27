@@ -123,6 +123,31 @@ function(head, req) {
           contains_keyword, matches_expression, pass, keywords, non_nulls,
           fields, values, options, send_separator, expressions, send_fields,
           row, start, send, getRow, head, req, require;
+          // Provide these useful property accumulators:
+          function sum(obj, result=0) {
+            if (obj && typeof obj=="object")
+              for (var p in obj) result+=obj[p];
+            return result;
+          }
+          function count(obj, result=0) {
+            if (obj && typeof obj=="object")
+              for (var p in obj) result++;
+            return result;
+          }
+          function min(obj, result={value:+Infinity}) {
+            if (obj && typeof obj=="object")
+              for (var p in obj)
+                if (obj[p]<result.value)
+                  result={field:p,value:obj[p]};
+            return result;
+          }
+          function max(obj, result={value:-Infinity}) {
+            if (obj && typeof obj=="object")
+              for (var p in obj)
+                if (obj[p]>result.value)
+                  result={field:p,value:obj[p]};
+            return result;
+          }
           try { return eval(expression); }
           catch(err) { return false; }
         }(expressions[e])) return false;
