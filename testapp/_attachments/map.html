@@ -157,7 +157,7 @@ $(document).ready(function() {
                 // evaluate columns
                 else if (cl==="field") {
                   var fields=path.decode(th.html()), value=doc;
-                  while (fields.length && value!=null) value=field[fields.shift()];
+                  while (fields.length && value!=null) value=value[fields.shift()];
                   td.append(value+'<br>');
                 }
                 if (cl!=="geometry") return;
