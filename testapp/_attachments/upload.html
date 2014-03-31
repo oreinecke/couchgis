@@ -207,6 +207,8 @@ $(document).ready(function() {
                                                                  .replace(/&gt;/g,'>');
                 if (data['ss:Type']==="Number") data.xml=parseFloat(data.xml);
                 if (data['ss:Type']==="Boolean") data.xml=(data.xml==="1");
+                if (data['ss:Type']==="DateTime") data.xml=data.xml.replace(/-/g,'/')
+                                                                   .replace(/T.*/,'');
                 properties[columns[c].xml[0].xml]=data.xml;
               }
               features.push({properties:properties});
