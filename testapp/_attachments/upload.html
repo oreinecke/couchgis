@@ -409,6 +409,8 @@ $(document).ready(function() {
       }
       while (data.rows.length) {
         var row=data.rows.shift();
+        if ( (feature.items[row.key[0]] || feature).shape )
+          continue;
         var GeoJSON_clone=feature.items[row.key[0]] && row.key[0];
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({
