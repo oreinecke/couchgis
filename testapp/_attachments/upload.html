@@ -490,6 +490,7 @@ $(document).ready(function() {
 </script>
 
 <style>
+  #upload span {white-space:nowrap}
   #modify span {white-space:nowrap}
   #modify div span {white-space:normal}
   .special { display:inline-block; min-width:7em;}
@@ -503,6 +504,7 @@ $(document).ready(function() {
   <h1> XML/GeoJSON-Upload </h1>
   <form id="upload">
     <input type="file">
+    <span>URL: <input type="text" title="Keine fremden Domains!!!"></span>
     <input type="submit" value="Los!" disabled>
     <input type="button" value="Rückgängig" name="revert" style="display:none"><br>
     <b></b>
