@@ -252,6 +252,27 @@ $(document).ready(function() {
     reader.readAsText(e.target.files[0]);
   });
 
+  $("#upload :text").change(function() {
+    $("#modify").hide();
+    $("#reduce [name='show']").show();
+    $("#reduce span").hide();
+    submit.prop('disabled', true);
+    $("#upload b").html("");
+    $.ajax({
+      dataType:"text",
+      url:$("#upload :text").val(),
+      error:function(jqXHR, text, error) {
+        $("#upload b").append(text+' '+error+"<br>");
+      },
+      success:function(data, text, jqXHR) {
+        var filetype=jqXHR.getResponseHeader('Content-type');
+        if (filetype==="text/xml") filetype="xml";
+        else filetype="geojson";
+        load_features(data, filetype);
+      }
+    });
+  });
+
   $("#modify").submit(function(e) {e.preventDefault();});
 
   // check/uncheck all
