@@ -89,7 +89,7 @@ function(head, req) {
       for (var prop in features[f].properties)
         if (fields.indexOf(prop)===-1) fields.push(prop);
     } else {
-      fields=["type", "time"].concat(fields.split(':'));
+      fields=["type", "time"].concat(fields?fields.split(':'):[]);
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
       if (include_revision) fields=["_id", "_rev"].concat(fields);
     }
