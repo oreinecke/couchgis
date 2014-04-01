@@ -175,6 +175,7 @@ $(document).ready(function() {
           } while (m);
           return elements;
         })(data, ["Table","Row","Cell","Data"]);
+        features=[];
         while (tables.length) {
           var rows=tables.shift().xml;
           // insert empty xml if ss:Index is set
