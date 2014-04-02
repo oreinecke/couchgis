@@ -518,7 +518,7 @@ $(document).ready(function() {
     if (e.which!==13) return;
     var cut={
       field:$("#filter [name='field']").val(),
-      value:$(this).val().replace(/(^\s+|\s+$)/g,'') || undefined
+      value:$(this).val().replace(/^\s+|\s+$/g,'') || undefined
     };
     // I've made template filter items at the bottom of the
     // page for the following field/value combinations.
@@ -577,7 +577,7 @@ $(document).ready(function() {
           // Do not suggest numbers or objects right now.
           if (row.value.type!=="string") continue;
           var label=row.key[2];
-          var value=label.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+          var value=label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&");
           // Suppress duplicate suggestions.
           if (labels[label]===null) continue;
           options.source.push({label:label, value:value});
@@ -704,7 +704,7 @@ $(document).ready(function() {
     if ($("#export [name='select-fields']:checked").val()==="from-table") {
       var fields=[];
       $("#table thead .field").each(function() { fields.push($(this).html()); });
-      url+="&fields="+fields.join(':');
+      url+="&fields="+fields.join(':').replace(/\+/g,'%2B').replace(/\s/g,'%20');
     }
     var translate_url=({
       'download':function(url) { window.open(url+"&download", "_self"); },

@@ -57,8 +57,8 @@ function(head, req) {
           if (fields==null) break;
           if (!/^[A-ZÄÖÜ]/.test(field)) continue;
           if (/^GeoJSON/.test(field)) continue;
-          if (fields.search('(^|:)'+field+'(:|$)')!==-1) continue;
-          delete doc[field];
+          if (fields.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
+            delete doc[field];
         }
         features.push({
           type:"Feature",
