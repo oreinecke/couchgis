@@ -470,6 +470,7 @@ $(document).ready(function() {
   $("#reduce [name='show']").click(function() {
     $(this).hide();
     $("#show-suggestions").show();
+    $("#show-suggestions :button").prop('disabled', true);
     // forward GeoJSON_clone property to show_fields()
     features[0].properties.GeoJSON_clone=features[0].properties.GeoJSON_clone || undefined;
     var keys=[];
@@ -484,7 +485,7 @@ $(document).ready(function() {
           similarity:0.0001
         }));
         var found_geometry=function() {
-          $("#reduce :button").prop('disabled', false);
+          $("#show-suggestions :button").prop('disabled', false);
           $("#reduce [name='next']").click();
           found_geometry=function() {};
         }
@@ -550,9 +551,9 @@ $(document).ready(function() {
     <input type="button" name="show" value="Ähnliche Geometrien suchen">
     <span id="show-suggestions" style="display:none">
       Ähnliche Geometrien für
-      <input type="button" name="prev" value="<" disabled>
+      <input type="button" name="prev" value="<">
       Datensatz <a>0</a>
-      <input type="button" name="next" value=">" disabled>
+      <input type="button" name="next" value=">">
     </span>
     <div id="map" style="height:100%"></div>
     <span id="create-new" style="display:none">Eigene/Neue Geometrie verwenden.</span>
