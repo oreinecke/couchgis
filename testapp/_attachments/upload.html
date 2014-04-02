@@ -125,6 +125,7 @@ $(document).ready(function() {
   }
 
   function load_features(data, filetype) {
+    show_geometry(-1);
     try {
       if (filetype==="geojson") {
         var GeoJSON;
@@ -412,8 +413,8 @@ $(document).ready(function() {
       }
     }
     $("#show-suggestions a").html(f+1);
+    if (!(feature=features[f])) return;
     var keys=[];
-    feature=features[f];
     if (!feature.items[feature.id]) keys.push([feature.id, 0]);
     for (var id in feature.items) keys.push([id, 0]);
     $("#reduce :button").prop('disabled', true);
