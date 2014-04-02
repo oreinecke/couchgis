@@ -1,8 +1,8 @@
 function(newDoc, oldDoc, userCtx, secObj) {
-// make your db read-only for everyone and grant
-// write-access for normal documents to all users.
+  // Make database read-only for everyone and grant
+  // write-access for regular documents to all users.
   if (userCtx.roles.indexOf("user")===-1 && userCtx.roles.indexOf("_admin")===-1)
-    throw({unauthorized: 'Database is read-only for non-members!'});
+    throw({unauthorized: 'Database is read-only for non-members.'});
   // Prevent database from writing an unchanged document (_revisions
   // are taken out of the comparison because they differ all the time).
   delete newDoc._revisions;

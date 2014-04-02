@@ -216,7 +216,7 @@ $(document).ready(function() {
           if (!(prop in features[0].properties))
             features[0].properties[prop]=undefined;
       }
-      // store previous document revision
+      // store existing documents
       $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
         data=JSON.parse(data);
         while (data.rows.length) {
@@ -293,7 +293,7 @@ $(document).ready(function() {
     show_feature(f-1);
   });
 
-  // compile fearures into document array
+  // compile features into document array
   $("#upload").submit(function(e) {
     var type=$("#modify [name='type']").val();
     var time=$("#modify [name='time']").val();
@@ -361,7 +361,7 @@ $(document).ready(function() {
       });
       submit.hide();
       revert.show();
-      // update id and revision
+      // Get IDs of new documents and update revisions if no error occured.
       while (data.length) {
         var item=data.pop();
         features[data.length].id=item.id;
