@@ -364,10 +364,11 @@ $(document).ready(function() {
       // update id and revision
       while (data.length) {
         var item=data.pop();
-        if (!item.ok) continue;
         features[data.length].id=item.id;
-        features[data.length].rev=item.rev;
         if (!uploaded_docs[item.id]) continue;
+        features[data.length].rev=uploaded_docs._rev;
+        if (item.error) continue;
+        features[data.length].rev=item.rev;
         uploaded_docs[item.id]._rev=item.rev;
       }
     }});
@@ -392,10 +393,9 @@ $(document).ready(function() {
       $("#reduce").hide();
       while (data.length) {
         var item=data.pop();
-        if (!item.ok) continue;
-        // updat rev in case we want to upload again
-        if (uploaded_docs[item.id])
-          features[data.length].properties._rev=item.rev;
+        if (!uploaded_docs[item.id] || item.error) continue;
+        // update rev in case we want to upload again
+        features[data.length].properties._rev=item.rev;
       }
     }});
   });
