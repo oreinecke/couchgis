@@ -240,8 +240,10 @@ $(document).ready(function() {
     $("#modify").hide();
     $("#reduce [name='show']").show();
     $("#reduce span").hide();
-    submit.prop('disabled', true);
+    $("#reduce").hide();
     $("#upload b").html("");
+    submit.prop('disabled', true).show();
+    revert.hide();
     var reader=new FileReader();
     // get file type and be flexible about extensions
     var filetype=e.target.files[0].name.match(/[^.]*$/)[0];
@@ -257,8 +259,10 @@ $(document).ready(function() {
     $("#modify").hide();
     $("#reduce [name='show']").show();
     $("#reduce span").hide();
-    submit.prop('disabled', true);
+    $("#reduce").hide();
     $("#upload b").html("");
+    submit.prop('disabled', true).show();
+    revert.hide();
     $.ajax({
       dataType:"text",
       url:$("#upload :text").val(),
