@@ -134,7 +134,7 @@ function(head, req) {
         return result;
       }
       function max(obj) {
-        var result={value:+Infinity};
+        var result={value:-Infinity};
         if (obj && typeof obj==="object")
           for (var p in obj)
             if (obj[p]>result.value)
