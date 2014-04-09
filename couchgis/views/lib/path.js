@@ -9,10 +9,15 @@ exports.decode=function(path) {
   return result;
 };
 
-// [" OBJ.","object's field"] -> "' OBJ.' . objects's field"
+// [" OBJ.","object's field"] -> "' OBJ.'. objects's field"
 
 exports.encode=function(fields) {
   for (var f=0;f<fields.length;f++)
     if (/\.|^\s|\s$/.test(fields[f])) fields[f]="'"+fields[f]+"'";
   return fields.join('.');
 };
+
+// Pretty-print path with extra characters after the dot.
+exports.pretty=function(path, extra) {
+  return path.match(/\s*'[^']+'\s*|[^.]+/g).join('.'+extra);
+}
