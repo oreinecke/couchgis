@@ -34,7 +34,7 @@ $(document).ready(function() {
       // insert username:password@ into centralhost
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
       $.couch.replicate(addr[source], addr[!source], {
-        success:function(data) { 
+        success:function(data) {
           $("#replicate :submit").prop('disabled', false);
           // display some replication results
           r=$("#response");
@@ -52,7 +52,7 @@ $(document).ready(function() {
             "missing_checked", "missing_found", "docs_read",
             "docs_written", "doc_write_failures"]);
         },
-        error:function(jqXHR, error) { 
+        error:function(jqXHR, error) {
           $("#replicate :submit").prop('disabled', false);
           $("#response").html("Fehler: <b>"+error+"</b>");
         }

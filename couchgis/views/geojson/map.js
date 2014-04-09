@@ -1,4 +1,4 @@
-// Emit GeoJSON, simplified GeoJSON for 
+// Emit GeoJSON, simplified GeoJSON for
 // faster drawing and associated documents.
 
 function(doc) {

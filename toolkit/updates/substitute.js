@@ -1,8 +1,8 @@
-// Applies regexp substitution to stringified doc. Syntax 
+// Applies regexp substitution to stringified doc. Syntax
 // reads /substitute/<doc>?/<pattern>/<flags>=<replacement>.
 
 function(doc, req) {
-  if (req.userCtx.roles.indexOf("_admin")==-1) 
+  if (req.userCtx.roles.indexOf("_admin")==-1)
     return[null, 'Only admins are allowed to use /_update/substitute!\n'];
   if (!doc)
     return[null, 'Document must be specified and existing!\n'];
