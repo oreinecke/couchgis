@@ -111,7 +111,7 @@ function(head, req) {
     send('<Table>');
     send('<Row>');
     for (var g=0;g<fields.length;g++)
-      send('<Cell><Data ss:Type="String">'+fields[g]+'</Data></Cell>');
+      send('<Cell><Data ss:Type="String">'+path.pretty(fields[g],'\n')+'</Data></Cell>');
     send('</Row>');
     for (var f=0;f<features.length;f++) {
       send('<Row>');
