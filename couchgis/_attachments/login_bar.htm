@@ -11,16 +11,18 @@
 $(document).ready(function() {
   var log={
     success: function(resp) {
-      if (resp.userCtx.name!==null || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")>=0) {
+      var name=resp.userCtx.name;
+      if (name!==null || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")>=0) {
         $("#logout").show();
-        href=$("#logout a");
-        // expect admin party if name==null
-        href.text(resp.userCtx.name||"Administrator (keine Benutzer festgelegt)");
         // link to futon user doc
-        if (resp.userCtx.name)
-          href.prop('href',"/_utils/document.html?_users/org.couchdb.user:"+href.text());
-        else
+        if (name)
+          $("#logout a").html(name)
+                        .prop('href',"/_utils/document.html?_users/org.couchdb.user:"+name);
+        else {
+          // expect admin party if name==null
+          $("#logout span").show();
           $("#logout :submit").hide();
+        }
         $("#login").hide();
         $("#login b").hide();
       } else {
@@ -62,7 +64,9 @@ $(document).ready(function() {
     <b style="display:none">Benutzername/Kennwort falsch!!</b>
   </form>
   <form id="logout" style="display:none">
-    Angemeldet als <a target="_top">?</a> <input type="submit" value="Abmelden">
+    Angemeldet als
+    <a target="_top">?</a> <input type="submit" value="Abmelden">
+    <span style="display:none">Administrator (keine Benutzer festgelegt)</span>
   </form>
 
   </body>
