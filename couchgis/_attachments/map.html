@@ -156,7 +156,7 @@ $(document).ready(function() {
                   ).append("<br>");
                 // evaluate columns
                 else if (cl==="field") {
-                  var fields=path.decode(th.html()), value=doc;
+                  var fields=path.decode(th.val()), value=doc;
                   while (fields.length && value!=null) value=value[fields.shift()];
                   td.append(value+'<br>');
                 }
@@ -597,7 +597,7 @@ $(document).ready(function() {
       // remove th from #table
       $("#table thead .field").each( function() {
         var th=$(this);
-        if (th.html()!==option.val()) return;
+        if (th.val()!==option.val()) return;
         th.remove();
         return false;
       });
@@ -605,7 +605,9 @@ $(document).ready(function() {
       select.find("[name='fields']").prepend(option);
     } else {
       var last=$("#table thead th").last();
-      $("#table thead tr").append('<th class="field">'+$(this).val()+'</th>');
+      $("#table thead tr").append($('<th>').html(path.pretty($(this).val(),'<br>'))
+                                           .val($(this).val())
+                                           .addClass("field"));
       // move column selection to the right
       $("#table thead tr").append(last);
       var select=$(this);
@@ -703,7 +705,7 @@ $(document).ready(function() {
       url+="&include_geojson_id";
     if ($("#export [name='select-fields']:checked").val()==="from-table") {
       var fields=[];
-      $("#table thead .field").each(function() { fields.push($(this).html()); });
+      $("#table thead .field").each(function() { fields.push($(this).val()); });
       url+="&fields="+fields.join(':').replace(/\+/g,'%2B').replace(/\s/g,'%20');
     }
     var translate_url=({
