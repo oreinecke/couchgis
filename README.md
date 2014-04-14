@@ -7,6 +7,27 @@ API and works well with [LibreOffice](http://www.libreoffice.org/) Calc for
 bulk document editing, and [Quantum GIS](http://qgis.org/en/site/) for shape
 import/export.
 
+Installation
+------------
+
+To install, push the couchgis directory into your couchdb using
+[erica](https://github.com/benoitc/erica):
+
+```
+$ erica push couchgis http://localhost:5984/db
+==> couchgis (push)
+==> Successfully pushed. You can browse it at: http://localhost:5984/db/_design/couchgis-v1.0/index.html
+```
+
+If you don't have erica installed, use the compiled design document that is
+shipped with every release (how nice of me!). Just unzip and post the json
+file:
+
+```
+$ gzip -dc couchgis-v1.0.json.gz | curl -XPOST localhost:5984/db \
+  -HContent-type:application/json -d@-
+```
+
 Document Structure
 ------------------
 
