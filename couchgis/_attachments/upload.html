@@ -369,12 +369,10 @@ $(document).ready(function() {
       // Get IDs of new documents and update revisions if no error occured.
       while (data.length) {
         var item=data.pop();
-        features[data.length].id=item.id;
-        if (!uploaded_docs[item.id]) continue;
-        features[data.length].rev=uploaded_docs._rev;
-        if (item.error) continue;
-        features[data.length].rev=item.rev;
-        uploaded_docs[item.id]._rev=item.rev;
+        var uploaded_doc = uploaded_docs[item.id] || {};
+        features[data.length].id = item.id;
+        features[data.length].rev =
+                uploaded_doc._rev = item.rev || uploaded_doc._rev;
       }
     }});
     e.preventDefault();
