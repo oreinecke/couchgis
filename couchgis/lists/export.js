@@ -41,8 +41,9 @@ function(head, req) {
           delete doc._rev;
           delete doc._id;
         }
-        if (include_geojson_id)
-          doc.GeoJSON_clone=row.key[0];
+        if (!include_geojson_id)
+          delete doc.GeoJSON_clone;
+        else doc.GeoJSON_clone=row.key[0];
         // create flat column names from nested objects
         (function flatten(obj, fields) {
           if (!obj || typeof obj!=="object")

@@ -28,7 +28,13 @@ function(doc) {
     }
   }
   var range=require('views/lib/range');
-  var val={doc:{_id:doc._id, _rev:doc._rev, type:doc.type, time:range.toRange(doc.time)}};
+  var val={doc:{
+    _id:doc._id,
+    _rev:doc._rev,
+    type:doc.type,
+    time:range.toRange(doc.time),
+    GeoJSON_clone:doc.GeoJSON_clone
+  }};
   for (var field in doc) {
     // fields with lowecase letters are english and kind of 'internal'
     if (!/^[A-ZÄÖÜ]/.test(field)) continue;
