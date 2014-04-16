@@ -40,8 +40,8 @@ function(head, req) {
         // ["nested field"]: the first match employs greediness to split
         // expression into the following substrings:
         //
-        //                       "string expression"    Field_Näme . 'nested .field'            anything else
-        //                             v.....v v.....................................................v v..v
+        //                   "string expression"    Field_Näme . 'nested .field'            anything else
+        //                         v.....v v.....................................................v v..v
         var parts=cut.value.match(/"[^"]*"|([\wäöüÄÖÜß]+|'[^']+')(\s*\.\s*([\wäöüÄÖÜß]+|'[^']+'))*|\W/g);
         var expression="";
         for (var part; (part=parts.shift())!=null; expression+=part ) {
@@ -50,7 +50,7 @@ function(head, req) {
           // This is equivalent to 'anything else'.
           if (/^\W$/.test(part)) continue;
           // (Unquoted) field names start with a capital by convention.
-          if (!/['A-ZÄÖÜ]/.test(part[0])) continue;
+          if (!/['A-ZÄÖÜ_]/.test(part[0])) continue;
           // See explanation below for parts as tagged here:
           //     (a)                     (b)                (c)            (d)      (e)
           part='doc["'+part.match(/'[^']+'|[^\s.]+/g).join('"]["').replace(/'/g,"")+'"]';
