@@ -110,7 +110,7 @@ function(head, req) {
     send('</ExcelWorkbook>');
     send('<Worksheet ss:Name="'+filename+'">');
     send('<Table>');
-    send('<Row>');
+    send('<Row ss:AutoFitHeight="0" ss:Height="24">');
     for (var g=0;g<fields.length;g++)
       send('<Cell><Data ss:Type="String">'+path.pretty(fields[g],'\n')+'</Data></Cell>');
     send('</Row>');
