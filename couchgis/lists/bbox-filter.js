@@ -33,42 +33,36 @@ function(head, req) {
     };
   }
   if ('error' in options) error=options.error;
-  var row=getRow(), GeoJSON;
   // iii) Check if bboxes intersect.
-  var inside_bbox=function() {
-    if ('bbox' in GeoJSON && bbox) inside_bbox=function(bbox2) {
+  var inside_bbox=function(bbox2) {
+    if (bbox && bbox2) inside_bbox=function(bbox2) {
       return (bbox[0]<=bbox2[2]&&bbox2[0]<=bbox[2]&&
               bbox[1]<=bbox2[3]&&bbox2[1]<=bbox[3]);
     }; else inside_bbox=pass;
-    return inside_bbox(GeoJSON.bbox);
+    return inside_bbox(bbox2);
   };
   // iv) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
     send_separator=function() {send(',\n');};
   };
   send('{');
-  while (row) {
-    GeoJSON=row.value.GeoJSON;
-    if (inside_bbox(GeoJSON.bbox) && bbox_is_similar(GeoJSON.bbox)) {
-      // scan rows for matching detail level
-      var last_GeoJSON=row.value.GeoJSON;
-      var last_key=row.key;
-      row=getRow();
-      while (row && row.key==last_key) {
-        GeoJSON=row.value.GeoJSON;
-        if (last_GeoJSON.error<GeoJSON.error && GeoJSON.error<error)
-          last_GeoJSON=GeoJSON;
-        row=getRow();
+  var row;
+  while (row=getRow()) {
+    var GeoJSON=row.value.GeoJSON;
+    var bbox2=GeoJSON.bbox;
+    if (!inside_bbox(bbox2) || !bbox_is_similar(bbox2))
+      continue;
+    var errors=GeoJSON.errors;
+    delete GeoJSON.errors;
+    for (var e=!error && errors.length-1; e<errors.length; e++) {
+      if (errors[e]<=error) {
+        GeoJSON.error=errors[e];
+        break;
       }
-      send_separator();
-      send('"'+last_key+'":{"GeoJSON":'+JSON.stringify(last_GeoJSON)+'}');
-      if (!proceed()) break;
-    } else {
-      // skip to next key if outside bbox
-      var last_key=row.key;
-      do row=getRow();
-      while (row && row.key==last_key);
     }
+    send_separator();
+    send('"'+row.key+'":{"GeoJSON":'+JSON.stringify(GeoJSON)+'}');
+    if (!proceed()) break;
   }
   return '}\n';
   // Uncomment this next line as soon as any(more) trouble arises: for some
