@@ -36,35 +36,32 @@ function(head, req) {
       var cut=options.cuts.shift();
       // eval()'d expression must be true
       if (cut.field==="_expression") {
-        // Transform Field_Näme . 'nested .field' into doc["Field_Näme"]
-        // ["nested field"]: the first match employs greediness to split
-        // expression into the following substrings:
-        //
-        //                   "string expression"    Field_Näme . 'nested .field'                              anything else
-        //                         v.....v v.......................................................................v v..v
-        var parts=cut.value.match(/"(\\"|[^"])*"|([\wäöüÄÖÜß]+|'(\\'|[^'])+')(\s*\.\s*([\wäöüÄÖÜß]+|'(\\'|[^'])+'))*|\W/g);
+        // concat RegExp /ab/ and /c/ into /(ab|c)/
+        function join() {
+          var result="";
+          for (var a=0;a<arguments.length;a++)
+            result+=(a?'|':'')+(arguments[a].source||arguments[a]);
+          return '('+result+')';
+        }
+        // match        unquoted or 'quoted fields' 
+        var f=join( /[\wäöüÄÖÜß]+/, /'(\\'|[^'])+'/ );
+        // match "string constant" or field.'opt. nested field' or anything else                               
+        var g=join( /"(\\"|[^"])*"/, f+join(/\s*\.\s*/.source+f)+'*', /\W/ );
+        var parts=cut.value.match(g,'g');
         var expression="";
         for (var part; (part=parts.shift())!=null; expression+=part ) {
-          // Double-quoted parts are attached as-is to expression.
-          if (/^"[^"]*"$/.test(part)) continue;
           // This is equivalent to 'anything else'.
           if (/^\W$/.test(part)) continue;
-          // (Unquoted) field names start with a capital by convention.
+          // Do not process keywords and accumulator functions.
           if (!/^['A-ZÄÖÜ_]/.test(part)) continue;
-          // See explanation below for parts as tagged here:
-          //     (a)                     (b)                      (c)     (d)      
-          part='doc["'+part.match(/'(\\'|[^'])+'|[^\s.]+/g).join('"]["')+'"]';
+          //     (a)              (b)          (c)     (d)              (e)
+          part=('doc["'+part.match(f,'g').join('"]["')+'"]').replace(/'"|"'/g,'"');
           // a) All fields are fetched from doc.
           // b) I might encounter a dot inside a field name and therefore
-          //    cannot use a simple part.split('.'). Again, the greediest
-          //    pattern is the left one, which fetches the variable string. It
-          //    takes precedende over a second pattern fetcheing unquoted field
-          //    names (white-spaces are ignored).
+          //    cannot use a simple part.split('.').
           // c) Done accessing this field, re-opening the next one.
           // d) This closes the last field access.
-          part=part.replace(/'"|"'/g,'"');
-          // e) Here I remove quotes from quoted field names. There is no
-          //    look-behind RegExp support, so I have to resort to kind a hack.
+          // e) Here I remove quotes from quoted field names.
         }
         expressions.push(expression);
       } else {
