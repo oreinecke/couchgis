@@ -40,9 +40,9 @@ function(head, req) {
         // ["nested field"]: the first match employs greediness to split
         // expression into the following substrings:
         //
-        //                   "string expression"    Field_Näme . 'nested .field'            anything else
-        //                         v.....v v.....................................................v v..v
-        var parts=cut.value.match(/"[^"]*"|([\wäöüÄÖÜß]+|'[^']+')(\s*\.\s*([\wäöüÄÖÜß]+|'[^']+'))*|\W/g);
+        //                   "string expression"    Field_Näme . 'nested .field'                              anything else
+        //                         v.....v v.......................................................................v v..v
+        var parts=cut.value.match(/"(\\"|[^"])*"|([\wäöüÄÖÜß]+|'(\\'|[^'])+')(\s*\.\s*([\wäöüÄÖÜß]+|'(\\'|[^'])+'))*|\W/g);
         var expression="";
         for (var part; (part=parts.shift())!=null; expression+=part ) {
           // Double-quoted parts are attached as-is to expression.
@@ -50,10 +50,10 @@ function(head, req) {
           // This is equivalent to 'anything else'.
           if (/^\W$/.test(part)) continue;
           // (Unquoted) field names start with a capital by convention.
-          if (!/['A-ZÄÖÜ_]/.test(part[0])) continue;
+          if (!/^['A-ZÄÖÜ_]/.test(part)) continue;
           // See explanation below for parts as tagged here:
-          //     (a)                     (b)                (c)            (d)      (e)
-          part='doc["'+part.match(/'[^']+'|[^\s.]+/g).join('"]["').replace(/'/g,"")+'"]';
+          //     (a)                     (b)                      (c)     (d)      
+          part='doc["'+part.match(/'(\\'|[^'])+'|[^\s.]+/g).join('"]["')+'"]';
           // a) All fields are fetched from doc.
           // b) I might encounter a dot inside a field name and therefore
           //    cannot use a simple part.split('.'). Again, the greediest
@@ -61,9 +61,10 @@ function(head, req) {
           //    takes precedende over a second pattern fetcheing unquoted field
           //    names (white-spaces are ignored).
           // c) Done accessing this field, re-opening the next one.
-          // d) Here I remove quotes from quoted field names. There is no
+          // d) This closes the last field access.
+          part=part.replace(/'"|"'/g,'"');
+          // e) Here I remove quotes from quoted field names. There is no
           //    look-behind RegExp support, so I have to resort to kind a hack.
-          // e) This closes the last field access.
         }
         expressions.push(expression);
       } else {
