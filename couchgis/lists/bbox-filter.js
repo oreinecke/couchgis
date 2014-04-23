@@ -54,7 +54,7 @@ function(head, req) {
       continue;
     var errors=GeoJSON.errors;
     delete GeoJSON.errors;
-    for (var e=(error?0:errors.length); e<errors.length; e++) {
+    for (var e=(error?0:errors.length-1); e<errors.length; e++) {
       if (errors[e]<=error) {
         GeoJSON.error=errors[e];
         break;
