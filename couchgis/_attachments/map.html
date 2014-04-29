@@ -531,7 +531,7 @@ $(document).ready(function() {
     if (!id) return;
     filter_documents({cuts:[cut]});
     var li=$(id).clone();
-    li.show().prop('id',"");
+    li.css('display','inline').prop('id',"");
     li.find('a').html(cut.value);
     li.find('b').html(cut.field[0]==='_'?undefined:cut.field);
     $("#cuts").append(li);
@@ -760,6 +760,7 @@ $(document).ready(function() {
   #settings .geometry-level {width:6em}
   span {white-space:nowrap}
   .types {white-space:normal}
+  #cuts li {display:inline}
   table, th, tr, td {
     padding:0; padding-right:3px;
     border-collapse:collapse;
