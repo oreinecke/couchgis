@@ -41,5 +41,6 @@ function(doc) {
     if (/^GeoJSON/.test(field)) continue;
     val.doc[field]=doc[field];
   }
-  emit([id,doc._id], val);
+  var ids=id.split(/[\s,;]+/);
+  while (ids.length) emit([ids.shift(),doc._id], val);
 }
