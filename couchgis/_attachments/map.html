@@ -168,6 +168,7 @@ $(document).ready(function() {
                                            (bbox[2]+bbox[0])/2.0+offset[0]));
                   item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
                   $("#table tbody").prepend(item.tr);
+                  e.preventDefault();
                 } }(item) );
               });
             }
