@@ -26,6 +26,7 @@ function(head, req) {
   }});
   var features=[];
   var row=getRow();
+  var doc_ids=[];
   while (row) {
     while (row && row.value.GeoJSON && row.value.GeoJSON.error!==0.0)
       row=getRow();
@@ -34,8 +35,8 @@ function(head, req) {
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
-      if (!indexes || index===indexes[0]) {
-        var doc=row.value.doc;
+      var doc=row.value.doc;
+      if ((!indexes || index===indexes[0]) && doc_ids.indexOf(doc._id)===-1) {
         doc.time=range.toString(doc.time) || undefined;
         if (!include_revision) {
           delete doc._rev;
@@ -67,6 +68,8 @@ function(head, req) {
           geometry:geometry,
           properties:row.value.doc
         });
+        // Avoid duplicate rows for xml export.
+        if (filetype==="xml") doc_ids.push(doc._id);
         if (indexes) indexes.shift();
       }
       row=getRow();
