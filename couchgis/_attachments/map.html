@@ -552,6 +552,17 @@ $(document).ready(function() {
     $("#cuts").append(li);
   });
 
+  // Show or Hide #keep-selection.
+  $("#cuts").click( function() {
+    var ol=$(this);
+    var li=$("#keep-selection");
+    var length=ol.find("li:visible").length-(li.css('display')!=='none');
+    if (length) ol.append(li.show());
+    else li.hide();
+  });
+  $("#filter .types").change( function() { $("#cuts").click(); });
+  $("#filter").keypress( function(e) { if (e.which===13) $("#cuts").click(); });
+
   // Update autocomplete source array.
   $("#filter [name='field']").change( function() {
     // clear text input on field change.
@@ -810,6 +821,9 @@ $(document).ready(function() {
         <input type="button" value="x" title="löschen"> <b></b> <a></a></li>
       <li style="display:none" id="expression">
         <input type="button" value="x" title="löschen"> <b>erfüllt</b> <a></a></li>
+      <!-- always show selected docs -->
+      <li style="display:none" id="keep-selection">
+        <input type="button" value="Auswahl merken"></li>
     </ol>
   </form>
   <table id="table">
