@@ -384,10 +384,10 @@ $(document).ready(function() {
     options.keys=documents;
     list("tabulate/geojson", options, function(data) {
       var new_documents=[], d=0;
-      for (var i=0;i<data.length;i++) {
-        var doc_id=data[i];
+      while (data.length) {
+        var doc_id=data.shift();
         while (documents[d][1]!=doc_id) d++;
-        new_documents.push(documents[d]);
+        new_documents.push(documents[d++]);
       }
       options.documents=new_documents;
       delete options.keys;
