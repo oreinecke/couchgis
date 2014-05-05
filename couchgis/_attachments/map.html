@@ -556,12 +556,25 @@ $(document).ready(function() {
   $("#cuts").click( function() {
     var ol=$(this);
     var li=$("#keep-selection");
-    var length=ol.find("li:visible").length-(li.css('display')!=='none');
+    var length=ol.find("> li:visible").length
+              -(li.css('display')!=='none')
+              -($("#union").css('display')!=='none');
     if (length) ol.append(li.show());
     else li.hide();
   });
   $("#filter .types").change( function() { $("#cuts").click(); });
   $("#filter").keypress( function(e) { if (e.which===13) $("#cuts").click(); });
+
+  $("#keep-selection :button").click( function() {
+    $("#keep-selection").hide();
+    $("#union").hide();
+    var union=$("#union");
+    union.append('<b>||</b>');
+    $("#cuts > li:visible").each( function() {
+      union.append($(this).html()).find(":button").last().remove();
+    });
+    union.css('display', 'block');
+  });
 
   // Update autocomplete source array.
   $("#filter [name='field']").change( function() {
@@ -824,6 +837,8 @@ $(document).ready(function() {
       <!-- always show selected docs -->
       <li style="display:none" id="keep-selection">
         <input type="button" value="Auswahl merken"></li>
+      <li style="display:none" id="union">
+        <input type="button" value="x" title="löschen"> <b>Auswahl:</b></li>
     </ol>
   </form>
   <table id="table">
