@@ -386,7 +386,16 @@ $(document).ready(function() {
       reset_viewports();
       return;
     }
-    options.keys=documents;
+    // Documents listed in union bypass content-filtering.
+    var union=filters[0].union;
+    var keys=documents.slice();
+    for (var d=0, lastIndex=0; d<union.length; d++) {
+      var index=keys.indexOf(union[d], lastIndex);
+      if (index===-1) continue;
+      lastIndex=index;
+      keys.splice(index, 1);
+    }
+    options.keys=keys;
     list("tabulate/geojson", options, function(data) {
       var new_documents=[], d=0;
       while (data.length) {
