@@ -388,14 +388,14 @@ $(document).ready(function() {
     }
     // Documents listed in union bypass content-filtering.
     var union=filters[0].union;
-    var keys=documents.slice();
+    var KEYS=documents.slice();
     for (var d=0, lastIndex=0; d<union.length; d++) {
-      var index=keys.indexOf(union[d], lastIndex);
+      var index=KEYS.indexOf(union[d], lastIndex);
       if (index===-1) continue;
       lastIndex=index;
-      keys.splice(index, 1);
+      KEYS.splice(index, 1);
     }
-    options.keys=keys;
+    options.keys=KEYS;
     list("tabulate/geojson", options, function(data) {
       var new_documents=[], d=0;
       while (data.length) {
