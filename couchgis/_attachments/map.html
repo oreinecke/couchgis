@@ -393,15 +393,23 @@ $(document).ready(function() {
       var index=KEYS.indexOf(union[d], lastIndex);
       if (index===-1) continue;
       lastIndex=index;
-      KEYS.splice(index, 1);
+      // Remove document from query options,
+      // but tag it as element of union.
+      KEYS.splice(index, 1)[0].keep_me=true;
     }
     options.keys=KEYS;
     list("tabulate/geojson", options, function(data) {
-      var new_documents=[], d=0;
-      while (data.length) {
-        var doc_id=data.shift();
-        while (documents[d][1]!=doc_id) d++;
-        new_documents.push(documents[d++]);
+      var new_documents=[];
+      var doc_id=data.shift();
+      for (var d=0;d<documents.length;d++) {
+        var doc=documents[d];
+        if (doc.keep_me) {
+          delete doc.keep_me;
+          new_documents.push(doc);
+        } else if (doc[1]===doc_id) {
+          doc_id=data.shift();
+          new_documents.push(doc);
+        }
       }
       options.documents=new_documents;
       delete options.keys;
