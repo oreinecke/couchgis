@@ -84,7 +84,7 @@ $(document).ready(function() {
     position: 0 // index from which to append remaining keys
   }];
   // Same as viewports for content-based filters.
-  var filters=[{ types:[], time:"", documents:[] }];
+  var filters=[{ types:[], time:"", documents:[], union:[] }];
 
   // query for GeoJSON and full documents
   function update_geometry() {
@@ -316,6 +316,10 @@ $(document).ready(function() {
       // most concise and every attempt to do this without resulted in
       // additional clutter. Also I expect filters.length not to exceed 20.
       if (filter[filter_name]==null) return true;
+      if (filter_name==="union") {
+        filter.union=new_filter.union;
+        return true;
+      }
       if (filter_name==="time") {
         var contains=(range.contains(filter.time, new_filter.time));
         if (contains) equal_filter=(range.contains(new_filter.time, filter.time));
@@ -324,7 +328,7 @@ $(document).ready(function() {
       if (filter_name==="types") {
         var contains=(new_filter.types.length<=filter.types.length);
         for (var t=0; contains && t<new_filter.types.length; t++)
-          contains &= (filter.types.indexOf(new_filter.types[t])>=0);
+          contains &= (filter.types.indexOf(new_filter.types[t])!==-1);
         if (contains) equal_filter=(new_filter.types.length===filter.types.length);
         return contains;
       }
@@ -558,22 +562,29 @@ $(document).ready(function() {
     var li=$("#keep-selection");
     var length=ol.find("> li:visible").length
               -(li.css('display')!=='none')
-              -($("#union").css('display')!=='none');
+              -($("#union:visible").length);
     if (length) ol.append(li.show());
     else li.hide();
   });
   $("#filter .types").change( function() { $("#cuts").click(); });
   $("#filter").keypress( function(e) { if (e.which===13) $("#cuts").click(); });
 
+  // Always show selected documents.
   $("#keep-selection :button").click( function() {
-    $("#keep-selection").hide();
-    $("#union").hide();
     var union=$("#union");
-    union.append('<b>||</b>');
+    if (union.css('display')==='none') union=union.clone();
+    else union.hide();
     $("#cuts > li:visible").each( function() {
       union.append($(this).html()).find(":button").last().remove();
     });
+    union.append(' <b>||</b> ');
     union.css('display', 'block');
+    $("#cuts").prepend(union);
+    union.find(":button").click( function() {
+      union.remove();
+      filter_documents({union:[]});
+    });
+    filter_documents({union:filters[filters.length-1].documents});
   });
 
   // Update autocomplete source array.
