@@ -32,6 +32,7 @@ function(head, req) {
       row=getRow();
     var geometry=row.value.GeoJSON || {};
     delete geometry.error;
+    delete geometry.bbox;
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
     // I apologize for the rude comma operator I used, but
@@ -79,10 +80,10 @@ function(head, req) {
   switch(filetype) {
   case "geojson":
     return JSON.stringify({
-      crs:{type:"name", properties:{name:"urn:ogc:def:crs:OGC:1.3:CRS84"}},
+      type:"FeatureCollection",
       name:filename,
-      features:features,
-      type:"FeatureCollection"
+      crs:{type:"name", properties:{name:"urn:ogc:def:crs:OGC:1.3:CRS84"}},
+      features:features
     });
   case "xml":
     if (fields==null) {
