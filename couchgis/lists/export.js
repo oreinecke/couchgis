@@ -34,43 +34,46 @@ function(head, req) {
     delete geometry.error;
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
-    while (row && row.value.doc) {
-      var doc=row.value.doc;
-      if (!indexes || index===indexes[0]) {
-        // Avoid duplicate rows for xml export.
-        if (doc_ids.indexOf(doc._id)===-1)
-          features.push({ type:"Feature", properties:doc, geometry:geometry });
-        if (filetype==="xml") doc_ids.push(doc._id);
-        if (indexes) indexes.shift();
-        doc.time=range.toString(doc.time) || undefined;
-        if (!include_revision) {
-          delete doc._rev;
-          delete doc._id;
-        }
-        if (!include_geojson_id)
-          delete doc.GeoJSON_clone;
-        else if (!doc.GeoJSON_clone)
-          doc.GeoJSON_clone=row.key[0];
-        // create flat column names from nested objects
-        (function flatten(obj, fields) {
-          if (!obj || typeof obj!=="object")
-            doc[path.encode(fields)]=obj;
-          else for (var prop in obj) {
-            var obj2=obj[prop];
-            delete obj[prop];
-            flatten(obj2, fields.concat([prop]));
-          }
-        })(doc, []);
-        for (var field in doc) {
-          if (fields==null) break;
-          if (!/^[A-ZÄÖÜ]/.test(field)) continue;
-          if (/^GeoJSON/.test(field)) continue;
-          if (fields.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
-            delete doc[field];
-        }
+    // I apologize for the rude comma operator I used, but
+    // it looks much worse written as a while() statement.
+    for (var doc; row && (doc=row.value.doc); row=getRow(), index++) {
+      if (indexes) {
+        if (index!==indexes[0]) continue;
+        indexes.shift();
       }
-      row=getRow();
-      index++;
+      if (doc_ids.indexOf(doc._id)!==-1) continue;
+      if (filetype==="xml") doc_ids.push(doc._id);
+      doc.time=range.toString(doc.time) || undefined;
+      if (!include_revision) {
+        delete doc._rev;
+        delete doc._id;
+      }
+      if (!include_geojson_id)
+        delete doc.GeoJSON_clone;
+      else if (!doc.GeoJSON_clone)
+        doc.GeoJSON_clone=row.key[0];
+      // create flat column names from nested objects
+      (function flatten(obj, fields) {
+        if (!obj || typeof obj!=="object")
+          doc[path.encode(fields)]=obj;
+        else for (var prop in obj) {
+          var obj2=obj[prop];
+          delete obj[prop];
+          flatten(obj2, fields.concat([prop]));
+        }
+      })(doc, []);
+      for (var field in doc) {
+        if (fields==null) break;
+        if (!/^[A-ZÄÖÜ]/.test(field)) continue;
+        if (/^GeoJSON/.test(field)) continue;
+        if (fields.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
+          delete doc[field];
+      }
+      features.push({
+        type:"Feature",
+        properties:doc,
+        geometry:geometry
+      });
     }
   }
   switch(filetype) {
