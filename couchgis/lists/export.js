@@ -36,7 +36,12 @@ function(head, req) {
     while (row && !row.value.doc) row=getRow();
     while (row && row.value.doc) {
       var doc=row.value.doc;
-      if ((!indexes || index===indexes[0]) && doc_ids.indexOf(doc._id)===-1) {
+      if (!indexes || index===indexes[0]) {
+        // Avoid duplicate rows for xml export.
+        if (doc_ids.indexOf(doc._id)===-1)
+          features.push({ type:"Feature", properties:doc, geometry:geometry });
+        if (filetype==="xml") doc_ids.push(doc._id);
+        if (indexes) indexes.shift();
         doc.time=range.toString(doc.time) || undefined;
         if (!include_revision) {
           delete doc._rev;
@@ -63,14 +68,6 @@ function(head, req) {
           if (fields.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
             delete doc[field];
         }
-        features.push({
-          type:"Feature",
-          geometry:geometry,
-          properties:row.value.doc
-        });
-        // Avoid duplicate rows for xml export.
-        if (filetype==="xml") doc_ids.push(doc._id);
-        if (indexes) indexes.shift();
       }
       row=getRow();
       index++;
