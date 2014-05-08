@@ -317,11 +317,20 @@ $(document).ready(function() {
       // additional clutter. Also I expect filters.length not to exceed 20.
       if (filter[filter_name]==null) return true;
       if (filter_name==="union") {
-        // Tag document selection to bypass _list/tabulate.
-        for (var d=0;d<new_filter.union.length;d++)
-          new_filter.union[d].keep_me=true;
         filter.union=new_filter.union;
-        return true;
+        // Tag document selection to bypass _list/tabulate.
+        for (var d=0;d<filter.union.length;d++)
+          filter.union[d].keep_me=true;
+        if (filter.union.length) return true;
+        // Remove the tag from each document if new_filter.union is empty.
+        // Here I take advantage over the circumstance that, by the poor design
+        // of my interface, new_filter.union is only shrinking to an empty set.
+        for (var d=0;d<documents.length;d++)
+          delete documents[d].keep_me;
+        // Here I cause the remaining filters to collapse into filters[1],
+        // because I want to leave the top-level filter untouched.
+        position++;
+        return false;
       }
       if (filter_name==="time") {
         var contains=(range.contains(filter.time, new_filter.time));
