@@ -590,11 +590,10 @@ $(document).ready(function() {
   $("#keep-selection :button").click( function() {
     var union=$("#union");
     if (union.css('display')==='none') union=union.clone();
-    else union.hide();
+    else union.append(' <b>&cup;</b> ').hide();
     $("#cuts > li:visible").each( function() {
       union.append($(this).html()).find(":button").last().remove();
     });
-    union.append(' <b>||</b> ');
     union.css('display', 'block');
     $("#cuts").prepend(union);
     union.find(":button").click( function() {
