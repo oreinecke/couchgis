@@ -793,6 +793,8 @@ $(document).ready(function() {
       // are JSON.parse'ed and then just skipped by _list/export.
       indexes.sort(list);
       var offset=list[0];
+      while (offset && JSON.parse(keys[offset])[0]===JSON.parse(keys[offset-1])[0])
+        offset--;
       var start_key='["'+JSON.parse(keys[offset])[0]+'",0]';
       var end_key=keys[list[list.length-1]];
       url+="&start_key="+start_key+"&end_key="+end_key;
