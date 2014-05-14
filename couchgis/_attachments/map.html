@@ -149,8 +149,8 @@ $(document).ready(function() {
                 // and set link text to a useful item explanation.
                   td.append($("<a>").attr({
                     href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
-                  }).html( (doc[doc.type]||doc.type) + ' ' +
-                           ('('+range.toString(doc.time)+')').replace('()',"") )
+                  }).html( (doc[doc.type]||doc.type) +
+                           (' ('+range.toString(doc.time)+')').replace(' ()',"") )
                   ).append("<br>");
                 // evaluate columns
                 else if (cl==="field") {
