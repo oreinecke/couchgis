@@ -242,6 +242,7 @@ $(document).ready(function() {
     $("#reduce span").hide();
     $("#reduce").hide();
     $("#upload b").html("");
+    $("#results").html();
     submit.prop('disabled', true).show();
     revert.hide();
     var reader=new FileReader();
@@ -261,6 +262,7 @@ $(document).ready(function() {
     $("#reduce span").hide();
     $("#reduce").hide();
     $("#upload b").html("");
+    $("#results").html();
     submit.prop('disabled', true).show();
     revert.hide();
     $.ajax({
@@ -366,14 +368,20 @@ $(document).ready(function() {
       });
       submit.hide();
       revert.show();
+      var results=[];
       // Get IDs of new documents and update revisions if no error occured.
       while (data.length) {
         var item=data.pop();
+        var result=item.ok && "ok" || item.error+" ("+item.reason+")";
+        results[result] = results[result] + 1 || 1;
         var uploaded_doc = uploaded_docs[item.id] || {};
         features[data.length].id = item.id;
         features[data.length].rev =
                 uploaded_doc._rev = item.rev || uploaded_doc._rev;
       }
+      for (var result in results)
+        results.push(results[result]+" "+result);
+      $("#results").html(results.join(", "));
     }});
     e.preventDefault();
   });
@@ -550,6 +558,7 @@ $(document).ready(function() {
       Datensatz <a>1</a>
       <input type="button" name="next" value=">"></span>
   </form>
+  <b id="results"></b>
   <form id="reduce" style="display:none;height:50%">
     <input type="button" name="show" value="Ähnliche Geometrien suchen">
     <span id="show-suggestions" style="display:none">
