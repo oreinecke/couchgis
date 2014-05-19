@@ -34,6 +34,7 @@ function toRanges(ranges) {
     return greater_or_equal(a.begin, b.begin) || -1;
   });
 }
+exports.toRanges=toRanges;
 
 // Convert range to string. If no day is given,
 // MM/YYYY is returned, DD.MM.YYYY otherwise.
@@ -102,17 +103,4 @@ exports.intersects=function(a, b) {
     if (b1[d]<a2[d]) break;
   }
   return true;
-};
-
-// Return minimum range that includes a and b.
-
-exports.expand=function(a, b) {
-  a=toRange(a);
-  var a1=a.begin, a2=a.end;
-  b=toRange(b);
-  var b1=b.begin, b2=b.end;
-  return {
-    begin:(less_or_equal(a1,b1)?a1:b1),
-    end:(greater_or_equal(a2,b2)?a2:b2)
-  };
 };
