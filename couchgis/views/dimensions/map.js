@@ -2,14 +2,14 @@
 
 function(doc) {
   var utils=require('views/lib/utils');
-  var range=require('views/lib/range');
+  var ranges=require('views/lib/ranges');
   if (doc.GeoJSON==null) {
-    emit(null, {range:range.toRange(doc.time)});
+    emit(null, {ranges:ranges.toRange(doc.time)});
     return;
   }
   var GeoJSON=utils.clone(doc.GeoJSON);
   utils.toWGS84(GeoJSON);
   utils.bbox(GeoJSON);
   utils.size(GeoJSON);
-  emit(GeoJSON.size, {bbox:GeoJSON.bbox, range:range.toRange(doc.time)});
+  emit(GeoJSON.size, {bbox:GeoJSON.bbox, ranges:ranges.toRange(doc.time)});
 }

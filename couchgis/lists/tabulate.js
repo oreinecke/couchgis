@@ -14,10 +14,10 @@ function(head, req) {
   }
   var time_matches=pass;
   if ('time' in options) {
-    var range=require('views/lib/range');
-    var time=range.toRange(options.time);
+    var ranges=require('views/lib/ranges');
+    var time=ranges.toRange(options.time);
     time_matches=function(doc_time) {
-      return range.intersects(time, doc_time);
+      return ranges.intersects(time, doc_time);
     };
   }
   var defines_field=pass;

@@ -22,7 +22,7 @@ $(document).ready(function() {
   });
 
   var path=require('views/lib/path');
-  var range=require('views/lib/range');
+  var ranges=require('views/lib/ranges');
   var indexes=require('views/lib/indexes');
 
   // call _list/bbox-filter/<view> with some useful options
@@ -150,7 +150,7 @@ $(document).ready(function() {
                   td.append($("<a>").attr({
                     href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
                   }).html( (doc[doc.type]||doc.type) +
-                           (' ('+range.toString(doc.time)+')').replace(' ()',"") )
+                           (' ('+ranges.toString(doc.time)+')').replace(' ()',"") )
                   ).append("<br>");
                 // evaluate columns
                 else if (cl==="field") {
@@ -333,8 +333,8 @@ $(document).ready(function() {
         return false;
       }
       if (filter_name==="time") {
-        var contains=(range.contains(filter.time, new_filter.time));
-        if (contains) equal_filter=(range.contains(new_filter.time, filter.time));
+        var contains=(ranges.contains(filter.time, new_filter.time));
+        if (contains) equal_filter=(ranges.contains(new_filter.time, filter.time));
         return contains;
       }
       if (filter_name==="types") {
@@ -426,7 +426,7 @@ $(document).ready(function() {
       var bbox=data.rows[0].value.bbox;
       map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
       // also initialize the time text field
-      $("#filter [name='time']").val(range.toString(data.rows[0].value.range));
+      $("#filter [name='time']").val(ranges.toString(data.rows[0].value.ranges));
     });
     // get list of GeoJSON keys, largest to smallest item
     $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {

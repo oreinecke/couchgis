@@ -17,5 +17,5 @@ function(doc) {
     }
     emit(doc._id, {GeoJSON:{bbox:GeoJSON.bbox, errors:errors}});
   }
-  var range=require('views/lib/range');
+  var ranges=require('views/lib/ranges');
 }

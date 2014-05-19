@@ -9,7 +9,7 @@ function(head, req) {
   var indexes=req.query.compressed_keys;
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes);
-  var range=require('views/lib/range');
+  var ranges=require('views/lib/ranges');
   var path=require('views/lib/path');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
@@ -44,7 +44,7 @@ function(head, req) {
       }
       if (doc_ids.indexOf(doc._id)!==-1) continue;
       if (filetype==="xml") doc_ids.push(doc._id);
-      doc.time=range.toString(doc.time) || undefined;
+      doc.time=ranges.toString(doc.time) || undefined;
       if (!include_revision) {
         delete doc._rev;
         delete doc._id;
