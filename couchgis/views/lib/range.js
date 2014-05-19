@@ -20,7 +20,6 @@ function toRange(range) {
     end:toDate(range[range.length-1])
   };
 }
-exports.toRange=toRange;
 
 // Convert list of ranges to ranges object.
 
