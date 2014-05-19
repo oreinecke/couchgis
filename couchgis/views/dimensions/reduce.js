@@ -27,11 +27,12 @@ function(keys, values, rereduce) {
     return a;
   }
   var bbox=values[0].bbox;
-  var range=values[0].range;
+  var range=values[0].ranges;
+  range={begin:range[0].begin, end:range[range.length-1].end};
   for (var v=1;v<values.length;v++) {
-    var range2=values[v].range;
-    range.begin=lesser(range.begin,range2.begin);
-    range.end=greater(range.end,range2.end);
+    var ranges=values[v].ranges;
+    range.begin=lesser(range.begin,ranges[0].begin);
+    range.end=greater(range.end,ranges[ranges.length-1].end);
     var bbox2=values[v].bbox;
     if (!bbox) bbox=bbox2;
     if (!bbox || !bbox2) continue;
@@ -40,5 +41,5 @@ function(keys, values, rereduce) {
     bbox[2]=(bbox[2]>bbox2[2])?bbox[2]:bbox2[2];
     bbox[3]=(bbox[3]>bbox2[3])?bbox[3]:bbox2[3];
   }
-  return {bbox:bbox, range:range};
+  return {bbox:bbox, ranges:[range]};
 }
