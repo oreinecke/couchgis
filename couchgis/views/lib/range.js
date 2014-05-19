@@ -91,22 +91,23 @@ exports.contains=function(a, b) {
   return true;
 }
 
-// Returns true if range a overlaps with range b.
+// Returns true if ranges a overlap with ranges b.
 
 exports.intersects=function(a, b) {
-  a=toRange(a);
-  var a1=a.begin, a2=a.end;
-  b=toRange(b);
-  var b1=b.begin, b2=b.end;
-  for (var d=0;d<3;d++) {
-    if (d==a1.length || d==b2.length) break;
-    if (a1[d]>b2[d]) return false;
-    if (a1[d]<b2[d]) break;
+  a=toRanges(a);
+  b=toRanges(b);
+  function greater(l,r) {
+    for (var d=0;d<3;d++) {
+      if (d===l.length || d===r.length) break;
+      if (l[d]>r[d]) return true;
+      if (l[d]<r[d]) break;
+    }
   }
-  for (var d=0;d<3;d++) {
-    if (d==b1.length || d==a2.length) break;
-    if (b1[d]>a2[d]) return false;
-    if (b1[d]<a2[d]) break;
-  }
-  return true;
-};
+  var a0=a.shift();
+  var b0=b.shift();
+  while (a0 && b0)
+    if (greater(a0.begin, b0.end)) b0=b.shift();
+    else if (greater(b0.begin, a0.end)) a0=a.shift();
+    else return true;
+  return false;
+}
