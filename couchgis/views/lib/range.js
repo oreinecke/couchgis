@@ -51,41 +51,33 @@ exports.toString=function(ranges) {
   return ranges.join(', ');
 }
 
-// Returns true if date a<=b.
-
-function less_or_equal(a, b) {
-  for (var d=0;d<3;d++) {
-    if (d==a.length) return true;
-    if (d==b.length) return false;
-    if (a[d]<b[d]) return true;
-    if (a[d]>b[d]) return false;
-  }
-  return true;
-}
-
-// Returns true if date a>=b, not equal to calling less_or_equal(b, a).
-
-function greater_or_equal(a, b) {
-  for (var d=0;d<3;d++) {
-    if (d==a.length) return true;
-    if (d==b.length) return false;
-    if (a[d]>b[d]) return true;
-    if (a[d]<b[d]) return false;
-  }
-  return true;
-}
-
 // Returns true if ranges a contain ranges b.
 
 exports.contains=function(a, b) {
   a=toRanges(a);
   b=toRanges(b);
+  function greater(a, b) {
+    for (var d=0;d<3;d++) {
+      if (d===a.length) break;
+      if (d===b.length) return true;
+      if (a[d]<b[d]) break;
+      if (a[d]>b[d]) return true;
+    }
+  }
+  function smaller(a, b) {
+    for (var d=0;d<3;d++) {
+      if (d===a.length) break;
+      if (d===b.length) return true;
+      if (a[d]>b[d]) break;
+      if (a[d]<b[d]) return true;
+    }
+  }
   var a0=a.shift();
   while (b.length) {
     var b0=b.shift(), b1=b0.begin;
-    while (a0 && !greater_or_equal(a0.end,b1))
+    while (a0 && smaller(a0.end,b1))
       a0=a.shift();
-    if ( !a0 || !less_or_equal(a0.begin,b1) || !greater_or_equal(a0.end,b0.end) )
+    if ( !a0 || greater(a0.begin,b1) || smaller(a0.end,b0.end) )
       return false;
   }
   return true;
