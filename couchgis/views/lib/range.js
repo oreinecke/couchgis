@@ -38,14 +38,17 @@ function toRanges(ranges) {
 // Convert range to string. If no day is given,
 // MM/YYYY is returned, DD.MM.YYYY otherwise.
 
-exports.toString=function(range) {
-  var begin=range.begin.reverse();
-  var end=range.end.reverse();
-  begin=begin.join(begin.length===2?'/':'.');
-  end=end.join(end.length===2?'/':'.');
-  if (begin===end) return begin;
-  else return begin+'-'+end;
-};
+exports.toString=function(ranges) {
+  for (var r=0;r<ranges.length;r++) {
+    var begin=ranges[r].begin.reverse();
+    var end=ranges[r].end.reverse();
+    begin=begin.join(begin.length===2?'/':'.');
+    end=end.join(end.length===2?'/':'.');
+    if (begin===end) ranges[r]=begin;
+    else ranges[r]=begin+'-'+end;
+  }
+  return ranges.join(', ');
+}
 
 // Returns true if date a<=b.
 
