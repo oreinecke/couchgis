@@ -13,7 +13,7 @@ function toDate(date) {
 
 function toRange(range) {
   if (!range) return { begin:[], end:[] };
-  if (typeof(range)=="object") return range;
+  if (typeof(range)==="object") return range;
   range=String(range).split('-');
   return {
     begin:toDate(range[0]),
@@ -21,6 +21,19 @@ function toRange(range) {
   };
 }
 exports.toRange=toRange;
+
+// Convert list of ranges to ranges object.
+
+function toRanges(ranges) {
+  if (!ranges) return [toRange()];
+  if (typeof(ranges)==="object") return range;
+  ranges=String(ranges).split(/\s*[,;&]\s*/);
+  for (var r=0;r<ranges.length;r++)
+    ranges[r]=toRange(ranges[r]);
+  return ranges.sort(function(a,b) {
+    return greater_or_equal(a.begin, b.begin) || -1;
+  });
+}
 
 // Convert range to string. If no day is given,
 // MM/YYYY is returned, DD.MM.YYYY otherwise.
