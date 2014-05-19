@@ -75,15 +75,21 @@ function greater_or_equal(a, b) {
   return true;
 }
 
-// Returns true if range a contains range b.
+// Returns true if ranges a contain ranges b.
 
 exports.contains=function(a, b) {
-  a=toRange(a);
-  var a1=a.begin, a2=a.end;
-  b=toRange(b);
-  var b1=b.begin, b2=b.end;
-  return less_or_equal(a1,b1) && greater_or_equal(a2,b2);
-};
+  a=toRanges(a);
+  b=toRanges(b);
+  var a0=a.shift();
+  while (b.length) {
+    var b0=b.shift(), b1=b0.begin;
+    while (a0 && !greater_or_equal(a0.end,b1))
+      a0=a.shift();
+    if ( !a0 || !less_or_equal(a0.begin,b1) || !greater_or_equal(a0.end,b0.end) )
+      return false;
+  }
+  return true;
+}
 
 // Returns true if range a overlaps with range b.
 
