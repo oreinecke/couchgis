@@ -11,6 +11,7 @@ function(head, req) {
     indexes=require('views/lib/indexes').decompress(indexes);
   var ranges=require('views/lib/ranges');
   var path=require('views/lib/path');
+  var utils=require('views/lib/utils');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
@@ -79,10 +80,16 @@ function(head, req) {
   }
   switch(filetype) {
   case "geojson":
+    // export to EPSG:3397
+    var projector=require('views/lib/proj4')(utils.EPSG[3397]);
+    utils.eachPoint(features, function(coord) {
+      var newCoord=projector.forward(coord);
+      coord[0]=newCoord[0];
+      coord[1]=newCoord[1];
+    });
     return JSON.stringify({
-      type:"FeatureCollection",
-      name:filename,
-      crs:{type:"name", properties:{name:"urn:ogc:def:crs:OGC:1.3:CRS84"}},
+      name:filename, type:"FeatureCollection",
+      crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::3397"}},
       features:features
     });
   case "xml":
