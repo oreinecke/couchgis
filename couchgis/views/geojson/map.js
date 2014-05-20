@@ -32,7 +32,7 @@ function(doc) {
     _id:doc._id,
     _rev:doc._rev,
     type:doc.type,
-    time:ranges.toRange(doc.time),
+    time:ranges.toRanges(doc.time),
     GeoJSON_clone:doc.GeoJSON_clone
   }};
   for (var field in doc) {

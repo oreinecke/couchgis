@@ -15,7 +15,7 @@ function(head, req) {
   var time_matches=pass;
   if ('time' in options) {
     var ranges=require('views/lib/ranges');
-    var time=ranges.toRange(options.time);
+    var time=ranges.toRanges(options.time);
     time_matches=function(doc_time) {
       return ranges.intersects(time, doc_time);
     };
