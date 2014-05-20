@@ -39,7 +39,7 @@ some conventions:
   "_id": "ab45", "_rev": "2-8945",
   "GeoJSON_clone": "e4af",
   "type": "Vegetation",
-  "time": "2003/05/02-2004",
+  "time": "2003/05/02-2004 & 2001",
   "Vegetation": "Coniferous Woodland",
   "Area"             : 20.0,
   "Net Area"         : 19.3,
@@ -64,16 +64,20 @@ them when uploading/editing documents.
 
 ###`doc.GeoJSON` or `doc.GeoJSON_clone`
 
-The former must be set to a valid [GeoJSON][1] object and the latter to
-the id of an existing document which actually has a `GeoJSON` property (there
-is no way to follow a chain of ids). Needless to say, using both at the same
-time makes no sense and results in a document validation error.
+The former must be set to a valid [GeoJSON][1] object and the latter to one or
+more ids of existing documents that all have the `GeoJSON` property (there is
+no way to follow a chain of ids). Needless to say, using both at the same time
+makes no sense and results in a document validation error.
 
 I introduced the geometry clone because I was blown away by how people working
 with GIS databases either use duplicate geometries for two rows of the property
 table (Seriously! The same geometry was drawn twice!!!), or are working around
 that problem by using more and more columns for the same property at a
 different time.
+
+Multiple geometry clones may be separated by comma/space/ampersand/semicolon.
+These documents may be listed twice or more in the map page, but are only
+exported once as a table row.
 
 `doc.GeoJSON.type` is restricted to Point, LineString, Polygon,
 MultiLineString, MultiPolygon. It could make sense, and it would be easy, to
@@ -116,7 +120,8 @@ always a column for day/month/year, probably with one of them missing, and the
 year had either four or two digits. Or worse, somehow a start and end date was
 given as `MONTH_BEG` `YEAR_BEG` `DAY_END` or whatever.
 
-A date or a range thereof is expressed as a string as such:
+[Dates or a ranges of dates](couchgis/views/lib/ranges.js) are expressed as a
+string as such:
 - Dates can be given in DD.MM.YYYY, YYYY.MM.DD, YYYY/MM/DD, DD/MM/YYYY i.e. I
   only expect the year to be four digits, the digits to be separated by either
   a slash or a dot, and I don't care about the order as long as it follows
@@ -127,6 +132,9 @@ A date or a range thereof is expressed as a string as such:
   for months.
 - If the entire date is left out, it is treated as +/- infinity. `"- 03/2004"`
   then amounts to any date before and including 31/03/2004.
+- Multiple ranges may be separated by comma/ampersand/semicolon. I do no
+  guarantee any predictable behaviour if ranges overlap, because for
+  performance reasons I assume they don't.
 - Spaces and leading zeros are ignored. Use them in the documents for clarity
   but avoid typing them in a search.
 
@@ -208,7 +216,7 @@ document would be exported into a GeoJSON Feature like this:
     "_id": "ab45", "_rev": "2-8945",
     "GeoJSON_clone": "e4af",
     "type": "Vegetation",
-    "time": "02.05.2003-2004",
+    "time": "2001, 02.05.2003-2004",
     "Vegetation": "Coniferous Woodland",
     "Area"                       : 20.0,
     "Net Area"                   : 19.3,
