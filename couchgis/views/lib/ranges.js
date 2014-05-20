@@ -25,7 +25,7 @@ function toRange(range) {
 
 function toRanges(ranges) {
   if (!ranges) return [toRange()];
-  if (typeof(ranges)==="object") return range;
+  if (typeof(ranges)==="object") return ranges.slice();
   ranges=String(ranges).split(/\s*[,;&]\s*/);
   for (var r=0;r<ranges.length;r++)
     ranges[r]=toRange(ranges[r]);
