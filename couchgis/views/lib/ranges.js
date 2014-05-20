@@ -29,8 +29,14 @@ function toRanges(ranges) {
   ranges=String(ranges).split(/\s*[,;&]\s*/);
   for (var r=0;r<ranges.length;r++)
     ranges[r]=toRange(ranges[r]);
-  return ranges.sort(function(a,b) {
-    return greater_or_equal(a.begin, b.begin) || -1;
+  return ranges.sort(function(l,r) {
+    l=l.begin; r=r.begin;
+    for (var d=0;d<3;d++) {
+      if (d===l.length && d===r.length) break;
+      if (d===l.length || d===r.length)
+        return (d===r.length) - (d===l.length);
+      if (l[d]!==r[d]) return l[d]-r[d];
+    }
   });
 }
 exports.toRanges=toRanges;
