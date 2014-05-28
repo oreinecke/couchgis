@@ -25,8 +25,9 @@ function MultiLineString(options) {
       shapes[s].setMap(map);
   };
   this.addListener=function(name, handler) {
+    var shape=this;
     for (var s=0;s<shapes.length;s++)
-      shapes[s].addListener(name, handler);
+      shapes[s].addListener(name, function() { handler.apply(shape); });
   };
 }
 
@@ -52,8 +53,9 @@ function MultiPolygon(options) {
       shapes[s].setMap(map);
   };
   this.addListener=function(name, handler) {
+    var shape=this;
     for (var s=0;s<shapes.length;s++)
-      shapes[s].addListener(name, handler);
+      shapes[s].addListener(name, function() { handler.apply(shape); });
   };
 }
 
