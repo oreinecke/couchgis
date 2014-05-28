@@ -450,7 +450,7 @@ $(document).ready(function() {
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({
           fillColor:GeoJSON_clone?"#0000FF":"#00FF00",
-          map:map, coordinates: GeoJSON.coordinates
+          map:map, coordinates: GeoJSON.coordinates, draggable: true
         }));
         shape.addListener('click', select_me(GeoJSON_clone));
         (feature.items[row.key[0]] || feature).shape=shape;
