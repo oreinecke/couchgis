@@ -17,7 +17,7 @@ var require=function() {
   });
   var result=function(lib, root) {
     var parts=lib.split('/');
-    if (parts[0]=='.') {
+    if (parts[0]==='.') {
       lib=root;
       parts.shift();
     } else lib=ddoc;

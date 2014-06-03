@@ -88,11 +88,11 @@ function expand_options(options) {
 }
 
 function create_shape(type, options) {
-  if (type=="Point") return new Maps.Marker(options);
-  if (type=="Polygon") return new Maps.Polygon(options);
-  if (type=="LineString") return new Maps.Polyline(options);
-  if (type=="MultiPolygon") return new MultiPolygon(options);
-  if (type=="MultiLineString") return new MultiLineString(options);
+  if (type==="Point") return new Maps.Marker(options);
+  if (type==="Polygon") return new Maps.Polygon(options);
+  if (type==="LineString") return new Maps.Polyline(options);
+  if (type==="MultiPolygon") return new MultiPolygon(options);
+  if (type==="MultiLineString") return new MultiLineString(options);
   // remind myself that this needs work!!!
   alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
 }

@@ -9,7 +9,7 @@ function(head, req) {
   if ('types' in options) {
     var types=options.types;
     type_matches=function(type) {
-      return (types.indexOf(type)>=0);
+      return (types.indexOf(type)!==-1);
     };
   }
   var time_matches=pass;

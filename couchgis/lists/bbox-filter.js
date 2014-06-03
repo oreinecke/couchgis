@@ -17,14 +17,14 @@ function(head, req) {
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=pass;
-  if (limit!=Infinity) proceed=function() {
+  if (limit!==Infinity) proceed=function() {
     return (--limit);
   };
   // ii) This is a crude optionial check for similar geometry.
   var similarity=Infinity;
   if ('similarity' in options) similarity=options.similarity;
   var bbox_is_similar=pass;
-  if (similarity!=Infinity) {
+  if (similarity!==Infinity) {
     similarity*=similarity;
     bbox_is_similar=function(bbox2) {
       var d0=bbox[0]-bbox2[0], d1=bbox[1]-bbox2[1],

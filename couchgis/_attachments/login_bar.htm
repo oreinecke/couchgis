@@ -12,7 +12,7 @@ $(document).ready(function() {
   var log={
     success: function(resp) {
       var name=resp.userCtx.name;
-      if (name!==null || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")>=0) {
+      if (name!==null || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")!==-1) {
         $("#logout").show();
         // link to futon user doc
         if (name)

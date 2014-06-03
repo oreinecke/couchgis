@@ -2,22 +2,22 @@
 
 exports.eachCoords=function(GeoJSON, action) {
   (function apply_action(obj) {
-    if (typeof(obj)!="object") return;
+    if (typeof(obj)!=="object") return;
     // ignore sets of unconnected points
-    if (obj.type=="Point" || obj.type=="MultiPoint") return;
+    if (obj.type==="Point" || obj.type==="MultiPoint") return;
     if (obj.coordinates) {
       var c=obj.coordinates;
       // LineString
-      if (typeof(c[0][0])=="number") action(c, obj.type);
+      if (typeof(c[0][0])==="number") action(c, obj.type);
       // Polygon/MultiLineString
-      else if (typeof(c[0][0][0])=="number")
+      else if (typeof(c[0][0][0])==="number")
         for (var i=0;i<c.length;i++) action(c[i], obj.type);
       // MultiPolygon
-      else if (typeof(c[0][0][0][0])=="number")
+      else if (typeof(c[0][0][0][0])==="number")
         for (var i=0;i<c.length;i++)
         for (var j=0;j<c[i].length;j++) action(c[i][j], obj.type);
     } else for (var field in obj) {
-      if (["geometries", "features", "geometry"].indexOf(field)!=-1)
+      if (["geometries", "features", "geometry"].indexOf(field)!==-1)
         apply_action(obj[field]);
       if (field.search(/^[0-9]+$/)>=0)
         apply_action(obj[field]);
@@ -29,8 +29,8 @@ exports.eachCoords=function(GeoJSON, action) {
 
 exports.eachPoint=function(GeoJSON, action) {
   (function apply_action(obj) {
-    if (typeof(obj)!="object") return;
-    if (typeof(obj[0])=="number")
+    if (typeof(obj)!=="object") return;
+    if (typeof(obj[0])==="number")
       action(obj);
     else for (var field in obj) {
       if (["geometries", "coordinates", "features", "geometry"].indexOf(field)!==-1)
@@ -44,7 +44,7 @@ exports.eachPoint=function(GeoJSON, action) {
 // Clone GeoJSON and handle arrays properly.
 
 exports.clone=function(GeoJSON) {
-  if (GeoJSON==null || typeof(GeoJSON)!="object")
+  if (GeoJSON==null || typeof(GeoJSON)!=="object")
     return GeoJSON;
   if (Array.isArray(GeoJSON)) {
     var array=[];
@@ -99,7 +99,7 @@ exports.toWGS84=function(GeoJSON) {
   try {
     var target="urn:ogc:def:crs:OGC:1.3:CRS84";
     var source=GeoJSON.crs.properties.name;
-    if (source==target) return GeoJSON;
+    if (source===target) return GeoJSON;
     var EPSG=source.match(/EPSG:+([0-9]+)/)[1];
     var projector=require('./proj4')(exports.EPSG[EPSG]);
     exports.eachPoint(GeoJSON, function(coord) {
@@ -119,7 +119,7 @@ exports.toWGS84=function(GeoJSON) {
 
 exports.stripLastCoord=function(GeoJSON) {
   exports.eachCoords(GeoJSON, function(coords, type) {
-    if (type=="Polygon" || type=="MultiPolygon") {
+    if (type==="Polygon" || type==="MultiPolygon") {
       var first=coords[0], last=coords[coords.length-1];
       if (first[0]===last[0] && first[1]===last[1])
         coords.pop();
@@ -133,7 +133,7 @@ exports.stripLastCoord=function(GeoJSON) {
 
 exports.simplify=function(GeoJSON, error) {
   GeoJSON.error=0;
-  if (error==0) return GeoJSON;
+  if (error===0) return GeoJSON;
   // some vector algebra
   ;function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
   ;function mul(u,m) { return [u[0]*m, u[1]*m]; }
@@ -170,7 +170,7 @@ exports.simplify=function(GeoJSON, error) {
           J.error=Math.sqrt(e2);
           if (J.error>error) J.index=j;
           // avoid di-angles in a non-elegant fashion
-          if (i==0 && k==coords.length-1 && dot(d,d)==0)
+          if (i===0 && k===coords.length-1 && dot(d,d)===0)
             J.index=j;
         }
       }
@@ -186,7 +186,7 @@ exports.simplify=function(GeoJSON, error) {
     if (coords.length<=2) return;
     bisect_or_remove(0, coords.length-1);
     // remove nulls from coords
-    for (var j; (j=coords.indexOf(null))>=0; coords.splice(j,1));
+    for (var j; (j=coords.indexOf(null))!==-1; coords.splice(j,1));
   });
   return GeoJSON;
 };

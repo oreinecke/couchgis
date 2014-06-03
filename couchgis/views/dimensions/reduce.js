@@ -8,8 +8,8 @@ function(keys, values, rereduce) {
     if (!a.length) return b;
     if (!b.length) return a;
     for (var d=0;d<3;d++) {
-      if (d==a.length) return a;
-      if (d==b.length) return b;
+      if (d===a.length) return a;
+      if (d===b.length) return b;
       if (a[d]<b[d]) return a;
       if (a[d]>b[d]) return b;
     }
@@ -19,8 +19,8 @@ function(keys, values, rereduce) {
     if (!a.length) return b;
     if (!b.length) return a;
     for (var d=0;d<3;d++) {
-      if (d==a.length) return a;
-      if (d==b.length) return b;
+      if (d===a.length) return a;
+      if (d===b.length) return b;
       if (a[d]>b[d]) return a;
       if (a[d]<b[d]) return b;
     }

@@ -132,8 +132,8 @@ $(document).ready(function() {
         // reformat JSON.parse error merrages
         try { GeoJSON=JSON.parse(data); }
         catch (err) { throw{message:"JSON.parse: "+err.message}; }
-        if (GeoJSON.type=="FeatureCollection") features=GeoJSON.features;
-        else if (GeoJSON.type=="Feature") features=[GeoJSON];
+        if (GeoJSON.type==="FeatureCollection") features=GeoJSON.features;
+        else if (GeoJSON.type==="Feature") features=[GeoJSON];
         else throw{message:"Unknown or useless GeoJSON type: "+GeoJSON.type};
         crs=GeoJSON.crs;
         if (!crs) throw{message:"No top-level CRS defined"};

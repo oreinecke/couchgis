@@ -19,7 +19,7 @@ $(document).ready(function() {
   var page=parts[4];
   $("#localapp").attr({href:"http://localhost:5984/"+db+'/'+app+'/'+page});
   $("#centralapp").attr({href:centralhost+'/'+db+'/'+app+'/'+page});
-  if (window.location.hostname=="lsh1908.selfhost.eu") $("div").show();
+  if (window.location.hostname==="lsh1908.selfhost.eu") $("div").show();
   else {
     form=$("form");
     form.show();
