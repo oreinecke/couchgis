@@ -137,13 +137,13 @@ exports.simplify=function(GeoJSON, error) {
   GeoJSON.error=0;
   if (error===0) return GeoJSON;
   // some vector algebra
-  ;function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
-  ;function mul(u,m) { return [u[0]*m, u[1]*m]; }
-  ;function add(u,v) { return [u[0]+v[0],u[1]+v[1]]; }
-  ;function sub(u,v) { return [u[0]-v[0],u[1]-v[1]]; }
+  function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
+  function mul(u,m) { return [u[0]*m, u[1]*m]; }
+  function add(u,v) { return [u[0]+v[0],u[1]+v[1]]; }
+  function sub(u,v) { return [u[0]-v[0],u[1]-v[1]]; }
   exports.eachCoords(GeoJSON, function(coords) {
     // http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm
-    ;function bisect_or_remove(i, k) {
+    function bisect_or_remove(i, k) {
       if (i+1==k) return;
       // Return index and distance of furthest point.
       // Return no index if distance is below error.
