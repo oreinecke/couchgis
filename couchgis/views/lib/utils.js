@@ -217,3 +217,25 @@ exports.simplify=function(GeoJSON, error) {
   });
   return GeoJSON;
 };
+
+// Returns the number of line segments intersecting a
+// horizontal line that spans between p and +Infinity.
+
+function intersections(p, coordinates) {
+  var result=0;
+  var a=coordinates[0];
+  var b=coordinates[1];
+  for (var c=1; c<coordinates.length; a=b, b=coordinates[++c]) {
+    var pa_u=p[0]-a[0], pa_v=p[1]-a[1];
+    var bp_u=b[0]-p[0], bp_v=b[1]-p[1];
+    var ba_u=b[0]-a[0], ba_v=b[1]-a[1];
+    if (pa_v===0 && bp_v===0) result += pa_u<=0 || bp_u>=0;
+    else if (pa_v===0) result += pa_u<=0;
+    else if (bp_v===0) result += bp_u>=0;
+    else if ((pa_v>0) ^ (bp_v>0)) continue;
+    if (pa_u>0 && bp_u<0) continue;
+    if (pa_u<=0 && bp_u>=0) result++;
+    else result += (ba_v<0) ^ (bp_u*pa_v-pa_u*bp_v>0);
+  }
+  return result;
+}
