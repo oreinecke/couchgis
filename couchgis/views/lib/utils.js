@@ -1,6 +1,7 @@
 // Apply action to every [[x1,y1],..].
 
 exports.eachCoords=function(GeoJSON, action) {
+  var fields=["geometries", "features", "geometry"];
   (function apply_action(obj) {
     if (typeof(obj)!=="object") return;
     // ignore sets of unconnected points
@@ -17,7 +18,7 @@ exports.eachCoords=function(GeoJSON, action) {
         for (var i=0;i<c.length;i++)
         for (var j=0;j<c[i].length;j++) action(c[i][j], obj.type);
     } else for (var field in obj) {
-      if (["geometries", "features", "geometry"].indexOf(field)!==-1)
+      if (fields.indexOf(field)!==-1)
         apply_action(obj[field]);
       if (field.search(/^[0-9]+$/)>=0)
         apply_action(obj[field]);
@@ -28,12 +29,13 @@ exports.eachCoords=function(GeoJSON, action) {
 // Apply action to every [x,y].
 
 exports.eachPoint=function(GeoJSON, action) {
+  var fields=["geometries", "coordinates", "features", "geometry"];
   (function apply_action(obj) {
     if (typeof(obj)!=="object") return;
     if (typeof(obj[0])==="number")
       action(obj);
     else for (var field in obj) {
-      if (["geometries", "coordinates", "features", "geometry"].indexOf(field)!==-1)
+      if (fields.indexOf(field)!==-1)
         apply_action(obj[field]);
       if (field.search(/^[0-9]+$/)>=0)
         apply_action(obj[field]);
