@@ -35,16 +35,14 @@ function MultiLineString(options) {
 function MultiPolygon(options) {
   var shapes=[];
   var paths=options.paths;
-  delete options.paths;
   for (var p=0;p<paths.length;p++) {
-    options.path=paths[p];
+    options.paths=paths[p];
     shapes.push(new Maps.Polygon(options));
   }
   this.setOptions=function(options) {
     paths=options.paths;
-    delete options.paths;
     for (var s=0;s<shapes.length;s++) {
-      if (paths) options.path=paths[s];
+      if (paths) options.paths=paths[s];
       shapes[s].setOptions(options);
     }
   };
@@ -69,17 +67,21 @@ function expand_options(options) {
   var ofs0=offset[0], ofs1=offset[1];
   var c=options.coordinates;
   delete options.coordinates;
-  if (typeof(c[0])=="number") c=new LatLng(c[1]+ofs1,c[0]+ofs0);
-  else if (typeof(c[0][0])=="number")
+  if (typeof(c[0])==="number")
+    options.position=new LatLng(c[1]+ofs1,c[0]+ofs0);
+  else if (typeof(c[0][0])==="number") {
     for (var i=0, ci; ci=c[i], i<c.length; i++) c[i]=new LatLng(ci[1]+ofs1,ci[0]+ofs0);
-  else if (typeof(c[0][0][0])=="number")
+    options.path=c;
+  } else if (typeof(c[0][0][0])==="number") {
     for (var i=0, ci; ci=c[i], i<c.length; i++)
     for (var j=0, cij; cij=ci[j], j<ci.length; j++) ci[j]=new LatLng(cij[1]+ofs1,cij[0]+ofs0);
-  else if (typeof(c[0][0][0][0])=="number")
+    options.paths=c;
+  } else if (typeof(c[0][0][0][0])==="number") {
     for (var i=0, ci; ci=c[i], i<c.length; i++)
     for (var j=0, cij; cij=ci[j], j<ci.length; j++)
     for (var k=0, cijk; cijk=cij[k], k<cij.length; k++) cij[k]=new LatLng(cijk[1]+ofs1,cijk[0]+ofs0);
-  options.position=options.path=options.paths=c;
+    options.paths=c;
+  }
   if (options.fillOpacity==null) options.fillOpacity=0.25;
   if (options.icon==null) options.icon="svg/marker.svg";
   return options;
