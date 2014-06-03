@@ -90,7 +90,7 @@ function(head, req) {
     return JSON.stringify({
       name:filename, type:"FeatureCollection",
       crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::3397"}},
-      features:features
+      features:utils.unstripLastCoord(features)
     });
   case "xml":
     if (fields==null) {
