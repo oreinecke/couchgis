@@ -58,7 +58,7 @@ exports.clone=function(GeoJSON) {
   for (var prop in GeoJSON)
     object[prop]=exports.clone(GeoJSON[prop]);
   return object;
-}
+};
 
 // Calculate bounding box and add it to GeoJSON.
 
@@ -128,7 +128,7 @@ exports.stripLastCoord=function(GeoJSON) {
     }
   });
   return GeoJSON;
-}
+};
 
 // Simplify LineStrings and Polygons for a given maximum
 // deviation and store the actual error as GeoJSON.error.
