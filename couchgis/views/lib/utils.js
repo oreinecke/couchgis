@@ -117,6 +117,19 @@ exports.toWGS84=function(GeoJSON) {
   return GeoJSON;
 };
 
+// Re-Append first coord from each Polygon/MultiPolygon.
+
+exports.unstripLastCoord=function(GeoJSON) {
+  exports.eachCoords(GeoJSON, function(coords, type) {
+    if (type==="Polygon" || type==="MultiPolygon") {
+      var first=coords[0], last=coords[coords.length-1];
+      if (first[0]!==last[0] || first[1]!==last[1])
+        coords.push(first);
+    }
+  });
+  return GeoJSON;
+};
+
 // Strip last coord from each Polygon/MultiPolygon.
 
 exports.stripLastCoord=function(GeoJSON) {
@@ -136,6 +149,7 @@ exports.stripLastCoord=function(GeoJSON) {
 exports.simplify=function(GeoJSON, error) {
   GeoJSON.error=0;
   if (error===0) return GeoJSON;
+  exports.unstripLastCoord(GeoJSON);
   // some vector algebra
   function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
   function mul(u,m) { return [u[0]*m, u[1]*m]; }
