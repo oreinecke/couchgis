@@ -121,11 +121,11 @@ exports.toWGS84=function(GeoJSON) {
 
 exports.unstripLastCoord=function(GeoJSON) {
   exports.eachCoords(GeoJSON, function(coords, type) {
-    if (type==="Polygon" || type==="MultiPolygon") {
-      var first=coords[0], last=coords[coords.length-1];
-      if (first[0]!==last[0] || first[1]!==last[1])
-        coords.push(first);
-    }
+    if (type!=="Polygon" && type!=="MultiPolygon")
+      return;
+    var first=coords[0], last=coords[coords.length-1];
+    if (first[0]!==last[0] || first[1]!==last[1])
+      coords.push(first);
   });
   return GeoJSON;
 };
@@ -134,11 +134,11 @@ exports.unstripLastCoord=function(GeoJSON) {
 
 exports.stripLastCoord=function(GeoJSON) {
   exports.eachCoords(GeoJSON, function(coords, type) {
-    if (type==="Polygon" || type==="MultiPolygon") {
-      var first=coords[0], last=coords[coords.length-1];
-      if (first[0]===last[0] && first[1]===last[1])
-        coords.pop();
-    }
+    if (type!=="Polygon" && type!=="MultiPolygon")
+      return;
+    var first=coords[0], last=coords[coords.length-1];
+    if (first[0]===last[0] && first[1]===last[1])
+      coords.pop();
   });
   return GeoJSON;
 };
