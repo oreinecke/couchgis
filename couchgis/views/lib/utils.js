@@ -226,15 +226,28 @@ function intersections(p, coordinates) {
   var a=coordinates[0];
   var b=coordinates[1];
   for (var c=1; c<coordinates.length; a=b, b=coordinates[++c]) {
+    // notation: ^ v
+    //     x a   |
+    //      \     -> u
+    //  p x--c------ +Infinity
+    //        \
+    //       b x
     var pa_u=p[0]-a[0], pa_v=p[1]-a[1];
     var bp_u=b[0]-p[0], bp_v=b[1]-p[1];
     var ba_u=b[0]-a[0], ba_v=b[1]-a[1];
+    // a, p and b are horizontally aligned
     if (pa_v===0 && bp_v===0) result += pa_u<=0 || bp_u>=0;
+    // p and a are horizontally aligned
     else if (pa_v===0) result += pa_u<=0;
+    // b and p are horizontally aligned
     else if (bp_v===0) result += bp_u>=0;
+    // a and b are either both below or above p
     else if ((pa_v>0) ^ (bp_v>0)) continue;
+    // a and b are both to the left of p
     if (pa_u>0 && bp_u<0) continue;
+    // a abd be are both to the right of p
     if (pa_u<=0 && bp_u>=0) result++;
+    // check if (c-p)u >= 0 if everything else fails
     else result += (ba_v<0) ^ (bp_u*pa_v-pa_u*bp_v>0);
   }
   return result;
