@@ -1,46 +1,57 @@
 // Apply action to every [[x1,y1],..].
 
 exports.eachCoords=function(GeoJSON, action) {
-  var fields=["geometries", "features", "geometry"];
-  (function apply_action(obj) {
-    if (typeof(obj)!=="object") return;
+  function apply_action(geometry) {
+    var t=geometry.type;
     // ignore sets of unconnected points
-    if (obj.type==="Point" || obj.type==="MultiPoint") return;
-    if (obj.coordinates) {
-      var c=obj.coordinates;
-      // LineString
-      if (typeof(c[0][0])==="number") action(c, obj.type);
-      // Polygon/MultiLineString
-      else if (typeof(c[0][0][0])==="number")
-        for (var i=0;i<c.length;i++) action(c[i], obj.type);
-      // MultiPolygon
-      else if (typeof(c[0][0][0][0])==="number")
-        for (var i=0;i<c.length;i++)
-        for (var j=0;j<c[i].length;j++) action(c[i][j], obj.type);
-    } else for (var field in obj) {
-      if (fields.indexOf(field)!==-1)
-        apply_action(obj[field]);
-      if (field.search(/^[0-9]+$/)>=0)
-        apply_action(obj[field]);
-    }
-  })(GeoJSON);
+    if (t==="Point" || t==="MultiPoint") return;
+    var c=geometry.coordinates;
+    // LineString
+    if (typeof(c[0][0])==="number") action(c, t);
+    // Polygon/MultiLineString
+    else if (typeof(c[0][0][0])==="number")
+      for (var i=0; i<c.length; i++) action(c[i], t);
+    // MultiPolygon
+    else if (typeof(c[0][0][0][0])==="number")
+      for (var i=0, ci; ci=c[i], i<c.length; i++)
+      for (var j=0; j<ci.length; j++) action(ci[j], t);
+  }
+  if (GeoJSON.type==="GeometryCollection")
+    for (var g=0;g<GeoJSON.geometries.length;g++)
+      apply_action(GeoJSON.geometries[g]);
+  else if (GeoJSON.type==="FeatureCollection")
+    for (var f=0;f<GeoJSON.features.length;f++)
+      apply_action(GeoJSON.features[f].geometry);
+  else apply_action(GeoJSON.geometry || GeoJSON);
 };
 
 // Apply action to every [x,y].
 
 exports.eachPoint=function(GeoJSON, action) {
-  var fields=["geometries", "coordinates", "features", "geometry"];
-  (function apply_action(obj) {
-    if (typeof(obj)!=="object") return;
-    if (typeof(obj[0])==="number")
-      action(obj);
-    else for (var field in obj) {
-      if (fields.indexOf(field)!==-1)
-        apply_action(obj[field]);
-      if (field.search(/^[0-9]+$/)>=0)
-        apply_action(obj[field]);
-    }
-  })(GeoJSON);
+  function apply_action(geometry) {
+    var c=geometry.coordinates;
+    // Point
+    if (typeof(c[0])==="number") action(c);
+    // MultiPoint/LineString
+    else if (typeof(c[0][0])==="number")
+      for (var i=0; i<c.length; i++) action(c[i]);
+    // Polygon/MultiLineString
+    else if (typeof(c[0][0][0])==="number")
+      for (var i=0, ci; ci=c[i], i<c.length; i++)
+      for (var j=0; j<ci.length; j++) action(ci[j]);
+    // MultiPolygon
+    else if (typeof(c[0][0][0][0])==="number")
+      for (var i=0, ci; ci=c[i], i<c.length; i++)
+      for (var j=0, cij; cij=ci[j], j<ci.length; j++)
+      for (var k=0; k<cij.length; k++) action(cij[k]);
+  }
+  if (GeoJSON.type==="GeometryCollection")
+    for (var g=0;g<GeoJSON.geometries.length;g++)
+      apply_action(GeoJSON.geometries[g]);
+  else if (GeoJSON.type==="FeatureCollection")
+    for (var f=0;f<GeoJSON.features.length;f++)
+      apply_action(GeoJSON.features[f].geometry);
+  else apply_action(GeoJSON.geometry || GeoJSON);
 };
 
 // Clone GeoJSON and handle arrays properly.
