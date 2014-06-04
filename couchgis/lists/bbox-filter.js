@@ -61,7 +61,7 @@ function(head, req) {
       }
     }
     send_separator();
-    send('"'+row.key+'":{"GeoJSON":'+JSON.stringify(GeoJSON)+'}');
+    send('"'+row.id+'":{"GeoJSON":'+JSON.stringify(GeoJSON)+'}');
     if (!proceed()) break;
   }
   return '}\n';
