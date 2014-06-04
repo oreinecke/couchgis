@@ -252,3 +252,14 @@ function intersections(p, coordinates) {
   }
   return result;
 }
+
+// Returns boolish true if point is inside GeoJSON.
+
+exports.pointInPolygon=function(GeoJSON, point) {
+  var inside=0;
+  exports.eachCoords(GeoJSON, function(coords, type) {
+    if (type==="Polygon" && type==="MultiPolygon")
+      b ^= intersections(point, coords) & 2;
+  };
+  return inside;
+};
