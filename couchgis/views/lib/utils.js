@@ -242,13 +242,13 @@ function intersections(p, coordinates) {
     // b and p are horizontally aligned
     else if (bp_v===0) result += bp_u>=0;
     // a and b are either both below or above p
-    else if ((pa_v>0) ^ (bp_v>0)) continue;
+    else if (pa_v>0 ^ bp_v>0) continue;
     // a and b are both to the left of p
     if (pa_u>0 && bp_u<0) continue;
     // a abd be are both to the right of p
     if (pa_u<=0 && bp_u>=0) result++;
     // check if (c-p)u >= 0 if everything else fails
-    else result += (ba_v<0) ^ (bp_u*pa_v-pa_u*bp_v>0);
+    else result += ba_v<0 ^ bp_u*pa_v-pa_u*bp_v>0;
   }
   return result;
 }
