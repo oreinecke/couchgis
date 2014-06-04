@@ -162,7 +162,7 @@ function(head, req) {
   };
   send('[');
   while (row=getRow()) {
-    var doc=row.value.doc
+    var doc=row.value.doc;
     if (!doc) continue;
     if (!type_matches(doc.type)) continue;
     if (!time_matches(doc.time)) continue;
