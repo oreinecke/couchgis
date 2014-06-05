@@ -670,7 +670,10 @@ $(document).ready(function() {
     }
     // unselect column
     select.val('');
-    for (var id in items) items[id].keep_documents=false;
+    for (var id in items) {
+      items[id].keep_documents=false;
+      items[id].keep_shape=true;
+    }
     call.this_one_next(update_geometry)();
   });
 
