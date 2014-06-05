@@ -236,9 +236,9 @@ function intersections(p, coordinates) {
     var bp_u=b[0]-p[0], bp_v=b[1]-p[1];
     var ba_u=b[0]-a[0], ba_v=b[1]-a[1];
     // a, p and b are horizontally aligned
-    if (pa_v===0 && bp_v===0) result += pa_u<=0 || bp_u>=0;
+    if (pa_v===0 && bp_v===0) continue;
     // p and a are horizontally aligned
-    else if (pa_v===0) result += pa_u<=0;
+    if (pa_v===0) result += pa_u<=0;
     // b and p are horizontally aligned
     else if (bp_v===0) result += bp_u>=0;
     // a and b are either both below or above p
