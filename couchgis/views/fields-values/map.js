@@ -2,7 +2,7 @@
 
 function(doc) {
   var path=require('views/lib/path');
-  if (doc.type==null) return;
+  if (!doc.type) return;
   for (var field in doc) {
     if (!/^[A-ZÄÖÜ]/.test(field)) continue;
     if (/^GeoJSON/.test(field)) continue;

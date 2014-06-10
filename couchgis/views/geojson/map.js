@@ -28,6 +28,7 @@ function(doc) {
     }
   }
   var ranges=require('views/lib/ranges');
+  if (!doc.type) return;
   var val={doc:{
     _id:doc._id,
     _rev:doc._rev,
