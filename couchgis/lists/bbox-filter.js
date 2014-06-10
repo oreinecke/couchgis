@@ -26,19 +26,25 @@ function(head, req) {
   var bbox_is_similar=pass;
   if (similarity!==Infinity) {
     similarity*=similarity;
+    var bbox_0=bbox[0], bbox_1=bbox[1],
+        bbox_2=bbox[2], bbox_3=bbox[3];
     bbox_is_similar=function(bbox2) {
-      var d0=bbox[0]-bbox2[0], d1=bbox[1]-bbox2[1],
-          d2=bbox[2]-bbox2[2], d3=bbox[3]-bbox2[3];
+      var d0=bbox_0-bbox2[0], d1=bbox_1-bbox2[1],
+          d2=bbox_2-bbox2[2], d3=bbox_3-bbox2[3];
       return d0*d0+d1*d1<=similarity && d2*d2+d3*d3<=similarity;
     };
   }
   if ('error' in options) error=options.error;
   // iii) Check if bboxes intersect.
   var inside_bbox=function(bbox2) {
-    if (bbox && bbox2) inside_bbox=function(bbox2) {
-      return (bbox[0]<=bbox2[2]&&bbox2[0]<=bbox[2]&&
-              bbox[1]<=bbox2[3]&&bbox2[1]<=bbox[3]);
-    }; else inside_bbox=pass;
+    if (bbox && bbox2) {
+      var bbox_0=bbox[0], bbox_1=bbox[1],
+          bbox_2=bbox[2], bbox_3=bbox[3];
+      inside_bbox=function(bbox2) {
+        return (bbox_0<=bbox2[2]&&bbox2[0]<=bbox_2&&
+                bbox_1<=bbox2[3]&&bbox2[1]<=bbox_3);
+      };
+    } else inside_bbox=pass;
     return inside_bbox(bbox2);
   };
   // iv) Send comma and newline as we reach the 2nd item.
