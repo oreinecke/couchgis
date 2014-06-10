@@ -218,48 +218,65 @@ exports.simplify=function(GeoJSON, error) {
   return GeoJSON;
 };
 
-// Returns the number of line segments intersecting a
-// horizontal line that spans between p and +Infinity.
+// Returns boolish true if point is inside GeoJSON. A point with known
+// inside-ness is also accepted as third and forth argument. These will
+// then be used to bypass remote line segments.
 
-function intersections(p, coordinates) {
-  var result=0;
-  var a=coordinates[0];
-  var b=coordinates[1];
-  for (var c=1; c<coordinates.length; a=b, b=coordinates[++c]) {
-    // notation: ^ v
-    //     x a   |
-    //      \     -> u
-    //  p x--c------ +Infinity
-    //        \
-    //       b x
-    var pa_u=p[0]-a[0], pa_v=p[1]-a[1];
-    var bp_u=b[0]-p[0], bp_v=b[1]-p[1];
-    var ba_u=b[0]-a[0], ba_v=b[1]-a[1];
-    // a, p and b are horizontally aligned
-    if (pa_v===0 && bp_v===0) continue;
-    // p and a are horizontally aligned
-    if (pa_v===0) result += pa_u<=0;
-    // b and p are horizontally aligned
-    else if (bp_v===0) result += bp_u>=0;
-    // a and b are either both below or above p
-    else if (pa_v>0 ^ bp_v>0) continue;
-    // a and b are both to the left of p
-    if (pa_u>0 && bp_u<0) continue;
-    // a abd be are both to the right of p
-    if (pa_u<=0 && bp_u>=0) result++;
-    // check if (c-p)u >= 0 if everything else fails
-    else result += ba_v<0 ^ bp_u*pa_v-pa_u*bp_v>0;
-  }
-  return result;
-}
-
-// Returns boolish true if point is inside GeoJSON.
-
-exports.pointInPolygon=function(GeoJSON, point) {
-  var inside=0;
-  exports.eachCoords(GeoJSON, function(coords, type) {
-    if (type==="Polygon" && type==="MultiPolygon")
-      b ^= intersections(point, coords) & 2;
-  };
+exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
+  var p_u=point[0], p_v=point[1];
+  if (known_point) {
+    var q_u=known_point[0], q_v=known_point[1];
+    var bbox_0=p_u<q_u?p_u:q_u;
+    var bbox_1=p_v<q_v?p_v:q_v;
+    var bbox_2=p_u>q_u?p_u:q_u;
+    var bbox_3=p_v>q_v?p_v:q_v;
+    var qp_u=q_u-p_u;
+    var qp_v=q_v-p_v;
+    exports.eachCoords(GeoJSON, function(coords, type) {
+      var a=coords[0], b=coords[1];
+      for (var c=1; c<coords.length; a=b, b=coords[++c]) {
+        var a_u=a[0], a_v=a[1];
+        var b_u=b[0], b_v=b[1];
+        // check bounding box
+        if (a_u<bbox_0 && b_u<bbox_0 || a_u>bbox_2 && b_u>bbox_2 ||
+            a_v<bbox_1 && b_v<bbox_1 || a_v>bbox_3 && b_v>bbox_3) continue;
+        var qa_u=q_u-a_u, qa_v=q_v-a_v;
+        var qb_u=q_u-b_u, qb_v=q_v-b_v;
+        if ( (qp_v*qa_u-qp_u*qa_v>=0) === (qp_v*qb_u-qp_u*qb_v>=0) ) continue;
+        var pa_u=p_u-a_u, pa_v=p_v-a_v;
+        var pb_u=p_u-b_u, pb_v=p_v-b_v;
+        if ( (pa_v*pb_u-pa_u*pb_v>=0) === (qa_v*qb_u-qa_u*qb_v>=0) ) continue;
+        inside^=1;
+      }
+    });
+  } else exports.eachCoords(GeoJSON, function(coords, type) {
+    if (type!=="Polygon" && type!=="MultiPolygon")
+      return;
+    var a=coords[0], b=coords[1];
+    for (var c=1; c<coords.length; a=b, b=coords[++c]) {
+      // notation: ^ v
+      //     x a   |
+      //      \     -> u
+      //  p x--c------ +Infinity
+      //        \
+      //       b x
+      var pa_u=p_u-a[0], bp_u=b[0]-p_u, ba_u=b[0]-a[0],
+          pa_v=p_v-a[1], bp_v=b[1]-p_v, ba_v=b[1]-a[1];
+      // a, p and b are horizontally aligned
+      if (pa_v===0 && bp_v===0) continue;
+      // p and a are horizontally aligned
+      if (pa_v===0) inside ^= pa_u<=0;
+      // b and p are horizontally aligned
+      else if (bp_v===0) inside ^= bp_u>=0;
+      // a and b are either both below or above p
+      else if (pa_v>0 ^ bp_v>0) continue;
+      // a and b are both to the left of p
+      if (pa_u>0 && bp_u<0) continue;
+      // a abd be are both to the right of p
+      if (pa_u<=0 && bp_u>=0) inside^=1;
+      // check if (c-p)u >= 0 if everything else fails
+      else inside ^= ba_v<0 ^ bp_u*pa_v-pa_u*bp_v>0;
+    }
+  });
   return inside;
 };
