@@ -237,14 +237,16 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
       for (var c=1; c<coords.length; a=b, b=coords[++c]) {
         var a_u=a[0], a_v=a[1];
         var b_u=b[0], b_v=b[1];
-        // check bounding box
+        // Bypass line segments outside pq's bounding box.
         if (a_u<bbox_0 && b_u<bbox_0 || a_u>bbox_2 && b_u>bbox_2 ||
             a_v<bbox_1 && b_v<bbox_1 || a_v>bbox_3 && b_v>bbox_3) continue;
         var qa_u=q_u-a_u, qa_v=q_v-a_v;
         var qb_u=q_u-b_u, qb_v=q_v-b_v;
+        // No intersection if a and b are on the same side of q-p.
         if ( (qp_v*qa_u-qp_u*qa_v>=0) === (qp_v*qb_u-qp_u*qb_v>=0) ) continue;
         var pa_u=p_u-a_u, pa_v=p_v-a_v;
         var pb_u=p_u-b_u, pb_v=p_v-b_v;
+        // No intersection if p and q are on the same side of a-b.
         if ( (pa_v*pb_u-pa_u*pb_v>=0) === (qa_v*qb_u-qa_u*qb_v>=0) ) continue;
         inside^=1;
       }
