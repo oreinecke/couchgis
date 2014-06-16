@@ -49,6 +49,36 @@ function(head, req) {
   };
   // iv) Check spatial relation with req.body.GeoJSON.
   var relates=pass;
+  if ('relation' in options) {
+    var related_GeoJSON=JSON.parse(req.body).GeoJSON;
+    var type_relates=related_GeoJSON.type+' '+options.relation;
+    var utils=require('views/lib/utils');
+    switch(type_relates) {
+    case "GeometryCollection contains":
+      var ignore_types=["Point", "LineString", "MultiLineString"];
+      for (var g=0;g<related_GeoJSON.geometries.length;g++)
+        if (ignore_types.indexOf(related_GeoJSON.geometries[g].type))
+          related_GeoJSON.geometries.splice(g--,1);
+    case "Polygon contains":
+    case "MultiPolygon contains":
+      var old_point=[
+        (related_GeoJSON.bbox[0]+related_GeoJSON.bbox[2])*.5,
+        (related_GeoJSON.bbox[1]+related_GeoJSON.bbox[3])*.5
+      ];
+      var inside=utils.pointInPolygon(related_GeoJSON, old_point);
+      relates=function(GeoJSON) {
+        var points=[];
+        utils.eachPoint(function(coord) { points.push(coord); });
+        do {
+          var point=points.pop();
+          inside=utils.pointInPolygon(GeoJSON, coord, old_point, inside);
+          old_point=point;
+        } while (coords.length && inside);
+        return inside;
+      };
+      break;
+    }
+  }
   // v) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
     send_separator=function() {send(',\n');};
