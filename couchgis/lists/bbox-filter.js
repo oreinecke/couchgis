@@ -58,7 +58,7 @@ function(head, req) {
     var bbox2=GeoJSON.bbox;
     if (!inside_bbox(bbox2) || !bbox_is_similar(bbox2))
       continue;
-    var errors=GeoJSON.errors;
+    var errors=GeoJSON.errors || [GeoJSON.error];
     delete GeoJSON.errors;
     for (var e=(error?0:errors.length-1); e<errors.length; e++) {
       if (errors[e]<=error) {
