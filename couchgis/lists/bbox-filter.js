@@ -47,7 +47,9 @@ function(head, req) {
     } else inside_bbox=pass;
     return inside_bbox(bbox2);
   };
-  // iv) Send comma and newline as we reach the 2nd item.
+  // iv) Check spatial relation with req.body.GeoJSON.
+  var relates=pass;
+  // v) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
     send_separator=function() {send(',\n');};
   };
@@ -56,7 +58,7 @@ function(head, req) {
   while (row=getRow()) {
     var GeoJSON=row.value.GeoJSON;
     var bbox2=GeoJSON.bbox;
-    if (!inside_bbox(bbox2) || !bbox_is_similar(bbox2))
+    if (!inside_bbox(bbox2) || !bbox_is_similar(bbox2) || !relates(GeoJSON))
       continue;
     var errors=GeoJSON.errors || [GeoJSON.error];
     delete GeoJSON.errors;
