@@ -37,14 +37,29 @@ function(head, req) {
   if ('error' in options) error=options.error;
   // iii) Check if bboxes intersect.
   var inside_bbox=function(bbox2) {
-    if (bbox && bbox2) {
-      var bbox_0=bbox[0], bbox_1=bbox[1],
-          bbox_2=bbox[2], bbox_3=bbox[3];
+    if (!bbox || !bbox2) return (inside_bbox=pass)();
+    var bbox_0=bbox[0], bbox_1=bbox[1],
+        bbox_2=bbox[2], bbox_3=bbox[3];
+    switch(options.relation) {
+    case "within":
+      inside_bbox=function(bbox2) {
+        return (bbox2[0]<=bbox_0&&bbox_2<=bbox2[2]&&
+                bbox2[1]<=bbox_1&&bbox_3<=bbox2[3]);
+      };
+      break;
+    case "contains":
+      inside_bbox=function(bbox2) {
+        return (bbox_0<=bbox2[0]&&bbox2[2]<=bbox_2&&
+                bbox_1<=bbox2[1]&&bbox2[3]<=bbox_3);
+      };
+      break;
+    default:
       inside_bbox=function(bbox2) {
         return (bbox_0<=bbox2[2]&&bbox2[0]<=bbox_2&&
                 bbox_1<=bbox2[3]&&bbox2[1]<=bbox_3);
       };
-    } else inside_bbox=pass;
+      break;
+    }
     return inside_bbox(bbox2);
   };
   // iv) Check spatial relation with req.body.GeoJSON.
