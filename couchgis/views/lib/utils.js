@@ -23,6 +23,7 @@ exports.eachCoords=function(GeoJSON, action) {
     for (var f=0;f<GeoJSON.features.length;f++)
       apply_action(GeoJSON.features[f].geometry);
   else apply_action(GeoJSON.geometry || GeoJSON);
+  return GeoJSON;
 };
 
 // Apply action to every [x,y].
@@ -52,6 +53,7 @@ exports.eachPoint=function(GeoJSON, action) {
     for (var f=0;f<GeoJSON.features.length;f++)
       apply_action(GeoJSON.features[f].geometry);
   else apply_action(GeoJSON.geometry || GeoJSON);
+  return GeoJSON;
 };
 
 // Clone GeoJSON and handle arrays properly.
@@ -75,13 +77,12 @@ exports.clone=function(GeoJSON) {
 
 exports.bbox=function(GeoJSON) {
   var bbox=GeoJSON.bbox=[Infinity,Infinity,-Infinity,-Infinity];
-  exports.eachPoint(GeoJSON, function(coord) {
+  return exports.eachPoint(GeoJSON, function(coord) {
     bbox[0]=(bbox[0]<coord[0])?bbox[0]:coord[0];
     bbox[1]=(bbox[1]<coord[1])?bbox[1]:coord[1];
     bbox[2]=(bbox[2]>coord[0])?bbox[2]:coord[0];
     bbox[3]=(bbox[3]>coord[1])?bbox[3]:coord[1];
   });
-  return GeoJSON;
 };
 
 // Also define some kind of 'importance' here to choose
@@ -131,27 +132,25 @@ exports.toWGS84=function(GeoJSON) {
 // Re-Append first coord from each Polygon/MultiPolygon.
 
 exports.unstripLastCoord=function(GeoJSON) {
-  exports.eachCoords(GeoJSON, function(coords, type) {
+  return exports.eachCoords(GeoJSON, function(coords, type) {
     if (type!=="Polygon" && type!=="MultiPolygon")
       return;
     var first=coords[0], last=coords[coords.length-1];
     if (first[0]!==last[0] || first[1]!==last[1])
       coords.push(first);
   });
-  return GeoJSON;
 };
 
 // Strip last coord from each Polygon/MultiPolygon.
 
 exports.stripLastCoord=function(GeoJSON) {
-  exports.eachCoords(GeoJSON, function(coords, type) {
+  return exports.eachCoords(GeoJSON, function(coords, type) {
     if (type!=="Polygon" && type!=="MultiPolygon")
       return;
     var first=coords[0], last=coords[coords.length-1];
     if (first[0]===last[0] && first[1]===last[1])
       coords.pop();
   });
-  return GeoJSON;
 };
 
 // Simplify LineStrings and Polygons for a given maximum
@@ -166,7 +165,7 @@ exports.simplify=function(GeoJSON, error) {
   function mul(u,m) { return [u[0]*m, u[1]*m]; }
   function add(u,v) { return [u[0]+v[0],u[1]+v[1]]; }
   function sub(u,v) { return [u[0]-v[0],u[1]-v[1]]; }
-  exports.eachCoords(GeoJSON, function(coords) {
+  return exports.eachCoords(GeoJSON, function(coords) {
     // http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm
     function bisect_or_remove(i, k) {
       if (i+1==k) return;
@@ -215,7 +214,6 @@ exports.simplify=function(GeoJSON, error) {
     // remove nulls from coords
     for (var j; (j=coords.indexOf(null))!==-1; coords.splice(j,1));
   });
-  return GeoJSON;
 };
 
 // Returns boolish true if point is inside GeoJSON. A point with known
