@@ -61,6 +61,7 @@ function(head, req) {
           related_GeoJSON.geometries.splice(g--,1);
     case "Polygon contains":
     case "MultiPolygon contains":
+      utils.unstripLastCoord(related_GeoJSON);
       var center={point:[
         (related_GeoJSON.bbox[0]+related_GeoJSON.bbox[2])*.5,
         (related_GeoJSON.bbox[1]+related_GeoJSON.bbox[3])*.5
