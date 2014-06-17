@@ -82,16 +82,15 @@ function(head, req) {
   case "geojson":
     // export to EPSG:3397
     var projector=require('views/lib/proj4')(utils.EPSG[3397]);
-    utils.eachPoint(features, function(coord) {
+    return JSON.stringify(utils.unstripLastCoord(utils.eachPoint({
+      name:filename, type:"FeatureCollection",
+      crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::3397"}},
+      features:features
+    }, function(coord) {
       var newCoord=projector.forward(coord);
       coord[0]=newCoord[0];
       coord[1]=newCoord[1];
-    });
-    return JSON.stringify({
-      name:filename, type:"FeatureCollection",
-      crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::3397"}},
-      features:utils.unstripLastCoord(features)
-    });
+    })));
   case "xml":
     if (fields==null) {
       fields=[];
