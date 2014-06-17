@@ -51,8 +51,8 @@ function(head, req) {
   var relates=pass;
   if ('relation' in options) {
     var related_GeoJSON = JSON.parse(req.body).GeoJSON || {};
+    var utils = related_GeoJSON.type && require('views/lib/utils');
     var type_relates=related_GeoJSON.type+' '+options.relation;
-    var utils=require('views/lib/utils');
     switch(type_relates) {
     case "GeometryCollection contains":
       var ignore_types=["Point", "LineString", "MultiLineString"];
