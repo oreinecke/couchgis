@@ -243,11 +243,11 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
         var qa_u=q_u-a_u, qa_v=q_v-a_v;
         var qb_u=q_u-b_u, qb_v=q_v-b_v;
         // No intersection if a and b are on the same side of q-p.
-        if ( (qp_v*qa_u-qp_u*qa_v>=0) === (qp_v*qb_u-qp_u*qb_v>=0) ) continue;
+        if ( (qp_v*qa_u>=qp_u*qa_v) === (qp_v*qb_u>=qp_u*qb_v) ) continue;
         var pa_u=p_u-a_u, pa_v=p_v-a_v;
         var pb_u=p_u-b_u, pb_v=p_v-b_v;
         // No intersection if p and q are on the same side of a-b.
-        if ( (pa_v*pb_u-pa_u*pb_v>=0) === (qa_v*qb_u-qa_u*qb_v>=0) ) continue;
+        if ( (pa_v*pb_u>=pa_u*pb_v) === (qa_v*qb_u>=qa_u*qb_v) ) continue;
         inside^=1;
       }
     });
