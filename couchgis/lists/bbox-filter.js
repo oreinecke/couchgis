@@ -95,6 +95,20 @@ function(head, req) {
       };
       break;
     }
+    if (related_GeoJSON.type && options.relation==="within") {
+      var points=[];
+      utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
+      relates=function(GeoJSON) {
+        var old_point=points[0];
+        var inside=utils.pointInPolygon(GeoJSON, old_point);
+        for (var p=1, point; inside && p<points.length; p++) {
+          point=points[p];
+          inside=utils.pointInPolygon(GeoJSON, point, old_point, inside);
+          old_point=point;
+        }
+        return inside;
+      };
+    }
   }
   // v) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
