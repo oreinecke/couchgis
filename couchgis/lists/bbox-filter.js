@@ -78,15 +78,14 @@ function(head, req) {
     case "Polygon contains":
     case "MultiPolygon contains":
       utils.unstripLastCoord(related_GeoJSON);
-      var center={point:[
+      var old_point=[
         (related_GeoJSON.bbox[0]+related_GeoJSON.bbox[2])*.5,
         (related_GeoJSON.bbox[1]+related_GeoJSON.bbox[3])*.5
-      ]};
-      center.inside=utils.pointInPolygon(related_GeoJSON, center.point);
+      ];
+      var inside=utils.pointInPolygon(related_GeoJSON, old_point);
       relates=function(GeoJSON) {
         var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
-        var old_point=center.point, inside=center.inside;
         do {
           var point=points.pop();
           inside=utils.pointInPolygon(related_GeoJSON, point, old_point, inside);
