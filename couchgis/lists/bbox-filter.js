@@ -65,6 +65,7 @@ function(head, req) {
   // iv) Check spatial relation with req.body.GeoJSON.
   var relates=pass;
   if ('relation' in options) {
+    if (req.body==="undefined") req.body='{}';
     var related_GeoJSON = JSON.parse(req.body).GeoJSON || {};
     var utils = related_GeoJSON.type && require('views/lib/utils');
     var type_relates=related_GeoJSON.type+' '+options.relation;
