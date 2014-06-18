@@ -28,6 +28,10 @@ $ gzip -dc couchgis-v1.0.json.gz | curl -XPOST localhost:5984/db \
   -HContent-type:application/json -d@-
 ```
 
+Or, if you don't even have gzip or curl or a shell, just replicate from
+http://lsh1908.selfhost.eu:5984/release, where just the design docs without any
+actual data are available from about 12 - 6 p.m. each workday except Friday.
+
 Document Structure
 ------------------
 
