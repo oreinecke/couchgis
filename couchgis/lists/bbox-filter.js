@@ -74,8 +74,9 @@ function(head, req) {
       bbox:related_GeoJSON.bbox,
       geometries:[]
     };
-    var type_relates=related_GeoJSON.type+' '+options.relation;
-    switch(type_relates) {
+    var flip_sideness=options.relation==="intersects";
+    switch(related_GeoJSON.type+' '+options.relation) {
+    case "GeometryCollection intersects":
     case "GeometryCollection contains":
       var inspect_types=["Polygon", "MultiPolygon"];
       for (var g=0;g<related_GeoJSON.geometries.length;g++)
@@ -84,13 +85,15 @@ function(head, req) {
         else relates=pass;
       if (relates===fail) break;
     case "Polygon contains":
+    case "Polygon intersects":
     case "MultiPolygon contains":
+    case "MultiPolygon intersects":
       utils.unstripLastCoord(related_GeoJSON);
       var old_point=[
         (related_GeoJSON.bbox[0]+related_GeoJSON.bbox[2])*.5,
         (related_GeoJSON.bbox[1]+related_GeoJSON.bbox[3])*.5
       ];
-      var inside=utils.pointInPolygon(related_GeoJSON, old_point);
+      var inside=utils.pointInPolygon(related_GeoJSON, old_point) ^ flip_sideness;
       relates=function(GeoJSON) {
         var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
@@ -103,14 +106,16 @@ function(head, req) {
       };
       break;
     }
-    switch (related_GeoJSON.type && options.relation) {
+    var outside_related_GeoJSON=relates;
+    switch(related_GeoJSON.type && options.relation) {
     case "within":
       skipped=related_GeoJSON;
+    case "intersects":
       var points=[];
       utils.eachPoint(skipped, function(coord) { points.push(coord); });
       relates=function(GeoJSON) {
         var old_point=points[points.length-1];
-        var inside=utils.pointInPolygon(GeoJSON, old_point);
+        var inside=utils.pointInPolygon(GeoJSON, old_point) ^ flip_sideness;
         for (var p=points.length-2; inside && p!==-1; p--) {
           var point=points[p];
           inside=utils.pointInPolygon(GeoJSON, point, old_point, inside);
@@ -120,6 +125,11 @@ function(head, req) {
       };
       break;
     }
+    var skipped_outside=relates;
+    if (related_GeoJSON.type && options.relation==="intersects")
+      relates=function(GeoJSON) {
+        return !outside_related_GeoJSON(GeoJSON) || !skipped_outside(GeoJSON)
+      };
   }
   // v) Send comma and newline as we reach the 2nd item.
   var send_separator=function() {
