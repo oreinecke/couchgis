@@ -89,11 +89,11 @@ function(head, req) {
       relates=function(GeoJSON) {
         var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
-        do {
-          var point=points.pop();
+        for (var p=points.length-1; inside && p!==-1; p++) {
+          var point=points[p];
           inside=utils.pointInPolygon(related_GeoJSON, point, old_point, inside);
           old_point=point;
-        } while (inside && points.length);
+        }
         return inside;
       };
       break;
@@ -102,10 +102,10 @@ function(head, req) {
       var points=[];
       utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
       relates=function(GeoJSON) {
-        var old_point=points[0];
+        var old_point=points[points.length-1];
         var inside=utils.pointInPolygon(GeoJSON, old_point);
-        for (var p=1, point; inside && p<points.length; p++) {
-          point=points[p];
+        for (var p=points.length-2; inside && p!==-1; p++) {
+          var point=points[p];
           inside=utils.pointInPolygon(GeoJSON, point, old_point, inside);
           old_point=point;
         }
