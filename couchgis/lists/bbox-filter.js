@@ -72,9 +72,9 @@ function(head, req) {
     var type_relates=related_GeoJSON.type+' '+options.relation;
     switch(type_relates) {
     case "GeometryCollection contains":
-      var ignore_types=["Point", "LineString", "MultiLineString"];
+      var inspect_types=["Polygon", "MultiPolygon"];
       for (var g=0;g<related_GeoJSON.geometries.length;g++)
-        if (ignore_types.indexOf(related_GeoJSON.geometries[g].type))
+        if (inspect_types.indexOf(related_GeoJSON.geometries[g].type)===-1)
           related_GeoJSON.geometries.splice(g--,1);
         else relates=pass;
       if (relates===fail) break;
