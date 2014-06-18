@@ -103,9 +103,11 @@ function(head, req) {
       };
       break;
     }
-    if (related_GeoJSON.type && options.relation==="within") {
+    switch (related_GeoJSON.type && options.relation) {
+    case "within":
+      skipped=related_GeoJSON;
       var points=[];
-      utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
+      utils.eachPoint(skipped, function(coord) { points.push(coord); });
       relates=function(GeoJSON) {
         var old_point=points[points.length-1];
         var inside=utils.pointInPolygon(GeoJSON, old_point);
@@ -116,6 +118,7 @@ function(head, req) {
         }
         return inside;
       };
+      break;
     }
   }
   // v) Send comma and newline as we reach the 2nd item.
