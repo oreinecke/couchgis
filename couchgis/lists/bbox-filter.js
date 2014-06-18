@@ -69,13 +69,18 @@ function(head, req) {
     if (req.body==="undefined") req.body='{}';
     var related_GeoJSON = JSON.parse(req.body).GeoJSON || {};
     var utils = related_GeoJSON.type && require('views/lib/utils');
+    var skipped={
+      type:"GeometryCollection",
+      bbox:related_GeoJSON.bbox,
+      geometries:[]
+    };
     var type_relates=related_GeoJSON.type+' '+options.relation;
     switch(type_relates) {
     case "GeometryCollection contains":
       var inspect_types=["Polygon", "MultiPolygon"];
       for (var g=0;g<related_GeoJSON.geometries.length;g++)
         if (inspect_types.indexOf(related_GeoJSON.geometries[g].type)===-1)
-          related_GeoJSON.geometries.splice(g--,1);
+          skipped.geometries.push( related_GeoJSON.geometries.splice(g--,1).pop() );
         else relates=pass;
       if (relates===fail) break;
     case "Polygon contains":
