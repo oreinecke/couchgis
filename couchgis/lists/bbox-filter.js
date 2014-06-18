@@ -92,12 +92,13 @@ function(head, req) {
       ];
       var inside=utils.pointInPolygon(related_GeoJSON, old_point);
       relates=function(GeoJSON) {
-        var points=[], point;
+        var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
-        while (point=points.pop()) {
+        do {
+          var point=points.pop();
           inside=utils.pointInPolygon(related_GeoJSON, point, old_point, inside);
           old_point=point;
-        }
+        } while (inside && point);
         return inside;
       };
       break;
