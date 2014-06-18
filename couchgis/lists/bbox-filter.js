@@ -14,6 +14,7 @@ function(head, req) {
   // allow reduced polygons to deviate up to this amount
   var error=0.0;
   function pass() {return true;}
+  function fail() {return false;}
   // Use function variables to work around useless repetition:
   // i) Check if we have to read more items.
   var proceed=pass;
@@ -63,7 +64,7 @@ function(head, req) {
     return inside_bbox(bbox2);
   };
   // iv) Check spatial relation with req.body.GeoJSON.
-  var relates=pass;
+  var relates=fail;
   if ('relation' in options) {
     if (req.body==="undefined") req.body='{}';
     var related_GeoJSON = JSON.parse(req.body).GeoJSON || {};
@@ -75,6 +76,8 @@ function(head, req) {
       for (var g=0;g<related_GeoJSON.geometries.length;g++)
         if (ignore_types.indexOf(related_GeoJSON.geometries[g].type))
           related_GeoJSON.geometries.splice(g--,1);
+        else relates=pass;
+      if (relates===fail) break;
     case "Polygon contains":
     case "MultiPolygon contains":
       utils.unstripLastCoord(related_GeoJSON);
