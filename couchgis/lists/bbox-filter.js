@@ -75,45 +75,12 @@ function(head, req) {
       geometries:[]
     };
     var flip_sideness=options.relation==="intersects";
-    switch(related_GeoJSON.type+' '+options.relation) {
-    case "GeometryCollection intersects":
-    case "GeometryCollection contains":
-      var inspect_types=["Polygon", "MultiPolygon"];
-      for (var g=0;g<related_GeoJSON.geometries.length;g++)
-        if (inspect_types.indexOf(related_GeoJSON.geometries[g].type)===-1)
-          skipped.geometries.push( related_GeoJSON.geometries.splice(g--,1).pop() );
-        else relates=pass;
-      if (relates===fail) break;
-    case "Polygon contains":
-    case "Polygon intersects":
-    case "MultiPolygon contains":
-    case "MultiPolygon intersects":
-      utils.unstripLastCoord(related_GeoJSON);
-      var old_point=[
-        (related_GeoJSON.bbox[0]+related_GeoJSON.bbox[2])*.5,
-        (related_GeoJSON.bbox[1]+related_GeoJSON.bbox[3])*.5
-      ];
-      var inside=utils.pointInPolygon(related_GeoJSON, old_point) ^ flip_sideness;
-      relates=function(GeoJSON) {
-        var points=[];
-        utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
-        do {
-          var point=points.pop();
-          inside=utils.pointInPolygon(related_GeoJSON, point, old_point, inside);
-          old_point=point;
-        } while (inside && point);
-        return inside;
-      };
-      break;
-    }
-    var outside_related_GeoJSON=relates;
-    switch(related_GeoJSON.type && options.relation) {
-    case "within":
-      skipped=related_GeoJSON;
-    case "intersects":
+    if ( related_GeoJSON.type && /within|intersects/.test(options.relation) ) {
       var points=[];
-      utils.eachPoint(skipped, function(coord) { points.push(coord); });
+      utils.stripLastCoord(related_GeoJSON);
+      utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
       relates=function(GeoJSON) {
+        utils.unstripLastCoord(GeoJSON);
         var old_point=points[points.length-1];
         var inside=utils.pointInPolygon(GeoJSON, old_point) ^ flip_sideness;
         for (var p=points.length-2; inside && p!==-1; p--) {
@@ -125,10 +92,44 @@ function(head, req) {
       };
       break;
     }
-    var skipped_outside=relates;
-    if (related_GeoJSON.type && options.relation==="intersects")
+    var related_GeoJSON_outside=relates;
+    var related_Polygons=function(type, relation) {
+      if (relates!=="intersects" && relates!=="contains") return;
+      var inspect_types=["Polygon", "MultiPolygon"];
+      if (inspect_types.indexOf(type)!==-1) return related_GeoJSON;
+      if (type!=="GeometryCollection") return;
+      var geometries=[];
+      for (var g=0;g<related_GeoJSON.geometries.length;g++)
+        if (inspect_types.indexOf(related_GeoJSON.geometries[g].type)!==-1)
+          geometries=push(related_GeoJSON.geometries[g]);
+      if (geometries.length) return {
+        type:"GeometryCollection",
+        bbox:related_GeoJSON.bbox,
+        geometries:geometries
+      };
+    }(related_GeoJSON.type, options.relation);
+    if (related_Polygons) {
+      utils.unstripLastCoord(related_Polygons);
+      var old_point=[
+        (related_Polygons.bbox[0]+related_Polygons.bbox[2])*.5,
+        (related_Polygons.bbox[1]+related_Polygons.bbox[3])*.5
+      ];
+      var inside=utils.pointInPolygon(related_Polygons, old_point) ^ flip_sideness;
       relates=function(GeoJSON) {
-        return !outside_related_GeoJSON(GeoJSON) || !skipped_outside(GeoJSON)
+        var points=[];
+        utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
+        do {
+          var point=points.pop();
+          inside=utils.pointInPolygon(related_Polygons, point, old_point, inside);
+          old_point=point;
+        } while (inside && point);
+        return inside;
+      };
+    }
+    var outside_related_Polygons=relates;
+    if ( related_GeoJSON.type && options.relation==="intersects" )
+      relates=function(GeoJSON) {
+        return !outside_related_Polygons(GeoJSON) || !related_GeoJSON_outside(GeoJSON);
       };
   }
   // v) Send comma and newline as we reach the 2nd item.
