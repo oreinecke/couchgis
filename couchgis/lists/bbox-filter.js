@@ -99,17 +99,12 @@ function(head, req) {
           geometries=push(related_GeoJSON.geometries[g]);
       if (geometries.length) return {
         type:"GeometryCollection",
-        bbox:related_GeoJSON.bbox,
         geometries:geometries
       };
     }(related_GeoJSON.type, options.relation);
     if (related_Polygons) {
       utils.unstripLastCoord(related_Polygons);
-      var old_point=[
-        (related_Polygons.bbox[0]+related_Polygons.bbox[2])*.5,
-        (related_Polygons.bbox[1]+related_Polygons.bbox[3])*.5
-      ];
-      var inside=utils.pointInPolygon(related_Polygons, old_point) ^ flip_sideness;
+      var old_point, inside=flip_sideness;
       relates=function(GeoJSON) {
         var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
