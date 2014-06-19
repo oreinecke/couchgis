@@ -69,11 +69,6 @@ function(head, req) {
     if (req.body==="undefined") req.body='{}';
     var related_GeoJSON = JSON.parse(req.body).GeoJSON || {};
     var utils = related_GeoJSON.type && require('views/lib/utils');
-    var skipped={
-      type:"GeometryCollection",
-      bbox:related_GeoJSON.bbox,
-      geometries:[]
-    };
     var flip_sideness=options.relation==="intersects";
     if ( related_GeoJSON.type && /within|intersects/.test(options.relation) ) {
       var points=[];
@@ -90,7 +85,6 @@ function(head, req) {
         }
         return inside;
       };
-      break;
     }
     var related_GeoJSON_outside=relates;
     var related_Polygons=function(type, relation) {
