@@ -139,7 +139,7 @@ $(document).ready(function() {
         if (!crs) throw{message:"No top-level CRS defined"};
       } else if (filetype==="xml") {
         // divide xml recursively into <Tag>..</Tag> objects
-        var tables=(function parse(xml, tags) {
+        var tables=function parse(xml, tags) {
           if (typeof tags==="object") {
             if (!tags.length) return xml;
             var tag=tags[0];
@@ -175,7 +175,7 @@ $(document).ready(function() {
             xml=xml.substring(m.index+m[0].length);
           } while (m);
           return elements;
-        })(data, ["Table","Row","Cell","Data"]);
+        }(data, ["Table","Row","Cell","Data"]);
         features=[];
         while (tables.length) {
           var rows=tables.shift().xml;

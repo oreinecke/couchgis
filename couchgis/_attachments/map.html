@@ -308,7 +308,7 @@ $(document).ready(function() {
     // Check what document list to reuse: As soon as a conflicting (that is
     // non-containing) filter is found, this one and every filter following it
     // need to be re-evaluated.
-    while ( position<filters.length && (function(filter) {
+    while ( position<filters.length && function(filter) {
       // In this part we determine for each filter type if it
       // a) is more restrictive than an already applied filter, and
       // b) happens to be identical to said filter.
@@ -353,7 +353,7 @@ $(document).ready(function() {
         delete new_filter.cuts;
         return false;
       }
-    }(filters[position])) )
+    }(filters[position]) )
       // If the last filter was compatible, we can use its document list.
       documents=filters[position++].documents;
     filters.push(new_filter);
