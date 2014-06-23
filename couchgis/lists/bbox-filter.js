@@ -108,11 +108,11 @@ function(head, req) {
       relates=function(GeoJSON) {
         var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
+        var point=points.pop();
         do {
-          var point=points.pop();
           inside=utils.pointInPolygon(related_Polygons, point, old_point, inside);
           old_point=point;
-        } while (inside && point);
+        } while (inside && (point=points.pop()) );
         return inside;
       };
     }
