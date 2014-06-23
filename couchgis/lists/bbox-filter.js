@@ -65,12 +65,11 @@ function(head, req) {
   };
   // iv) Check spatial relation with req.body.GeoJSON.
   var relates=pass;
-  if ('relation' in options && !bbox) {
-    if (req.body==="undefined") req.body='{}';
-    var related_GeoJSON = JSON.parse(req.body).GeoJSON || {};
-    var utils = related_GeoJSON.type && require('views/lib/utils');
+  if ('relation' in options && req.body!=="undefined" && !bbox) {
+    var related_GeoJSON = JSON.parse(req.body).GeoJSON;
+    var utils = require('views/lib/utils');
     var flip_sideness=options.relation==="intersects";
-    if ( related_GeoJSON.type && /within|intersects/.test(options.relation) ) {
+    if ( /within|intersects/.test(options.relation) ) {
       var points=[];
       utils.stripLastCoord(related_GeoJSON);
       utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
@@ -89,7 +88,6 @@ function(head, req) {
     var related_GeoJSON_outside=relates;
     var related_Polygons=function(type, relation) {
       if (relation!=="intersects" && relation!=="contains") return;
-      if (type) relates=fail;
       var inspect_types=["Polygon", "MultiPolygon"];
       if (inspect_types.indexOf(type)!==-1) return related_GeoJSON;
       if (type!=="GeometryCollection") return;
@@ -117,7 +115,7 @@ function(head, req) {
       };
     }
     var outside_related_Polygons=relates;
-    if ( related_GeoJSON.type && options.relation==="intersects" ) {
+    if ( options.relation==="intersects" ) {
       if (outside_related_Polygons===fail) relates=function(GeoJSON) {
         return !related_GeoJSON_outside(GeoJSON);
       }; else relates=function(GeoJSON) {
