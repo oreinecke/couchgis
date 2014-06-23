@@ -89,7 +89,7 @@ function(head, req) {
     var related_GeoJSON_outside=relates;
     var related_Polygons=function(type, relation) {
       if (relation!=="intersects" && relation!=="contains") return;
-      relates=fail;
+      if (type) relates=fail;
       var inspect_types=["Polygon", "MultiPolygon"];
       if (inspect_types.indexOf(type)!==-1) return related_GeoJSON;
       if (type!=="GeometryCollection") return;
