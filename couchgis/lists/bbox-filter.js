@@ -5,14 +5,13 @@ function(head, req) {
   start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
   var options=JSON.parse(req.query.options || '{}');
   // initialize to false if none provided
-  var bbox=false;
-  if ('bbox' in options) bbox=options.bbox;
+  var bbox=options.bbox || false;
+  // allow reduced polygons to deviate up to this amount
+  var error=options.error || 0.0;
   // we need to limit output and server load
   var limit=Infinity;
   if ('limit' in options) limit=options.limit;
   if (!limit) return '{}\n';
-  // allow reduced polygons to deviate up to this amount
-  var error=0.0;
   function pass() {return true;}
   function fail() {return false;}
   // Use function variables to work around useless repetition:
@@ -35,7 +34,6 @@ function(head, req) {
       return d0*d0+d1*d1<=similarity && d2*d2+d3*d3<=similarity;
     };
   }
-  if ('error' in options) error=options.error;
   // iii) Check if bboxes intersect.
   var inside_bbox=function(bbox2) {
     if (!bbox || !bbox2) return (inside_bbox=pass)();
