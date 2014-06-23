@@ -96,7 +96,7 @@ function(head, req) {
       var geometries=[];
       for (var g=0;g<related_GeoJSON.geometries.length;g++)
         if (inspect_types.indexOf(related_GeoJSON.geometries[g].type)!==-1)
-          geometries=push(related_GeoJSON.geometries[g]);
+          geometries.push(related_GeoJSON.geometries[g]);
       if (geometries.length) return {
         type:"GeometryCollection",
         geometries:geometries
