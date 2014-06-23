@@ -145,7 +145,7 @@ function(head, req) {
       }
     }
     send_separator();
-    send('"'+row.id+'":{"GeoJSON":'+JSON.stringify(GeoJSON)+'}');
+    send('"'+row.id+'":{"GeoJSON":{"bbox":['+GeoJSON.bbox+'],"error":'+GeoJSON.error+'}}');
     if (!proceed()) break;
   }
   return '}\n';
