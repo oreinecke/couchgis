@@ -610,6 +610,15 @@ $(document).ready(function() {
     filter_documents({union:[]});
   });
 
+  // Filter geometry by spatial relation.
+  $("#union > :button").click( function() {
+    var union=$("#union");
+    var li=$("#spatial-"+$(this).prop('name'));
+    // copy filter description into geometry filter item
+    li.css('display', 'block').find("span").html(union.find("span").html());
+    union.hide().find("span").html("");
+  });
+
   // Update autocomplete source array.
   $("#filter [name='field']").change( function() {
     // clear text input on field change.
@@ -876,9 +885,26 @@ $(document).ready(function() {
       <!-- always show selected docs -->
       <li style="display:none" id="keep-selection">
         <input type="button" value="Auswahl merken"></li>
+      <!-- union with stored selection -->
       <li style="display:none" id="union">
         <input type="button" value="x" title="löschen" id="discard-selection">
-        <b>Auswahl:</b> <span></span>
+        <b>Auswahl:</b> <span></span><br>
+        <input type="button" value="umgibt" name="contains">
+        <input type="button" value="schneidet" name="intersects">
+        <input type="button" value="innerhalb" name="within">
+      </li>
+      <!-- stored selection related to active selection -->
+      <li style="display:none" id="spatial-contains">
+        <input type="button" value="x" title="löschen">
+        <span></span> <b>umgibt:</b>
+      </li>
+      <li style="display:none" id="spatial-intersects">
+        <input type="button" value="x" title="löschen">
+        <span></span> <b>überschneidet sich mit:</b>
+      </li>
+      <li style="display:none" id="spatial-within">
+        <input type="button" value="x" title="löschen">
+        <span></span> <b>befindet sich innerhalb:</b>
       </li>
     </ol>
   </form>
