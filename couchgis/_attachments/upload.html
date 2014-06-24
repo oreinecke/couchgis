@@ -157,7 +157,7 @@ $(document).ready(function() {
             var attribs=m[0].match(/[\w:]+="[^"]*"/g);
             var element={};
             while (attribs && attribs.length) {
-              var attrib=attribs.shift().match(/([\w:]+)="([^"]*)"/);
+              var attrib=attribs.pop().match(/([\w:]+)="([^"]*)"/);
               element[attrib[1]]=attrib[2];
             }
             if (m[0].search('/>$')===-1) {
@@ -221,7 +221,7 @@ $(document).ready(function() {
       $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
         data=JSON.parse(data);
         while (data.rows.length) {
-          var row=data.rows.shift();
+          var row=data.rows.pop();
           uploaded_docs[row.id]=row.doc;
         }
       });
@@ -445,7 +445,7 @@ $(document).ready(function() {
         };
       }
       while (data.rows.length) {
-        var row=data.rows.shift();
+        var row=data.rows.pop();
         var GeoJSON_clone=feature.items[row.key[0]] && row.key[0];
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({

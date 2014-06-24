@@ -104,7 +104,7 @@ $(document).ready(function() {
     function ajax() {
       $.ajax("_view/geojson", {
         type:"POST",
-        data:'{"keys":'+JSON.stringify(keys)+'}',
+        data:'{"keys":'+JSON.stringify(keys.reverse())+'}',
         dataType:"json",
         success:success,
         complete:function() {
@@ -125,10 +125,10 @@ $(document).ready(function() {
       var timeout = 5 * $("#settings [name='delayed']").prop('checked');
       (function update_one_geometry() {
         while (data.rows.length) {
-          var row=data.rows.shift();
+          var row=data.rows.pop();
           var item=items[row.key[0]];
           if (row.value.doc) {
-            data.rows.unshift(row);
+            data.rows.push(row);
             var tr=item.tr;
             tr.html('');
             var headers=$("#table th");
@@ -138,7 +138,7 @@ $(document).ready(function() {
             var fillColor=null;
             for (var d=1;d<item.keys.length;d++) {
               // Group docs with identical GIS into one li.
-              var doc=data.rows.shift().value.doc;
+              var doc=data.rows.pop().value.doc;
               if (!fillColor) fillColor=fillColors[doc.type];
               headers.each(function(i) {
                 var th=$(this);
@@ -403,11 +403,11 @@ $(document).ready(function() {
       if (!documents[d].keep_me) options.keys.push(documents[d]);
     list("tabulate/geojson", options, function(data) {
       var new_documents=[];
-      var doc_id=data.shift();
+      var doc_id=data.reverse().pop();
       for (var d=0;d<documents.length;d++) {
         var doc=documents[d];
         if (doc[1]===doc_id) {
-          doc_id=data.shift();
+          doc_id=data.pop();
           new_documents.push(doc);
         } else if (doc.keep_me)
           new_documents.push(doc);
@@ -621,13 +621,13 @@ $(document).ready(function() {
     var labels={};
     types.each(function() {
       var type=$(this).prop('name');
-      var start_key=encodeURIComponent(JSON.stringify([type, field]));
-      var end_key=encodeURIComponent(JSON.stringify([type, field+' ']));
-      var url="_view/fields-values?group=true&inclusive_end=false&group=true";
+      var start_key=encodeURIComponent(JSON.stringify([type, field+' ']));
+      var end_key=encodeURIComponent(JSON.stringify([type, field]));
+      var url="_view/fields-values?group=true&inclusive_end=false&descending=true";
       url+="&start_key="+start_key+"&end_key="+end_key;
       $.getJSON(url, function(data) {
         while (data.rows.length) {
-          var row=data.rows.shift();
+          var row=data.rows.pop();
           // Do not suggest numbers or objects right now.
           if (row.value.type!=="string") continue;
           var label=row.key[2];

@@ -8,14 +8,15 @@ function(head, req) {
   var download='download' in req.query;
   var indexes=req.query.compressed_keys;
   if (indexes)
-    indexes=require('views/lib/indexes').decompress(indexes);
+    indexes=require('views/lib/indexes').decompress(indexes).reverse();
+  else indexes=[];
   var ranges=require('views/lib/ranges');
   var path=require('views/lib/path');
   var utils=require('views/lib/utils');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
-  var index=0;
+  var next_index=indexes.pop(), index=next_index && 0;
   start({'headers':{
     'Content-Type':{
       geojson:'application/json;charset=utf-8',
@@ -38,10 +39,11 @@ function(head, req) {
     while (row && !row.value.doc) row=getRow();
     // I apologize for the rude comma operator I used, but
     // it looks much worse written as a while() statement.
-    for (var doc; row && (doc=row.value.doc); row=getRow(), index++) {
-      if (indexes) {
-        if (index!==indexes[0]) continue;
-        indexes.shift();
+    for (var doc; row && (doc=row.value.doc); row=getRow()) {
+      if (index===next_index) next_index=indexes.pop();
+      else {
+        index++;
+        continue;
       }
       if (doc_ids.indexOf(doc._id)!==-1) continue;
       if (filetype==="xml") doc_ids.push(doc._id);
