@@ -73,12 +73,12 @@ function(head, req) {
       utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
       relates=function(GeoJSON) {
         utils.unstripLastCoord(GeoJSON);
-        var old_point=points[points.length-1];
-        var inside=utils.pointInPolygon(GeoJSON, old_point) ^ flip_sideness;
+        var last_point=points[points.length-1];
+        var inside=utils.pointInPolygon(GeoJSON, last_point) ^ flip_sideness;
         for (var p=points.length-2; inside && p!==-1; p--) {
           var point=points[p];
-          inside=utils.pointInPolygon(GeoJSON, point, old_point, inside);
-          old_point=point;
+          inside=utils.pointInPolygon(GeoJSON, point, last_point, inside);
+          last_point=point;
         }
         return inside;
       };
@@ -100,14 +100,14 @@ function(head, req) {
     }(related_GeoJSON.type, options.relation);
     if (related_Polygons) {
       utils.unstripLastCoord(related_Polygons);
-      var old_point, inside=flip_sideness;
+      var last_point, inside=flip_sideness;
       relates=function(GeoJSON) {
         var points=[];
         utils.eachPoint(GeoJSON, function(coord) { points.push(coord); });
         var point=points.pop();
         do {
-          inside=utils.pointInPolygon(related_Polygons, point, old_point, inside);
-          old_point=point;
+          inside=utils.pointInPolygon(related_Polygons, point, last_point, inside);
+          last_point=point;
         } while (inside && (point=points.pop()) );
         return inside;
       };

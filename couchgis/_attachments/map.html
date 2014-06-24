@@ -370,16 +370,16 @@ $(document).ready(function() {
       var documents=filters[filters.length-1].documents;
       keys.splice(0);
       viewports.splice(1);
-      var old_id=null;
+      var last_id=null;
       for (var d=0;d<documents.length;d++) {
         var id=documents[d][0];
-        if (old_id===id) continue;
+        if (last_id===id) continue;
         keys.push(id);
-        old_id=id;
+        last_id=id;
         if (!items[id]) continue;
         var old_keys=items[id].keys;
         old_keys.splice(1);
-        while (d<documents.length && old_id===documents[d][0])
+        while (d<documents.length && last_id===documents[d][0])
           old_keys.push(documents[d++]);
         // update document list in the next _view/geojson
         items[id].keep_documents=false;
