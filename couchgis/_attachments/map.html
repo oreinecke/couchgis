@@ -578,10 +578,8 @@ $(document).ready(function() {
   $("#cuts").click( function() {
     var ol=$(this);
     var li=$("#keep-selection");
-    var length=ol.find("> li:visible").length
-              -(li.css('display')!=='none')
-              -($("#union:visible").length);
-    if (length) ol.append(li.show());
+    if (ol.find(".filter-item:visible").length)
+      ol.append(li.show());
     else li.hide();
   });
   $("#filter .types").change( function() { $("#cuts").click(); });
@@ -595,7 +593,7 @@ $(document).ready(function() {
     var span=union.find("span");
     if (union.css('display')!=='none')
       span.append(' <b>&cup;</b> ');
-    $("#cuts > li:visible[id!='union']").each( function() {
+    $("#cuts > .filter-item:visible").each( function() {
       var li=$("<li>").html($(this).html());
       li.find(":button").remove();
       span.append(li);
@@ -863,17 +861,17 @@ $(document).ready(function() {
     </select></span>
     <ol id="cuts">
       <!-- default filter list items -->
-      <li style="display:none" id="type-is">
+      <li style="display:none" id="type-is" class="filter-item">
         <input type="button" value="x" title="löschen"> <a></a></li>
-      <li style="display:none" id="time-is">
+      <li style="display:none" id="time-is" class="filter-item">
         <input type="button" value="x" title="löschen"> <b>Zeit:</b> <a></a></li>
-      <li style="display:none" id="contains">
+      <li style="display:none" id="contains" class="filter-item">
         <input type="button" value="x" title="löschen"> <b>enthält</b> <a></a></li>
-      <li style="display:none" id="has-defined">
+      <li style="display:none" id="has-defined" class="filter-item">
         <input type="button" value="x" title="löschen"> <b></b> zugewiesen</li>
-      <li style="display:none" id="field-is">
+      <li style="display:none" id="field-is" class="filter-item">
         <input type="button" value="x" title="löschen"> <b></b> <a></a></li>
-      <li style="display:none" id="expression">
+      <li style="display:none" id="expression" class="filter-item">
         <input type="button" value="x" title="löschen"> <b>erfüllt</b> <a></a></li>
       <!-- always show selected docs -->
       <li style="display:none" id="keep-selection">
