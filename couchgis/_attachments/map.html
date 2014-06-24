@@ -587,21 +587,29 @@ $(document).ready(function() {
   $("#filter .types").change( function() { $("#cuts").click(); });
   $("#filter").keypress( function(e) { if (e.which===13) $("#cuts").click(); });
 
-  // Always show selected documents.
+  // Add filtered document to #union filter item and copy the filter list into
+  // it; this servers neatly as a description of with which documents the union
+  // is constructed.
   $("#keep-selection :button").click( function() {
     var union=$("#union");
-    if (union.css('display')==='none') union=union.clone();
-    else union.append(' <b>&cup;</b> ').hide();
-    $("#cuts > li:visible").each( function() {
-      union.append($(this).html()).find(":button").last().remove();
+    var span=union.find("span");
+    if (union.css('display')!=='none')
+      span.append(' <b>&cup;</b> ');
+    $("#cuts > li:visible[id!='union']").each( function() {
+      var li=$("<li>").html($(this).html());
+      li.find(":button").remove();
+      span.append(li);
     });
     union.css('display', 'block');
     $("#cuts").prepend(union);
-    union.find(":button").click( function() {
-      union.remove();
-      filter_documents({union:[]});
-    });
     filter_documents({union:filters[filters.length-1].documents});
+  });
+
+  // Discard stored selection and hide #union filter item.
+  $("#discard-selection").click( function() {
+    // also clear selection summary
+    $("#union").hide().find("span").html('');
+    filter_documents({union:[]});
   });
 
   // Update autocomplete source array.
@@ -818,7 +826,7 @@ $(document).ready(function() {
 <style>
   #settings .geometry-level {width:6em}
   span {white-space:nowrap}
-  .types {white-space:normal}
+  .types, #union span {white-space:normal}
   #cuts li {display:inline}
   table, th, tr, td {
     padding:0; padding-right:3px;
@@ -871,7 +879,9 @@ $(document).ready(function() {
       <li style="display:none" id="keep-selection">
         <input type="button" value="Auswahl merken"></li>
       <li style="display:none" id="union">
-        <input type="button" value="x" title="löschen"> <b>Auswahl:</b></li>
+        <input type="button" value="x" title="löschen" id="discard-selection">
+        <b>Auswahl:</b> <span></span>
+      </li>
     </ol>
   </form>
   <table id="table">
