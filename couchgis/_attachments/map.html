@@ -27,13 +27,14 @@ $(document).ready(function() {
 
   // call _list/bbox-filter/<view> with some useful options
   function list(list, options, success) {
-    var keys=options.keys;
+    var data={keys:options.keys, GeoJSON:options.GeoJSON};
     delete options.keys;
+    delete options.GeoJSON;
     list+="?options="+encodeURIComponent(JSON.stringify(options));
     $.ajax("_list/"+list, {
       type:"POST",
       dataType:"json",
-      data:JSON.stringify({keys:keys}),
+      data:JSON.stringify(data),
       success:success,
       error:call.that_last_one
     });
