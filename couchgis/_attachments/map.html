@@ -298,7 +298,7 @@ $(document).ready(function() {
   // ii) inserted in the middle and merged with filters following it
   // iii) nothing of the above if an identical filter is already used.
   function filter_documents(new_filter) {
-    // Aquire (single) property name of new_filter.
+    // Aquire first property as name of new_filter.
     var filter_name=function() {for (var prop in new_filter) return prop;}();
     // In any case, we can use the full, non-filtered document list.
     var documents=filters[0].documents;
@@ -616,10 +616,17 @@ $(document).ready(function() {
 
   // Filter geometry by spatial relation.
   $("#union > :button").click( function() {
+    var relation=$(this).prop('name');
+    var keys=[], documents=filters[0].union;
+    for (var d=0, id; d<documents.length; d++)
+      if (id!==documents[d][0])
+        keys.push(id=documents[d][0]);
+    filter_documents({union:[]}, {spatial:relation,keys:keys});
     var union=$("#union");
-    var li=$("#spatial-"+$(this).prop('name'));
     // copy filter description into geometry filter item
-    li.css('display', 'block').find("span").html(union.find("span").html());
+    var li=$("#spatial-"+relation).css('display', 'block')
+                                  .find("span")
+                                  .html(union.find("span").html());
     union.hide().find("span").html("");
   });
 
