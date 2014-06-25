@@ -293,8 +293,8 @@ $(document).ready(function() {
     });
   }
 
-  // Applies new filter to document list; new_filter must be a single-member
-  // object denoting the filter type. It is then either
+  // Applies new filter to document list; new_filter must be an object
+  // denoting the filter type by its first member. It is then either
   // i) attached at the end of the filter queue
   // ii) inserted in the middle and merged with filters following it
   // iii) nothing of the above if an identical filter is already used.
