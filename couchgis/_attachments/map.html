@@ -364,6 +364,7 @@ $(document).ready(function() {
       if ('types' in filter) options.types=filter.types;
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
     }
+    var recall_arguments=Array.prototype.slice.apply(arguments, [1]);
     // Generate geometry id list from latest document list and
     // reset viewports because they are most likely invalidated.
     function reset_viewports() {
@@ -388,6 +389,9 @@ $(document).ready(function() {
       }
 //    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
       Maps.event.trigger(map, 'bounds_changed');
+      if (recall_arguments.length)
+        filter_documents.apply(this, recall_arguments);
+      else Maps.event.trigger(map, 'bounds_changed');
     }
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
