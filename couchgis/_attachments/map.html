@@ -662,7 +662,7 @@ $(document).ready(function() {
     var select=$(this);
     // Get selected option and find out in wich <optgroup> it belongs.
     var option=select.find(":selected");
-    if (select.find("[name='columns']").find(option).length) {
+    if (select.find("[name='columns'] :selected").length) {
       // remove th from #table
       $("#table thead .field").each( function() {
         var th=$(this);
@@ -674,12 +674,11 @@ $(document).ready(function() {
       select.find("[name='fields']").prepend(option);
     } else {
       var last=$("#table thead th").last();
-      $("#table thead tr").append($('<th>').html(path.pretty($(this).val(),'<br>'))
-                                           .val($(this).val())
+      $("#table thead tr").append($('<th>').html(path.pretty(option.val(),'<br>'))
+                                           .val(option.val())
                                            .addClass("field"));
       // move column selection to the right
       $("#table thead tr").append(last);
-      var select=$(this);
       // move option to the columns optgroup
       select.find("[name='columns']").append(option);
     }
