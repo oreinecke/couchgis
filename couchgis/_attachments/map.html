@@ -384,12 +384,23 @@ $(document).ready(function() {
     filters.push(new_filter);
     // Use this to recall filter_documents with first argument removed.
     var recall_arguments=Array.prototype.slice.apply(arguments, [1]);
+    if (filter_name==="spatial") {
+      // blank filter below
+      console.log("APPLYING SPATIAL-"+new_filter.spatial);
+      new_filter.documents=documents;
+      filter_documents.apply(this, recall_arguments);
+      return;
+    }
     // Collapse remaining filters into options.
     var options={cuts:[]};
     for (var filter; filter=filters.splice(position,1)[0]; ) {
       if ('time' in filter) options.time=filter.time;
       if ('types' in filter) options.types=filter.types;
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
+      if ('spatial' in filter) {
+        console.log("ADDED SPATIAL-"+filter.spatial);
+        recall_arguments.push(filter);
+      }
     }
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
