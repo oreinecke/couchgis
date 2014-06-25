@@ -299,6 +299,30 @@ $(document).ready(function() {
   // ii) inserted in the middle and merged with filters following it
   // iii) nothing of the above if an identical filter is already used.
   function filter_documents(new_filter) {
+    // Generate geometry id list from latest document list and
+    // reset viewports because they are most likely invalidated.
+    if (!new_filter) {
+      var documents=filters[filters.length-1].documents;
+      keys.splice(0);
+      viewports.splice(1);
+      for (var d=0, id; d<documents.length; d++) {
+        if (id===documents[d][0]) continue;
+        id=documents[d][0];
+        keys.push(id);
+        if (!items[id]) continue;
+        var old_keys=items[id].keys;
+        old_keys.splice(1);
+        while (d<documents.length && id===documents[d][0])
+          old_keys.push(documents[d++]);
+        // update document list in the next _view/geojson
+        items[id].keep_documents=false;
+        // the nested loop results in an off-by-one document index
+        d--;
+      }
+//    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
+      Maps.event.trigger(map, 'bounds_changed');
+      return;
+    }
     // Aquire first property as name of new_filter.
     var filter_name=function() {for (var prop in new_filter) return prop;}();
     // In any case, we can use the full, non-filtered document list.
@@ -358,39 +382,14 @@ $(document).ready(function() {
       // If the last filter was compatible, we can use its document list.
       documents=filters[position++].documents;
     filters.push(new_filter);
-    var options={cuts:[]};
+    // Use this to recall filter_documents with first argument removed.
+    var recall_arguments=Array.prototype.slice.apply(arguments, [1]);
     // Collapse remaining filters into options.
+    var options={cuts:[]};
     for (var filter; filter=filters.splice(position,1)[0]; ) {
       if ('time' in filter) options.time=filter.time;
       if ('types' in filter) options.types=filter.types;
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
-    }
-    var recall_arguments=Array.prototype.slice.apply(arguments, [1]);
-    // Generate geometry id list from latest document list and
-    // reset viewports because they are most likely invalidated.
-    function reset_viewports() {
-      var documents=filters[filters.length-1].documents;
-      keys.splice(0);
-      viewports.splice(1);
-      for (var d=0, id; d<documents.length; d++) {
-        if (id===documents[d][0]) continue;
-        id=documents[d][0];
-        keys.push(id);
-        if (!items[id]) continue;
-        var old_keys=items[id].keys;
-        old_keys.splice(1);
-        while (d<documents.length && id===documents[d][0])
-          old_keys.push(documents[d++]);
-        // update document list in the next _view/geojson
-        items[id].keep_documents=false;
-        // the nested loop results in an off-by-one document index
-        d--;
-      }
-//    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
-      Maps.event.trigger(map, 'bounds_changed');
-      if (recall_arguments.length)
-        filter_documents.apply(this, recall_arguments);
-      else Maps.event.trigger(map, 'bounds_changed');
     }
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
@@ -398,7 +397,7 @@ $(document).ready(function() {
     if (equal_filter) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
     if (function() { for (var prop in options) return; return true; }()) {
-      reset_viewports();
+      filter_documents.apply(this, recall_arguments);
       return;
     }
     options.keys=[];
@@ -418,7 +417,7 @@ $(document).ready(function() {
       options.documents=new_documents;
       delete options.keys;
       filters.push(options);
-      reset_viewports();
+      filter_documents.apply(this, recall_arguments);
     });
   }
 
