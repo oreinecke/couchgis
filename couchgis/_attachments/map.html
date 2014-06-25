@@ -96,7 +96,7 @@ $(document).ready(function() {
       if (!item.keep_documents)
         keys=keys.concat(item.keys.slice(1));
     }
-    if (!keys.length) {
+    if (!keys.reverse().length) {
       call.that_last_one();
       return;
     }
@@ -104,7 +104,7 @@ $(document).ready(function() {
     function ajax() {
       $.ajax("_view/geojson", {
         type:"POST",
-        data:'{"keys":'+JSON.stringify(keys.reverse())+'}',
+        data:'{"keys":'+JSON.stringify(keys)+'}',
         dataType:"json",
         success:success,
         complete:function() {
