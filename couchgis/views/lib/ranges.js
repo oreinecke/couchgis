@@ -106,5 +106,4 @@ exports.intersects=function(a, b) {
     if (greater(a0.begin, b0.end)) b0=b.shift();
     else if (greater(b0.begin, a0.end)) a0=a.shift();
     else return true;
-  return false;
 }
