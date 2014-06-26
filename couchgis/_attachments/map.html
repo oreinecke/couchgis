@@ -357,6 +357,8 @@ $(document).ready(function() {
         position++;
         return false;
       }
+      if (filter_name==="spatial")
+        return (new_filter.spatial);
       if (filter_name==="time") {
         var contains=(ranges.contains(filter.time, new_filter.time));
         if (contains) equal_filter=(ranges.contains(new_filter.time, filter.time));
@@ -385,7 +387,7 @@ $(document).ready(function() {
     // Use this to recall filter_documents with first argument removed.
     var recall_arguments=Array.prototype.slice.apply(arguments, [1]);
     // Divert spatial filters to the request chain below.
-    if (filter_name==="spatial") {
+    if (new_filter.spatial) {
       var data='{"keys":[["'+new_filter.keys.join('",0],["')+'",0]]}';
       $.post("_view/geojson", data, function(data) {
         var GeometryCollection={ type:"GeometryCollection", geometries:[] };
@@ -432,6 +434,7 @@ $(document).ready(function() {
       if ('types' in filter) options.types=filter.types;
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
       // Issue spatial to be applied when the other filters are done.
+      if (new_filter.spatial===false) continue;
       if ('spatial' in filter) recall_arguments.push(filter);
     }
     // Remove options.cuts array if empty.
@@ -662,13 +665,19 @@ $(document).ready(function() {
     for (var d=0, id; d<documents.length; d++)
       if (id!==documents[d][0])
         keys.push(id=documents[d][0]);
-    filter_documents({union:[]}, {spatial:relation,keys:keys});
     var union=$("#union");
     // copy filter description into geometry filter item
     var li=$("#spatial-"+relation).css('display', 'block')
                                   .find("span")
                                   .html(union.find("span").html());
     union.hide().find("span").html("");
+    filter_documents({union:[]}, {spatial:relation,keys:keys});
+  });
+
+  // Remove spatial filter.
+  $("#cuts [id^='spatial-'] :button").click( function() {
+    filter_documents({spatial:false});
+    $("#cuts [id^='spatial-']").hide();
   });
 
   // Update autocomplete source array.
