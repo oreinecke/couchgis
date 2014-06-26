@@ -384,11 +384,45 @@ $(document).ready(function() {
     filters.push(new_filter);
     // Use this to recall filter_documents with first argument removed.
     var recall_arguments=Array.prototype.slice.apply(arguments, [1]);
+    // Divert spatial filters to the request chain below.
     if (filter_name==="spatial") {
-      // blank filter below
-      console.log("APPLYING SPATIAL-"+new_filter.spatial);
-      new_filter.documents=documents;
-      filter_documents.apply(this, recall_arguments);
+      var data='{"keys":[["'+new_filter.keys.join('",0],["')+'",0]]}';
+      $.post("_view/geojson", data, function(data) {
+        var GeometryCollection={ type:"GeometryCollection", geometries:[] };
+        var bbox=[Infinity,Infinity,-Infinity,-Infinity];
+        while (data.rows.length) {
+          var GeoJSON=data.rows.pop().value.GeoJSON;
+          var bbox2=GeoJSON.bbox;
+          bbox[0]=(bbox[0]<bbox2[0]?bbox:bbox2)[0];
+          bbox[1]=(bbox[1]<bbox2[1]?bbox:bbox2)[1];
+          bbox[2]=(bbox[2]>bbox2[2]?bbox:bbox2)[2];
+          bbox[3]=(bbox[3]>bbox2[3]?bbox:bbox2)[3];
+          delete GeoJSON.bbox;
+          delete GeoJSON.crs;
+          delete GeoJSON.error;
+          GeometryCollection.geometries.push(GeoJSON);
+        }
+        var keys=[];
+        for (var d=0, id; d<documents.length; d++)
+          if (id!==documents[d][0])
+            keys.push(id=documents[d][0]);
+        var options={keys:keys, bbox:bbox, relation:new_filter.spatial};
+        list("bbox-filter/bbox", options, function(data) {
+          keys=[];
+          for (var id in data) keys.push([id,0]);
+          options.keys=keys;
+          options.GeoJSON=GeometryCollection;
+          delete options.bbox;
+          list("bbox-filter/geojson", options, function(data) {
+            var new_documents=[];
+            for (var d=0, doc; d<documents.length; d++)
+              if ((doc=documents[d])[0] in data)
+                new_documents.push(doc);
+            new_filter.documents=new_documents;
+            filter_documents.apply(this, recall_arguments);
+          });
+        });
+      }, "json");
       return;
     }
     // Collapse remaining filters into options.
@@ -397,10 +431,8 @@ $(document).ready(function() {
       if ('time' in filter) options.time=filter.time;
       if ('types' in filter) options.types=filter.types;
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
-      if ('spatial' in filter) {
-        console.log("ADDED SPATIAL-"+filter.spatial);
-        recall_arguments.push(filter);
-      }
+      // Issue spatial to be applied when the other filters are done.
+      if ('spatial' in filter) recall_arguments.push(filter);
     }
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
