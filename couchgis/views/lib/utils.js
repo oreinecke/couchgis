@@ -78,8 +78,8 @@ exports.clone=function(GeoJSON) {
 exports.bbox=function(GeoJSON) {
   var bbox=GeoJSON.bbox=[Infinity,Infinity,-Infinity,-Infinity];
   return exports.eachPoint(GeoJSON, function(coord) {
-    bbox[0]=(bbox[0]<coord[0])?bbox[0]:coord[0];
-    bbox[1]=(bbox[1]<coord[1])?bbox[1]:coord[1];
+    bbox[0]=(bbox[0]<coord[0]?bbox:coord)[0];
+    bbox[1]=(bbox[1]<coord[1]?bbox:coord)[1];
     bbox[2]=(bbox[2]>coord[0])?bbox[2]:coord[0];
     bbox[3]=(bbox[3]>coord[1])?bbox[3]:coord[1];
   });

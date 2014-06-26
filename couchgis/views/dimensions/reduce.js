@@ -36,10 +36,10 @@ function(keys, values, rereduce) {
     var bbox2=values[v].bbox;
     if (!bbox) bbox=bbox2;
     if (!bbox || !bbox2) continue;
-    bbox[0]=(bbox[0]<bbox2[0])?bbox[0]:bbox2[0];
-    bbox[1]=(bbox[1]<bbox2[1])?bbox[1]:bbox2[1];
-    bbox[2]=(bbox[2]>bbox2[2])?bbox[2]:bbox2[2];
-    bbox[3]=(bbox[3]>bbox2[3])?bbox[3]:bbox2[3];
+    bbox[0]=(bbox[0]<bbox2[0]?bbox:bbox2)[0];
+    bbox[1]=(bbox[1]<bbox2[1]?bbox:bbox2)[1];
+    bbox[2]=(bbox[2]>bbox2[2]?bbox:bbox2)[2];
+    bbox[3]=(bbox[3]>bbox2[3]?bbox:bbox2)[3];
   }
   return {bbox:bbox, ranges:[range]};
 }
