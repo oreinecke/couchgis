@@ -389,6 +389,8 @@ $(document).ready(function() {
     // Divert spatial filters to the request chain below.
     if (new_filter.spatial) {
       var data='{"keys":[["'+new_filter.keys.join('",0],["')+'",0]]}';
+      var passed=new_filter.passed || new_filter.keys.slice();
+      var failed=new_filter.failed || [];
       $.post("_view/geojson", data, function(data) {
         var GeometryCollection={ type:"GeometryCollection", geometries:[] };
         var bbox=[Infinity,Infinity,-Infinity,-Infinity];
@@ -405,22 +407,31 @@ $(document).ready(function() {
           GeometryCollection.geometries.push(GeoJSON);
         }
         var keys=[];
-        for (var d=0, id; d<documents.length; d++)
-          if (id!==documents[d][0])
-            keys.push(id=documents[d][0]);
+        for (var d=0, id; d<documents.length; d++) {
+          if (id===documents[d][0]) continue;
+          id=documents[d][0];
+          if (passed.indexOf(id)!==-1) continue;
+          if (failed.indexOf(id)!==-1) continue;
+          keys.push(id);
+        }
         var options={keys:keys, bbox:bbox, relation:new_filter.spatial};
         list("bbox-filter/bbox", options, function(data) {
-          keys=[];
-          for (var id in data) keys.push([id,0]);
-          options.keys=keys;
+          options.keys=[];
+          for (var id in data) options.keys.push([id,0]);
           options.GeoJSON=GeometryCollection;
           delete options.bbox;
           list("bbox-filter/geojson", options, function(data) {
             var new_documents=[];
+            while (keys.length) {
+              var id=keys.pop();
+              (id in data?passed:failed).push(id);
+            }
             for (var d=0, doc; d<documents.length; d++)
-              if ((doc=documents[d])[0] in data)
+              if (passed.indexOf((doc=documents[d])[0])!==-1)
                 new_documents.push(doc);
             new_filter.documents=new_documents;
+            new_filter.passed=passed;
+            new_filter.failed=failed;
             filter_documents.apply(this, recall_arguments);
           });
         });
