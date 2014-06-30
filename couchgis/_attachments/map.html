@@ -650,14 +650,14 @@ $(document).ready(function() {
     var span=union.find("span");
     if (union.css('display')!=='none')
       span.append(' <b>&cup;</b> ');
-    $("#cuts > .filter-item:visible").each( function() {
+    $("#cuts > [id!='union' id!='keep-selection']:visible").each( function() {
       var li=$("<li>").html($(this).html());
       li.find(":button").remove();
-      span.append(li);
+      span.append(li.html());
     });
-    union.css('display', 'block');
-    $("#cuts").prepend(union);
-    filter_documents({union:filters[filters.length-1].documents});
+    $("#cuts").prepend(union.css('display', 'block'));
+    $("#cuts > [id^='spatial-']").hide();
+    filter_documents({union:filters[filters.length-1].documents}, {spatial:false});
   });
 
   // Discard stored selection and hide #union filter item.
