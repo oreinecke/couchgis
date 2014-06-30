@@ -684,9 +684,9 @@ $(document).ready(function() {
   });
 
   // Remove spatial filter.
-  $("#cuts [id^='spatial-'] :button").click( function() {
+  $("#cuts > [id^='spatial-'] :button").click( function() {
     filter_documents({spatial:false});
-    $("#cuts [id^='spatial-']").hide();
+    $("#cuts > [id^='spatial-']").hide();
   });
 
   // Update autocomplete source array.
