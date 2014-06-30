@@ -178,6 +178,23 @@ these are refering to):
                         // to define functions if it implies less typing.
 ```
 
+###Spatial Relations
+
+As of version 1.0.7, there's rudimentary support for so-called _spatial
+relations_. That means, given a fixed geometry, you can check what other
+geometry either lies inside, intersects or circumfences it. After you figured
+out your fixed geometry, click on 'Auswahl merken', and then a button presents
+itself for each relation. I have the following to add to this:
+
+- Each geometry relates to itself by default.
+- You might encounter glitches because of my sloppy implementation: For
+  instance, I do not check for intersecting line segments, and the algorithm
+  gets confused by identical points, and there's probably more.
+- You might want to select the documents as tightly as possible (and the
+  interface encurages to do so), that are about to be filtered geometrically.
+  I've tried my best to make the filter perform as fast as possible, but
+  there's of course limitations with JavaScript.
+
 How Document Editing Works
 --------------------------
 
