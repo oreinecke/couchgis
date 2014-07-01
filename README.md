@@ -184,16 +184,17 @@ As of version 1.0.7, there's rudimentary support for so-called _spatial
 relations_. That means, given a fixed geometry, you can check what other
 geometry either lies inside, intersects or circumfences it. After you figured
 out your fixed geometry, click on 'Auswahl merken', and then a button presents
-itself for each relation. I have the following to add to this:
+itself for each relation. I have the following to say to this:
 
 - Each geometry relates to itself by default.
 - You might encounter glitches because of my sloppy implementation: For
   instance, I do not check for intersecting line segments, and the algorithm
   gets confused by identical points, and there's probably more.
-- You might want to select the documents as tightly as possible (and the
-  interface encurages to do so), that are about to be filtered geometrically.
-  I've tried my best to make the filter perform as fast as possible, but
-  there's of course limitations with JavaScript.
+- Let the interface encourage you to select the documents as tightly as
+  possible, before they are filtered geometrically. I've tried to make the
+  filter perform as fast as it gets, but there's of course limitations. If it
+  has to process lots of polygons, it is going to take a while. The application
+  will not stall or anything, you just won't be able to apply other filters.
 
 How Document Editing Works
 --------------------------
