@@ -16,7 +16,7 @@ function(head, req) {
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
-  var next_index=indexes.pop(), index=next_index && 0;
+  var index=0, next_index=indexes.pop();
   start({'headers':{
     'Content-Type':{
       geojson:'application/json;charset=utf-8',
@@ -37,14 +37,10 @@ function(head, req) {
     delete geometry.bbox;
     delete geometry.crs;
     while (row && !row.value.doc) row=getRow();
-    // I apologize for the rude comma operator I used, but
-    // it looks much worse written as a while() statement.
     for (var doc; row && (doc=row.value.doc); row=getRow()) {
-      if (index===next_index) next_index=indexes.pop();
-      else {
-        index++;
-        continue;
-      }
+      if (next_index===undefined || next_index===index++)
+        next_index=indexes.pop();
+      else continue;
       if (doc_ids.indexOf(doc._id)!==-1) continue;
       if (filetype==="xml") doc_ids.push(doc._id);
       doc.time=ranges.toString(doc.time) || undefined;
