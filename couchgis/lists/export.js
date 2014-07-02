@@ -12,7 +12,6 @@ function(head, req) {
   else indexes=[];
   var ranges=require('views/lib/ranges');
   var path=require('views/lib/path');
-  var utils=require('views/lib/utils');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
@@ -79,6 +78,7 @@ function(head, req) {
   switch(filetype) {
   case "geojson":
     // export to EPSG:3397
+    var utils=require('views/lib/utils');
     var projector=require('views/lib/proj4')(utils.EPSG[3397]);
     return JSON.stringify(utils.unstripLastCoord(utils.eachPoint({
       name:filename, type:"FeatureCollection",
