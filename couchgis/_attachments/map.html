@@ -305,7 +305,7 @@ $(document).ready(function() {
       var documents=filters[filters.length-1].documents;
       keys.splice(0);
       viewports.splice(1);
-      for (var d=0, id; d<documents.length; d++) {
+      for (var d=0, id=null; d<documents.length; d++) {
         if (id===documents[d][0]) continue;
         id=documents[d][0];
         keys.push(id);
@@ -407,7 +407,7 @@ $(document).ready(function() {
           GeometryCollection.geometries.push(GeoJSON);
         }
         var keys=[];
-        for (var d=0, id; d<documents.length; d++) {
+        for (var d=0, id=null; d<documents.length; d++) {
           if (id===documents[d][0]) continue;
           id=documents[d][0];
           if (passed.indexOf(id)!==-1) continue;
@@ -671,7 +671,7 @@ $(document).ready(function() {
   $("#union > :button").click( function() {
     var relation=$(this).prop('name');
     var keys=[], documents=filters[0].union;
-    for (var d=0, id; d<documents.length; d++)
+    for (var d=0, id=null; d<documents.length; d++)
       if (id!==documents[d][0])
         keys.push(id=documents[d][0]);
     var union=$("#union");
