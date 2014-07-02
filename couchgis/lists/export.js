@@ -80,15 +80,21 @@ function(head, req) {
     // export to EPSG:3397
     var utils=require('views/lib/utils');
     var projector=require('views/lib/proj4')(utils.EPSG[3397]);
-    return JSON.stringify(utils.unstripLastCoord(utils.eachPoint({
+    for (var f=0, geometry=null; f<features.length; f++) {
+      // ensure each geometry is projected only once
+      if (geometry===features[f].geometry) continue;
+      geometry=features[f].geometry;
+      utils.eachPoint(geometry, function(coord) {
+        var newCoord=projector.forward(coord);
+        coord[0]=newCoord[0];
+        coord[1]=newCoord[1];
+      });
+    }
+    return JSON.stringify(utils.unstripLastCoord({
       name:filename, type:"FeatureCollection",
       crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::3397"}},
       features:features
-    }, function(coord) {
-      var newCoord=projector.forward(coord);
-      coord[0]=newCoord[0];
-      coord[1]=newCoord[1];
-    })));
+    }));
   case "xml":
     if (fields==null) {
       fields=[];
