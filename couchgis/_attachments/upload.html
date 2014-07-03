@@ -65,7 +65,7 @@ $(document).ready(function() {
   function show_feature(f) {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
-    for (var prop in properties)
+    for (var prop in fields)
       values[prop].val(properties[prop]).attr('title', properties[prop]);
   }
 
