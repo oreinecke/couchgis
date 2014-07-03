@@ -502,7 +502,7 @@ $(document).ready(function() {
     });
     // get doc types and set colors
     $.getJSON("_view/fields-values?group_level=2", function(data) {
-      var options={};
+      var options={_id:null};
       var inputs={};
       while (data.rows.length) {
         var key=data.rows.shift().key;
@@ -553,7 +553,7 @@ $(document).ready(function() {
     // Update the list of fields to show only those
     // that are available by the given type selection.
     $.getJSON("_view/fields-values?group_level=2&group=true", function(data) {
-      var options={};
+      var options={_id:null};
       while (data.rows.length) {
         var key=data.rows.shift().key;
         if (types.indexOf(key[0])===-1) continue;
