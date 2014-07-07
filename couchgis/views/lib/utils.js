@@ -286,5 +286,8 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
       }
     });
     return inside;
-  } catch(e) { if (e===on_boundary) return 0.5; throw(e); }
+  } catch(e) {
+    if (e===on_boundary) return 0.5;
+    throw(e);
+  }
 };
