@@ -242,6 +242,8 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
               a_v<bbox_1 && b_v<bbox_1 || a_v>bbox_3 && b_v>bbox_3) continue;
           var pa_u=p_u-a_u, pa_v=p_v-a_v;
           var pb_u=p_u-b_u, pb_v=p_v-b_v;
+          if (-5e-7<pa_u && pa_u<5e-7 && -5e-7<pa_v && pa_v<5e-7)
+            throw on_boundary;
           // No intersection if a and b are on the same side of q-p.
           if ( (qp_v*pa_u>=qp_u*pa_v) === (qp_v*pb_u>=qp_u*pb_v) ) continue;
           var qa_u=q_u-a_u, qa_v=q_v-a_v;
