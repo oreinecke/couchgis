@@ -511,10 +511,10 @@ $(document).ready(function() {
       }
       var optgroup=$("[name='fields']");
       for (var field in options)
-        optgroup.append('<option>'+field+'</option>');
+        optgroup.append($("<option>").html(field));
       var span=$("#filter .types");
       for (var type in inputs) {
-        span.append('<input type="checkbox" name="'+type+'">'+type);
+        span.append($('<input>').attr({type:"checkbox",name:type}));
         filters[0].types.push(type);
         // This is one rare advantage of javascripts 'phony' arrays:
         // I can use fillColors first as a set and then assign keys
@@ -563,7 +563,7 @@ $(document).ready(function() {
       var val=$("#filter [name='field']").val();
       $("[name='fields']").html('');
       for (var field in options)
-        optgroup.append('<option>'+field+'</option>');
+        optgroup.append($("<option>").html(field));
       // The selected option was destroyed three
       // lines above, so I just re-select it here.
       $("#filter [name='field']").val(val);
@@ -574,7 +574,7 @@ $(document).ready(function() {
       // Fill 'fields' optgroup with reduced set of options.
       var optgroup=$("#table [name='fields']");
       for (var field in options)
-        optgroup.append('<option>'+field+'</option>');
+        optgroup.append($('<option>').html(field));
     });
     filter_documents({types:types});
     // It sure would be nice to see the new filter appear
