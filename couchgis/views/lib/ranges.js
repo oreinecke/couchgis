@@ -54,7 +54,7 @@ exports.toString=function(ranges) {
     else ranges[r]=begin+'-'+end;
   }
   return ranges.join(', ');
-}
+};
 
 // Returns true if ranges a contain ranges b.
 
@@ -86,7 +86,7 @@ exports.contains=function(a, b) {
       return false;
   }
   return true;
-}
+};
 
 // Returns true if ranges a overlap with ranges b.
 
@@ -106,4 +106,4 @@ exports.intersects=function(a, b) {
     if (greater(a0.begin, b0.end)) b0=b.shift();
     else if (greater(b0.begin, a0.end)) a0=a.shift();
     else return true;
-}
+};
