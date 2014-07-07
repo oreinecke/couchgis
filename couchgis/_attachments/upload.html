@@ -165,7 +165,7 @@ $(document).ready(function() {
               xml=xml.substring(m.index+m[0].length);
               // match closing </Tag>
               if (!(m=xml.match('</\\s*'+tag+'\\s*>')))
-                throw({message:"XML.parse: Missing </"+tag+">"});
+                throw{message:"XML.parse: Missing </"+tag+">"};
               // add xml between <Tag>..</Tag>
               element.xml=xml.substring(0,m.index);
             // add empty xml if <Tag/> is singular
