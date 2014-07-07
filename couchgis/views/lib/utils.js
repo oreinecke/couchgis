@@ -226,10 +226,10 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
   try {
     if (known_point) {
       var q_u=known_point[0], q_v=known_point[1];
-      var bbox_0=p_u<q_u?p_u:q_u;
-      var bbox_1=p_v<q_v?p_v:q_v;
-      var bbox_2=p_u>q_u?p_u:q_u;
-      var bbox_3=p_v>q_v?p_v:q_v;
+      var bbox_0=(p_u<q_u?p_u:q_u)-5e-7;
+      var bbox_1=(p_v<q_v?p_v:q_v)-5e-7;
+      var bbox_2=(p_u>q_u?p_u:q_u)+5e-7;
+      var bbox_3=(p_v>q_v?p_v:q_v)+5e-7;
       var qp_u=q_u-p_u;
       var qp_v=q_v-p_v;
       exports.eachCoords(GeoJSON, function(coords, type) {
