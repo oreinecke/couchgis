@@ -4,6 +4,6 @@ function(doc) {
   if (!doc.type) return;
   var ids=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
   if (!ids) return;
-  ids=ids.split(/[\s,;&]+/);
+  ids=ids.replace(/(^)?[\s,;&]+($)?/g,'').split(/[\s,;&]+/);
   while (ids.length) emit(ids.shift());
 }
