@@ -514,7 +514,7 @@ $(document).ready(function() {
         optgroup.append($("<option>").html(field));
       var span=$("#filter .types");
       for (var type in inputs) {
-        span.append($('<input>').attr({type:"checkbox",name:type}));
+        span.append($('<input>').attr({type:"checkbox",name:type})).append(type);
         filters[0].types.push(type);
         // This is one rare advantage of javascripts 'phony' arrays:
         // I can use fillColors first as a set and then assign keys
