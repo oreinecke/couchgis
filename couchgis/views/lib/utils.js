@@ -233,6 +233,8 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
       var qp_u=q_u-p_u;
       var qp_v=q_v-p_v;
       exports.eachCoords(GeoJSON, function(coords, type) {
+        if (type!=="Polygon" && type!=="MultiPolygon")
+          return;
         var a=coords[0], b=coords[1];
         for (var c=1; c<coords.length; a=b, b=coords[++c]) {
           var a_u=a[0], a_v=a[1];
