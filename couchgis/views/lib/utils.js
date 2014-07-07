@@ -284,7 +284,7 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
         // a and be are both to the right of p
         if (pa_u<=0 && bp_u>=0) inside^=1;
         // check if (c-p)u >= 0 if everything else fails
-        else inside ^= ba_v<0 ^ bp_u*pa_v-pa_u*bp_v>0;
+        else inside ^= ba_v<0 ^ bp_u*pa_v>pa_u*bp_v;
       }
     });
     return inside;
