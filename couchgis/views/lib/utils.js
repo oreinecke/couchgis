@@ -262,8 +262,11 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
         //  p x--c------ +Infinity
         //        \
         //       b x
-        var pa_u=p_u-a[0], bp_u=b[0]-p_u, ba_u=b[0]-a[0],
-            pa_v=p_v-a[1], bp_v=b[1]-p_v, ba_v=b[1]-a[1];
+        var pa_u=p_u-a[0], pa_v=p_v-a[1];
+        if (-5e-7<pa_u && pa_u<5e-7 && -5e-7<pa_v && pa_v<5e-7)
+          throw on_boundary;
+        var bp_u=b[0]-p_u, ba_u=b[0]-a[0],
+            bp_v=b[1]-p_v, ba_v=b[1]-a[1];
         // a, p and b are horizontally aligned
         if (pa_v===0 && bp_v===0) continue;
         // p and a are horizontally aligned
