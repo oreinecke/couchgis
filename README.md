@@ -124,7 +124,7 @@ always a column for day/month/year, probably with one of them missing, and the
 year had either four or two digits. Or worse, somehow a start and end date was
 given as `MONTH_BEG` `YEAR_BEG` `DAY_END` or whatever.
 
-[Dates or a ranges of dates](couchgis/views/lib/ranges.js) are expressed as a
+[Dates or ranges of dates](couchgis/views/lib/ranges.js) are expressed as a
 string as such:
 - Dates can be given in DD.MM.YYYY, YYYY.MM.DD, YYYY/MM/DD, DD/MM/YYYY i.e. I
   only expect the year to be four digits, the digits to be separated by either
