@@ -108,11 +108,11 @@ function(head, req) {
       var point_outside={message:"Point outside related polygons."};
       relates=function(GeoJSON) {
         try { utils.eachPoint(GeoJSON, function(point) {
+          inside=utils.pointInPolygon(related_Polygons, point, last_point, inside);
           if (inside===0.5) {
             last_point=undefined;
-            inside=flip_sideness;
-          }
-          inside=utils.pointInPolygon(related_Polygons, point, last_point, inside);
+            inside=!flip_sideness;
+          } else last_point=point;
           if (!inside) throw point_outside;
           last_point=point;
         }); } catch (e) {
