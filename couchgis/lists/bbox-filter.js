@@ -103,9 +103,9 @@ function(head, req) {
     }(related_GeoJSON.type, options.relation);
     if (related_Polygons) {
       utils.unstripLastCoord(related_Polygons);
-      var last_point, inside=flip_sideness;
       var point_outside={message:"Point outside related polygons."};
       relates=function(GeoJSON) {
+        var last_point, inside=flip_sideness;
         try { utils.eachPoint(GeoJSON, function(point) {
           inside=utils.pointInPolygon(related_Polygons, point, last_point, inside);
           if (inside===0.5) {
