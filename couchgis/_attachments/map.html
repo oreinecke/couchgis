@@ -161,8 +161,8 @@ $(document).ready(function() {
                 }
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.
-                td.html('').append($("#table thead .geometry a").clone().show());
-                td.find("a").click(function(item) { return function(e) {
+                td.html($("#table thead .geometry span").html()).addClass("geometry");
+                td.click(function(item) { return function(e) {
                   // Center map to the shape and highlight it.
                   var bbox=item.GeoJSON.bbox;
                   map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
@@ -917,7 +917,8 @@ $(document).ready(function() {
     vertical-align:top
   }
   #table a:focus {font-weight:bold}
-  #table .field:hover {cursor:pointer}
+  #table .field:hover, #table .geometry:hover {cursor:pointer}
+  #table .geometry {font-weight:900}
 </style>
 
   </head>
@@ -988,8 +989,7 @@ $(document).ready(function() {
   <table id="table">
     <thead><tr>
       <!-- link to highlight geometry in the map canvas -->
-      <th class="geometry"><a style="display:none;font-weight:900"
-                              title="Polygon hervorheben" href="">&bull;</a></th>
+      <th class="geometry"><span style="display:none">&bull;</span></th>
       <th class="document">Beschreibung</th>
       <th><select name="field">
         <!-- unselect any column on page load -->
