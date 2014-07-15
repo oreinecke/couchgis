@@ -141,6 +141,7 @@ $(document).ready(function() {
               // Group docs with identical GIS into one li.
               var doc=data.rows.pop().value.doc;
               if (!fillColor) fillColor=fillColors[doc.type];
+              doc.time=ranges.toString(doc.time);
               headers.each(function(i) {
                 var th=$(this);
                 var td=$(columns[i]);
@@ -151,7 +152,7 @@ $(document).ready(function() {
                   td.append($("<a>").attr({
                     href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
                   }).html( (doc[doc.type]||doc.type) +
-                           (' ('+ranges.toString(doc.time)+')').replace(' ()',"") )
+                           (doc.time?' ('+doc.time+'):"")
                   ).append("<br>");
                 // evaluate columns
                 else if (cl==="field") {
