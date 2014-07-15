@@ -146,16 +146,17 @@ $(document).ready(function() {
                 var th=$(this);
                 var td=$(columns[i]);
                 var cl=th.prop('class');
-                if (cl==="document")
-                // Link to Futon for the lack of a better interface
-                // and set link text to a useful item explanation.
-                  td.append($("<a>").attr({
+                if (cl==="title-time" || cl==="title") {
+                  // Link to Futon for the lack of a better interface
+                  // and set link text to a useful item explanation.
+                  var a=$("<a>").attr({
                     href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
-                  }).html( (doc[doc.type]||doc.type) +
-                           (doc.time?' ('+doc.time+'):"")
-                  ).append("<br>");
+                  }).html( doc[doc.type]||doc.type );
+                  if (cl==="title-time" && doc.time)
+                    a.append(' ('+doc.time+')');
+                  td.append(a).append('<br>');
                 // evaluate columns
-                else if (cl==="field") {
+                } else if (cl==="field") {
                   var fields=path.decode(th.val()), value=doc;
                   while (fields.length && value!=null) value=value[fields.shift()];
                   td.append(value+'<br>');
@@ -765,6 +766,20 @@ $(document).ready(function() {
     call.this_one_next(update_geometry)();
   });
 
+  // Toggle document time.
+  $("#table th.title-time").click( function() {
+    var th=$(this);
+    var cl=th.prop('class');
+    th.removeClass(cl);
+    if (cl==="title") th.addClass("title-time");
+    if (cl==="title-time") th.addClass("title");
+    for (var id in items) {
+      items[id].keep_documents=false;
+      items[id].keep_shape=true;
+    }
+    call.this_one_next(update_geometry)();
+  });
+
   // cycle through geometric detail mode:
   // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
   $("#settings [name='refine']").click( function() {
@@ -918,7 +933,10 @@ $(document).ready(function() {
     vertical-align:top
   }
   #table a:focus {font-weight:bold}
-  #table .field:hover, #table td.geometry:hover {cursor:pointer}
+  #table td.geometry:hover,
+  #table th.field:hover,
+  #table th.title:hover,
+  #table th.title-time:hover {cursor:pointer}
   #table .geometry {font-weight:900}
 </style>
 
@@ -991,7 +1009,7 @@ $(document).ready(function() {
     <thead><tr>
       <!-- link to highlight geometry in the map canvas -->
       <th class="geometry"><span style="display:none">&bull;</span></th>
-      <th class="document">Beschreibung</th>
+      <th class="title-time">Beschreibung</th>
       <th><select name="field">
         <!-- unselect any column on page load -->
         <option selected style="display:none"></option>
