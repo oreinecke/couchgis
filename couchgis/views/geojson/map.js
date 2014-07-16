@@ -16,9 +16,8 @@ function(doc) {
     // the last simplification. If error is zero, no reduction was done and the
     // list is complete.
     for (var error=Infinity;error>0;error=error*0.5) {
-      // In google maps, we are unable to zoom way below this level, but before
-      // anyone complains, I shall stack the unabreviated geometry on top of
-      // the list.
+      // In google maps, we are unable to zoom way below this level;
+      // we still need the unabreviated geometry for geojson export.
       error*=(error>=5e-6);
       var simplified_GeoJSON=utils.stripLastCoord(utils.simplify(utils.clone(GeoJSON),error));
       emit([id,+Number(simplified_GeoJSON.error).toExponential(1)], {GeoJSON:simplified_GeoJSON});
