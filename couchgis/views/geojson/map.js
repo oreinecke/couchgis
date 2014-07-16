@@ -11,11 +11,10 @@ function(doc) {
     var GeoJSON=utils.clone(doc.GeoJSON);
     utils.toWGS84(GeoJSON);
     utils.bbox(GeoJSON);
-    // Provide a neat set of reduced polygons: we start with the crappiest
-    // resolution that usually consists of only two points. This version is
-    // usually dropped. Then we set a new error limit of half the accuracy of
-    // the last one. If error is zero, no reduction was done and the list is
-    // complete.
+    // Provide a neat set of reduced polygons: we allow an infinite error at
+    // the beginning, and then set the new error limit to half the accuracy of
+    // the last simplification. If error is zero, no reduction was done and the
+    // list is complete.
     for (var error=Infinity;error>0;error=error*0.5) {
       // In google maps, we are unable to zoom way below this level, but before
       // anyone complains, I shall stack the unabreviated geometry on top of
