@@ -166,6 +166,9 @@ exports.simplify=function(GeoJSON, error) {
   function add(u,v) { return [u[0]+v[0],u[1]+v[1]]; }
   function sub(u,v) { return [u[0]-v[0],u[1]-v[1]]; }
   return exports.eachCoords(GeoJSON, function(coords) {
+    var first=coords[0], last=coords[coords.length-1];
+    // Remember number of nested function calls for linear rings.
+    var depth = first[0]===last[0] && first[1]===last[1] ? 1 : Infinity;
     // http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm
     function bisect_or_remove(i, k) {
       if (i+1==k) return;
@@ -194,10 +197,7 @@ exports.simplify=function(GeoJSON, error) {
         var e2=dot(e,e);
         if (e2>J.error*J.error) {
           J.error=Math.sqrt(e2);
-          if (J.error>error) J.index=j;
-          // avoid di-angles in a non-elegant fashion
-          if (i===0 && k===coords.length-1 && dot(d,d)===0)
-            J.index=j;
+          if (J.error>error || depth<=2 ) J.index=j;
         }
       }
       if (J.index==null) {
@@ -205,8 +205,10 @@ exports.simplify=function(GeoJSON, error) {
           GeoJSON.error=J.error;
         for (var j=i+1;j<k;j++) coords[j]=null;
       } else {
+        depth++;
         bisect_or_remove(i, J.index);
         bisect_or_remove(J.index, k);
+        depth--;
       }
     }
     if (coords.length<=2) return;
