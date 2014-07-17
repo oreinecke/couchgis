@@ -160,6 +160,17 @@ exports.simplify=function(GeoJSON, error) {
   GeoJSON.error=0;
   if (error===0) return GeoJSON;
   exports.unstripLastCoord(GeoJSON);
+  var planar=function(coord) {return coord;};
+  try {
+    if (GeoJSON.crs.properties.name!=="urn:ogc:def:crs:OGC:1.3:CRS84")
+      throw "unknown CRS";
+    // For WGS84, I factor in the overall longitude
+    // of the geometry when calculating distances.
+    var aspect=Math.cos(Math.PI*(GeoJSON.bbox[1]+GeoJSON.bbox[3])/360);
+    planar=function(coord) {
+      return [aspect*coord[0], coord[1]];
+    };
+  } catch(err) {};
   // some vector algebra
   function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
   function mul(u,m) { return [u[0]*m, u[1]*m]; }
@@ -175,11 +186,11 @@ exports.simplify=function(GeoJSON, error) {
       // Return index and distance of furthest point.
       // Return no index if distance is below error.
       var J={error:0};
-      var a=coords[i];
-      var c=coords[k];
+      var a=planar(coords[i]);
+      var c=planar(coords[k]);
       var d=sub(c,a);
       for (var j=i+1;j<k;j++) {
-        var b=coords[j], e;
+        var b=planar(coords[j]), e;
         var a_b=dot(sub(b,a),d);
         var b_c=dot(sub(c,b),d);
         // check if b falls outside the line segment a-c.
