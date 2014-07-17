@@ -123,8 +123,8 @@ exports.toWGS84=function(GeoJSON) {
     });
     // write crs according to GeoJSON spec
     GeoJSON.crs.properties.name=target;
-  } catch(e) {
-    GeoJSON.crs=e;
+  } catch(err) {
+    GeoJSON.crs=err;
   }
   return GeoJSON;
 };
@@ -290,8 +290,8 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
       }
     });
     return inside;
-  } catch(e) {
-    if (e===on_boundary) return 0.5;
-    throw(e);
+  } catch(err) {
+    if (err===on_boundary) return 0.5;
+    throw(err);
   }
 };

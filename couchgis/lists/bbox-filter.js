@@ -114,9 +114,9 @@ function(head, req) {
           } else last_point=point;
           if (!inside) throw point_outside;
           last_point=point;
-        }); } catch (e) {
-          if (e===point_outside) return false;
-          throw e;
+        }); } catch (err) {
+          if (err===point_outside) return false;
+          throw err;
         }
         return true;
       };
