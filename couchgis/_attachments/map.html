@@ -719,7 +719,7 @@ $(document).ready(function() {
           if (row.value.type!=="string") continue;
           var label=row.key[2];
           if (labels[label]===null) continue;
-          var value=label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&");
+          var value=$.ui.autocomplete.escapeRegex(label);
           // Suppress duplicate suggestions.
           options.source.push({label:label, value:value});
           labels[label]=null;
