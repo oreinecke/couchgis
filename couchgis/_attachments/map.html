@@ -696,16 +696,27 @@ $(document).ready(function() {
     // clear text input on field change.
     var input=$("#filter [name='content']");
     input.val('');
-    var options={ minLength:0, maxItems:50, source:[] };
     var field=$(this).val();
     if (!$(this).find("[name='fields'] :selected").length) {
-      input.autocomplete(options);
+      input.autocomplete({source:[]});
       return;
     }
     var types=$("#filter .types :checked");
     if (!types.length) types=$("#filter .types :checkbox");
-    // Store labels as {label:null}.
-    var labels={};
+    var labels=[];
+    // Set-up autocomplete to match the text input's value
+    // as regular expression against a list of suggestions.
+    function source(request, response) {
+      var data=[];
+      var matcher=new RegExp(request.term, "i");
+      for (var l=0;l<labels.length;l++) {
+        var label=labels[l];
+        if (matcher.test(label))
+          data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") });
+      }
+      response(data);
+    }
+    input.autocomplete({ minLength:0, maxItems:50, source:source });
     types.each(function() {
       var type=$(this).prop('name');
       var start_key=encodeURIComponent(JSON.stringify([type, field+' ']));
@@ -718,13 +729,8 @@ $(document).ready(function() {
           // Do not suggest numbers or objects right now.
           if (row.value.type!=="string") continue;
           var label=row.key[2];
-          if (labels[label]===null) continue;
-          var value=$.ui.autocomplete.escapeRegex(label);
-          // Suppress duplicate suggestions.
-          options.source.push({label:label, value:value});
-          labels[label]=null;
+          if (labels.indexOf(label)===-1) labels.push(label);
         }
-        input.autocomplete(options);
       });
     });
   });
