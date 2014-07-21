@@ -30,7 +30,7 @@ $(document).ready(function() {
       if (username!="") login=username+'@';
       if (password!="") login=username+':'+password+'@';
       // to be read as 'are we (localhost) the source??'
-      var source=($("#replicate [name='mode']:checked").val()==="push");
+      var source=($("#replicate [name=mode]:checked").val()==="push");
       // insert username:password@ into centralhost
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
       $.couch.replicate(addr[source], addr[!source], {

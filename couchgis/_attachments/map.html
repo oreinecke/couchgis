@@ -123,7 +123,7 @@ $(document).ready(function() {
     function success(data) {
       successful=true;
       // timeout is 5ms or instantaneous
-      var timeout = 5 * $("#settings [name='delayed']").prop('checked');
+      var timeout = 5 * $("#settings [name=delayed]").prop('checked');
       (function update_one_geometry() {
         while (data.rows.length) {
           var row=data.rows.pop();
@@ -209,7 +209,7 @@ $(document).ready(function() {
     var NE=map.getBounds().getNorthEast();
     var SW=map.getBounds().getSouthWest();
     var options={
-      limit:parseFloat($("#settings [name='limit']").val()),
+      limit:parseFloat($("#settings [name=limit]").val()),
       error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
       bbox:[
         SW.lng()-offset[0], SW.lat()-offset[1],
@@ -485,7 +485,7 @@ $(document).ready(function() {
       var bbox=data.rows[0].value.bbox;
       map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
       // also initialize the time text field
-      $("#filter [name='time']").val(ranges.toString(data.rows[0].value.ranges));
+      $("#filter [name=time]").val(ranges.toString(data.rows[0].value.ranges));
     });
     // get list of GeoJSON keys, largest to smallest item
     $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
@@ -511,7 +511,7 @@ $(document).ready(function() {
         options[key[1]]=null;
         inputs[key[0]]=null;
       }
-      var optgroup=$("[name='fields']");
+      var optgroup=$("[name=fields]");
       for (var field in options)
         optgroup.append($("<option>").html(field));
       var span=$("#filter .types");
@@ -527,7 +527,7 @@ $(document).ready(function() {
   });
 
   // Refine document list if date has changed.
-  $("#filter [name='time']").keypress( function(e) {
+  $("#filter [name=time]").keypress( function(e) {
     if (e.which!==13) return;
     filter_documents({ time: $(this).val() });
     var li=$("#time-is");
@@ -538,7 +538,7 @@ $(document).ready(function() {
     li.find('a').html($(this).val());
     li.find(':button').off().click(function() {
       filter_documents({time:""});
-      $("#filter [name='time']").val('');
+      $("#filter [name=time]").val('');
       li.hide();
     });
   });
@@ -561,20 +561,20 @@ $(document).ready(function() {
         if (types.indexOf(key[0])===-1) continue;
         options[key[1]]=null;
       }
-      var optgroup=$("#filter [name='fields']");
-      var val=$("#filter [name='field']").val();
-      $("[name='fields']").html('');
+      var optgroup=$("#filter [name=fields]");
+      var val=$("#filter [name=field]").val();
+      $("[name=fields]").html('');
       for (var field in options)
         optgroup.append($("<option>").html(field));
       // The selected option was destroyed three
       // lines above, so I just re-select it here.
-      $("#filter [name='field']").val(val);
+      $("#filter [name=field]").val(val);
       // Remove options that are in the 'columns' <optgroup> already.
-      $("#table [name='columns'] option").each( function() {
+      $("#table [name=columns] option").each( function() {
         delete options[$(this).val()];
       });
       // Fill 'fields' optgroup with reduced set of options.
-      var optgroup=$("#table [name='fields']");
+      var optgroup=$("#table [name=fields]");
       for (var field in options)
         optgroup.append($('<option>').html(field));
     });
@@ -597,10 +597,10 @@ $(document).ready(function() {
   });
 
   // Add content-filter on <enter> key press.
-  $("#filter [name='content']").keypress( function(e) {
+  $("#filter [name=content]").keypress( function(e) {
     if (e.which!==13) return;
     var cut={
-      field:$("#filter [name='field']").val(),
+      field:$("#filter [name=field]").val(),
       value:$(this).val().replace(/^\s+|\s+$/g,'') || undefined
     };
     // I've made template filter items at the bottom of the
@@ -622,10 +622,10 @@ $(document).ready(function() {
       // Tell filter_documents() to remove cut from the queue and set form
       // fields to its parameters; it is likely that the filter had a
       // spelling error, so I should provide an easy way to correct it.
-      $("#filter [name='field']").val( cut.field || "" );
+      $("#filter [name=field]").val( cut.field || "" );
       // update autocomplete source array
-      $("#filter [name='field']").change();
-      $("#filter [name='content']").val( cut.value || "" );
+      $("#filter [name=field]").change();
+      $("#filter [name=content]").val( cut.value || "" );
       cut.remove_me=true;
       filter_documents({cuts:[cut]});
       li.remove();
@@ -658,7 +658,7 @@ $(document).ready(function() {
       span.append(li.html());
     });
     $("#cuts").prepend(union.css('display', 'block'));
-    $("#cuts > [id^='spatial-']").hide();
+    $("#cuts > [id^=spatial-]").hide();
     filter_documents({union:filters[filters.length-1].documents}, {spatial:false});
   });
 
@@ -686,18 +686,18 @@ $(document).ready(function() {
   });
 
   // Remove spatial filter.
-  $("#cuts > [id^='spatial-'] :button").click( function() {
+  $("#cuts > [id^=spatial-] :button").click( function() {
     filter_documents({spatial:false});
-    $("#cuts > [id^='spatial-']").hide();
+    $("#cuts > [id^=spatial-]").hide();
   });
 
   // Update autocomplete source array.
-  $("#filter [name='field']").change( function() {
+  $("#filter [name=field]").change( function() {
     // clear text input on field change.
-    var input=$("#filter [name='content']");
+    var input=$("#filter [name=content]");
     input.val('');
     var field=$(this).val();
-    if (!$(this).find("[name='fields'] :selected").length) {
+    if (!$(this).find("[name=fields] :selected").length) {
       input.autocomplete({source:[]});
       return;
     }
@@ -736,11 +736,11 @@ $(document).ready(function() {
   });
 
   // Add or remove column to #table.
-  $("#table [name='field']").change( function() {
+  $("#table [name=field]").change( function() {
     var select=$(this);
     // Get selected option and find out in wich <optgroup> it belongs.
     var option=select.find(":selected");
-    if (select.find("[name='columns'] :selected").length) {
+    if (select.find("[name=columns] :selected").length) {
       // remove th from #table
       $("#table thead .field").each( function() {
         var th=$(this);
@@ -749,7 +749,7 @@ $(document).ready(function() {
         return false;
       });
       // move option back to the fields optgroup
-      select.find("[name='fields']").prepend(option);
+      select.find("[name=fields]").prepend(option);
     } else {
       var last=$("#table thead th").last();
       $("#table thead tr").append(
@@ -761,7 +761,7 @@ $(document).ready(function() {
       // move column selection to the right
       $("#table thead tr").append(last);
       // move option to the columns optgroup
-      select.find("[name='columns']").append(option);
+      select.find("[name=columns]").append(option);
     }
     // unselect column
     select.val('');
@@ -788,9 +788,9 @@ $(document).ready(function() {
 
   // cycle through geometric detail mode:
   // 'refine' <-> 'precise' -> 'simplified' -> 'refine'
-  $("#settings [name='refine']").click( function() {
-    $("#settings [name='refine']").hide();
-    $("#settings [name='precise']").show();
+  $("#settings [name=refine]").click( function() {
+    $("#settings [name=refine]").hide();
+    $("#settings [name=precise]").show();
     // show refined geometry once, and
     for (var id in items) {
       items[id].keep_shape=(items[id].keys[0][1]===0);
@@ -799,45 +799,45 @@ $(document).ready(function() {
     call.this_one_next(update_geometry)();
     // revert to 'refine', if viewport was moved
     Maps.event.addListenerOnce(map, 'bounds_changed', function() {
-      $("#settings [name='precise']").hide();
-      $("#settings [name='refine']").show();
+      $("#settings [name=precise]").hide();
+      $("#settings [name=refine]").show();
     });
   });
 
-  $("#settings [name='precise']").click( function() {
-    $("#settings [name='precise']").hide();
-    $("#settings [name='simplified']").show();
+  $("#settings [name=precise]").click( function() {
+    $("#settings [name=precise]").hide();
+    $("#settings [name=simplified]").show();
     Maps.event.clearListeners(map, 'bounds_changed');
     Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
   });
 
-  $("#settings [name='simplified']").click( function() {
-    $("#settings [name='simplified']").hide();
-    $("#settings [name='refine']").show();
+  $("#settings [name=simplified]").click( function() {
+    $("#settings [name=simplified]").hide();
+    $("#settings [name=refine]").show();
     Maps.event.clearListeners(map, 'bounds_changed');
     Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
     Maps.event.trigger(map, 'bounds_changed');
   });
 
   // increase limit to next higher [1,2,5,10,20,50,etc]
-  $("#settings [name='more']").click( function() {
-    var limit=parseFloat($("#settings [name='limit']").val());
+  $("#settings [name=more]").click( function() {
+    var limit=parseFloat($("#settings [name=limit]").val());
     var new_limit=10;
     while (new_limit<=limit) new_limit*=10;
     if (new_limit>5*limit) new_limit/=5;
     if (new_limit>2*limit) new_limit/=2;
-    $("#settings [name='limit']").val(new_limit);
+    $("#settings [name=limit]").val(new_limit);
     Maps.event.trigger(map, 'bounds_changed');
   });
 
   // decrease limit to next lower [1,2,5,10,20,50,etc]
-  $("#settings [name='less']").click( function() {
-    var limit=parseFloat($("#settings [name='limit']").val());
+  $("#settings [name=less]").click( function() {
+    var limit=parseFloat($("#settings [name=limit]").val());
     var new_limit=1;
     while (new_limit*10<limit) new_limit*=10;
     if (new_limit*5<limit) new_limit*=5;
     if (new_limit*2<limit) new_limit*=2;
-    $("#settings [name='limit']").val(new_limit);
+    $("#settings [name=limit]").val(new_limit);
     // remove populated-viewport-notification
     viewports[viewports.length-1].populated=false;
     Maps.event.trigger(map, 'bounds_changed');
@@ -853,23 +853,23 @@ $(document).ready(function() {
 
   $("#export :button").click( function() {
     var url="_list/export/geojson";
-    url+="?filename="+$("#export [name='filename']").val();
-    url+="&filetype="+$("#export [name='filetype']:checked").val();
+    url+="?filename="+$("#export [name=filename]").val();
+    url+="&filetype="+$("#export [name=filetype]:checked").val();
     var documents=filters[filters.length-1].documents;
     var keys=[], id=null;
     // ignore geometry keys for xml
-    var include_geometry=$("#export [name='filetype']:checked").val()!=="xml";
+    var include_geometry=$("#export [name=filetype]:checked").val()!=="xml";
     for (var d=0;d<documents.length;d++) {
       var key=documents[d];
       if (include_geometry && id!==key[0]) keys.push([key[0],0]);
       keys.push(key);
       id=key[0];
     }
-    if ($("#export [name='include-revision']").prop('checked'))
+    if ($("#export [name=include-revision]").prop('checked'))
       url+="&include_revision";
-    if ($("#export [name='include-geojson-id']").prop('checked'))
+    if ($("#export [name=include-geojson-id]").prop('checked'))
       url+="&include_geojson_id";
-    if ($("#export [name='select-fields']:checked").val()==="from-table") {
+    if ($("#export [name=select-fields]:checked").val()==="from-table") {
       var fields=[];
       $("#table thead .field").each(function() { fields.push($(this).val()); });
       url+="&fields="+fields.join(':').replace(/\+/g,'%2B').replace(/\s/g,'%20');
@@ -879,9 +879,9 @@ $(document).ready(function() {
       'get-url':function(url) {
         url=window.location.origin+'/'+list.db+'/_design/'+list.app+'/'+url;
         // hide download button
-        $("#export [name='get-url']").hide();
+        $("#export [name=get-url]").hide();
         // display the url in a selected text input
-        $("#export [name='url']").val(url).show().focus().select();
+        $("#export [name=url]").val(url).show().focus().select();
       }
     })[$(this).prop('name')];
     // Provide a permanent link if the URI is small.
@@ -915,14 +915,14 @@ $(document).ready(function() {
     });
   });
 
-  $("#export [name='filename']").keypress( function(e) {
-    if (e.which===13) $("#export [name='download']").click();
+  $("#export [name=filename]").keypress( function(e) {
+    if (e.which===13) $("#export [name=download]").click();
   });
 
   // Hide url text input and display 'get-url' again.
-  $("#export [name='url']").focusout( function() {
+  $("#export [name=url]").focusout( function() {
     $(this).hide();
-    $("#export [name='get-url']").show();
+    $("#export [name=get-url]").show();
   });
 
 });

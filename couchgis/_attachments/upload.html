@@ -28,14 +28,14 @@ $(document).ready(function() {
     var source=[];
     while (data.rows.length)
       source.push(data.rows.shift().key[0]);
-    $("#modify [name='type']").autocomplete({
+    $("#modify [name=type]").autocomplete({
       source:source, minLength:0,
       change:function() {$(this).change();}
     });
-    $("#modify [name='type']").autocomplete({ source:source, minLength:0 });
+    $("#modify [name=type]").autocomplete({ source:source, minLength:0 });
   });
 
-  $("#modify [name='type']").change( function() {
+  $("#modify [name=type]").change( function() {
     var key="start_key="+encodeURIComponent(JSON.stringify([$(this).val()])) +
              "&end_key="+encodeURIComponent(JSON.stringify([$(this).val()+' ']));
     // Suggest these common field names:
@@ -46,7 +46,7 @@ $(document).ready(function() {
     $.getJSON("_view/fields-values?group_level=2&"+key, function(data) {
       while (data.rows.length)
         source.push(data.rows.shift().key[1]);
-      $("#modify [name='field']").autocomplete({
+      $("#modify [name=field]").autocomplete({
         minLength:0, source:source,
         change:function() {$(this).change();}
       });
@@ -238,7 +238,7 @@ $(document).ready(function() {
 
   $("#upload :file").change(function(e) {
     $("#modify").hide();
-    $("#reduce [name='show']").show();
+    $("#reduce [name=show]").show();
     $("#reduce span").hide();
     $("#reduce").hide();
     $("#upload b").html("");
@@ -258,7 +258,7 @@ $(document).ready(function() {
 
   $("#upload :text").change(function() {
     $("#modify").hide();
-    $("#reduce [name='show']").show();
+    $("#reduce [name=show]").show();
     $("#reduce span").hide();
     $("#reduce").hide();
     $("#upload b").html("");
@@ -283,18 +283,18 @@ $(document).ready(function() {
   $("#modify").submit(function(e) {e.preventDefault();});
 
   // check/uncheck all
-  $("#modify [name='all']").change(function() {
+  $("#modify [name=all]").change(function() {
     $("#modify :checkbox:enabled").prop('checked', $(this).prop('checked'));
-    $("#modify [name='include']").change();
+    $("#modify [name=include]").change();
   });
 
-  $("#modify [name='prev']").click(function() {
+  $("#modify [name=prev]").click(function() {
     var f=$("#modify a").html();
     if (--f<1) f=features.length;
     show_feature(f-1);
   });
 
-  $("#modify [name='next']").click(function() {
+  $("#modify [name=next]").click(function() {
     var f=$("#modify a").html();
     if (++f>features.length) f=1;
     show_feature(f-1);
@@ -302,8 +302,8 @@ $(document).ready(function() {
 
   // compile features into document array
   $("#upload").submit(function(e) {
-    var type=$("#modify [name='type']").val();
-    var time=$("#modify [name='time']").val();
+    var type=$("#modify [name=type]").val();
+    var time=$("#modify [name=time]").val();
     var docs=[];
     for (var f=0;f<features.length;f++) {
       var feature=features[f];
@@ -463,14 +463,14 @@ $(document).ready(function() {
   }
 
   // skip to next/previous document with similar geometry
-  $("#reduce [name='next']").click(function() {
+  $("#reduce [name=next]").click(function() {
     var f=$("#show-suggestions a").html()-1, g=f;
     do f=(f+1)%features.length;
     while (!features[f].items && f!=g);
     show_geometry(f);
   });
 
-  $("#reduce [name='prev']").click(function() {
+  $("#reduce [name=prev]").click(function() {
     var f=$("#show-suggestions a").html()-1, g=f;
     do f=(f+features.length-1)%features.length;
     while (!features[f].items && f!=g);
@@ -478,7 +478,7 @@ $(document).ready(function() {
   });
 
   // query for similar geometry
-  $("#reduce [name='show']").click(function() {
+  $("#reduce [name=show]").click(function() {
     $(this).hide();
     $("#show-suggestions").show();
     $("#show-suggestions :button").prop('disabled', true);
@@ -497,7 +497,7 @@ $(document).ready(function() {
         }));
         var found_geometry=function() {
           $("#show-suggestions :button").prop('disabled', false);
-          $("#reduce [name='next']").click();
+          $("#reduce [name=next]").click();
           found_geometry=function() {};
         }
         $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, feature) {
