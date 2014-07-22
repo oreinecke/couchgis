@@ -129,7 +129,9 @@ exports.toWGS84=function(GeoJSON) {
     // CRS defaults to WGS84 if none acquired.
     delete GeoJSON.crs;
   } catch(err) {
-    GeoJSON.crs=err;
+    GeoJSON.crs={
+      type:"error", properties: {error:err}
+    };
   }
   return GeoJSON;
 };
