@@ -15,6 +15,7 @@ function(head, req) {
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
+  var EPSG=req.query.EPSG;
   var index=0, next_index=indexes.pop();
   start({'headers':{
     'Content-Type':{
@@ -34,7 +35,12 @@ function(head, req) {
     var geometry=row.value.GeoJSON || {};
     delete geometry.error;
     delete geometry.bbox;
-    delete geometry.crs;
+    // If no EPSG was specified in the query, export to the first EPSG of all
+    // geometries; Chances are, that it's the only EPSG at the same time. In
+    // this case projecting coordinates back and forth causes a numeric
+    // inaccuracy of 2mm (otherwhise 1m).
+    if (!EPSG) EPSG=geometry.EPSG;
+    delete geometry.EPSG;
     while (row && !row.value.doc) row=getRow();
     for (var doc; row && (doc=row.value.doc); row=getRow()) {
       if (next_index===undefined || next_index===index++)
@@ -77,9 +83,8 @@ function(head, req) {
   }
   switch(filetype) {
   case "geojson":
-    // export to EPSG:3397
     var utils=require('views/lib/utils');
-    var projector=require('views/lib/proj4')(utils.EPSG[3397]);
+    var projector=require('views/lib/proj4')(utils.projection[EPSG]);
     for (var f=0, geometry=null; f<features.length; f++) {
       // ensure each geometry is projected only once
       if (geometry===features[f].geometry) continue;
@@ -92,7 +97,7 @@ function(head, req) {
     }
     return JSON.stringify(utils.unstripLastCoord({
       name:filename, type:"FeatureCollection",
-      crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::3397"}},
+      crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::"+EPSG}},
       features:features
     }));
   case "xml":
