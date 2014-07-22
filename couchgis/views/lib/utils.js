@@ -121,8 +121,8 @@ exports.toWGS84=function(GeoJSON) {
       coord[0]=newCoord[0];
       coord[1]=newCoord[1];
     });
-    // write crs according to GeoJSON spec
-    GeoJSON.crs.properties.name=target;
+    // CRS defaults to WGS84 if none acquired.
+    delete GeoJSON.crs;
   } catch(err) {
     GeoJSON.crs=err;
   }
