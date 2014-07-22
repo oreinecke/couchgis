@@ -7,7 +7,7 @@ function(doc) {
   // abort if no GeoJSON is set at all
   if (id==null) return;
   if (id===doc._id) {
-    // I need a copy that can be modified
+    // I need a copy that can be modified.
     var GeoJSON=utils.clone(doc.GeoJSON);
     // Keep CRS name of source geometry.
     var crs=GeoJSON.crs;
