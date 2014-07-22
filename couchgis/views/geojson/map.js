@@ -9,6 +9,8 @@ function(doc) {
   if (id===doc._id) {
     // I need a copy that can be modified
     var GeoJSON=utils.clone(doc.GeoJSON);
+    // Keep CRS name of source geometry.
+    var crs=GeoJSON.crs;
     utils.toWGS84(GeoJSON);
     utils.bbox(GeoJSON);
     // Provide a neat set of reduced polygons: we allow an infinite error at
@@ -20,6 +22,8 @@ function(doc) {
       // we still need the unabreviated geometry for geojson export.
       error*=(error>=5e-6);
       var simplified_GeoJSON=utils.stripLastCoord(utils.simplify(utils.clone(GeoJSON),error));
+      // Store EPSG used to transform coordinates from source geometry.
+      if (simplified_GeoJSON.error===0) simplified_GeoJSON.EPSG=utils.EPSG({crs:crs});
       emit([id,+Number(simplified_GeoJSON.error).toExponential(1)], {GeoJSON:simplified_GeoJSON});
       error=simplified_GeoJSON.error;
     }
