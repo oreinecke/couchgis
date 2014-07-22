@@ -169,16 +169,14 @@ exports.simplify=function(GeoJSON, error) {
   if (error===0) return GeoJSON;
   exports.unstripLastCoord(GeoJSON);
   var planar=function(coord) {return coord;};
-  try {
-    if (GeoJSON.crs.properties.name!=="urn:ogc:def:crs:OGC:1.3:CRS84")
-      throw "unknown CRS";
+  if (exports.EPSG(GeoJSON)===4326) {
     // For WGS84, I factor in the overall longitude
     // of the geometry when calculating distances.
     var aspect=Math.cos(Math.PI*(GeoJSON.bbox[1]+GeoJSON.bbox[3])/360);
     planar=function(coord) {
       return [aspect*coord[0], coord[1]];
     };
-  } catch(err) {};
+  }
   // some vector algebra
   function dot(u,v) { return u[0]*v[0]+u[1]*v[1]; }
   function mul(u,m) { return [u[0]*m, u[1]*m]; }
