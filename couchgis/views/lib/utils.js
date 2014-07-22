@@ -94,9 +94,10 @@ exports.size=function(GeoJSON) {
   return GeoJSON;
 };
 
-// Export some EPSG definitions.
+// Export projection definitions for some EPSG numbers.
 
-exports.EPSG={
+exports.projection={
+  4326:"+proj=longlat +datum=WGS84 +no_defs",
   3396:"+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel +units=m +no_defs",
   3397:"+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel +units=m +no_defs",
   31467:"+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=4499998.5 +y_0=65 +ellps=bessel "
@@ -107,15 +108,19 @@ exports.EPSG={
        +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs"
 };
 
+// Acquire EPSG numbers from GeoJSON.crs.
+
+exports.EPSG=function(GeoJSON) {
+  var name=GeoJSON.crs.properties.name;
+  if (name==="urn:ogc:def:crs:OGC:1.3:CRS84") return 4326;
+  return +GeoJSON.crs.properties.name.match(/EPSG:+([0-9]+)/)[1];
+};
+
 // Transform to WGS84.
 
 exports.toWGS84=function(GeoJSON) {
   try {
-    var target="urn:ogc:def:crs:OGC:1.3:CRS84";
-    var source=GeoJSON.crs.properties.name;
-    if (source===target) return GeoJSON;
-    var EPSG=source.match(/EPSG:+([0-9]+)/)[1];
-    var projector=require('./proj4')(exports.EPSG[EPSG]);
+    var projector=require('./proj4')(exports.projection[exports.EPSG(GeoJSON)]);
     exports.eachPoint(GeoJSON, function(coord) {
       var newCoord=projector.inverse(coord);
       coord[0]=newCoord[0];
