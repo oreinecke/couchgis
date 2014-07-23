@@ -431,18 +431,16 @@ $(document).ready(function() {
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
       $("#reduce :button").prop('disabled', false);
       data=JSON.parse(data);
-      function select_me(GeoJSON_clone) {
-        return function() {
-          feature.properties.GeoJSON_clone=GeoJSON_clone;
-          shape.setOptions({strokeColor:"#000000"});
-          this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
-          shape=this;
-          $("#clone-from a").html(GeoJSON_clone)
-                            .prop('href',"/_utils/document.html?"+db+'/'+GeoJSON_clone);
-          var spans={ true: $("#clone-from"), false: $("#create-new") };
-          spans[!GeoJSON_clone].hide();
-          spans[!!GeoJSON_clone].show();
-        };
+      function select_me() {
+        feature.properties.GeoJSON_clone=this.GeoJSON_clone;
+        shape.setOptions({strokeColor:"#000000"});
+        this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
+        shape=this;
+        $("#clone-from a").html(this.GeoJSON_clone)
+                          .prop('href',"/_utils/document.html?"+db+'/'+this.GeoJSON_clone);
+        var spans={ true: $("#clone-from"), false: $("#create-new") };
+        spans[!this.GeoJSON_clone].hide();
+        spans[!!this.GeoJSON_clone].show();
       }
       while (data.rows.length) {
         var row=data.rows.pop();
@@ -452,13 +450,14 @@ $(document).ready(function() {
           fillColor:GeoJSON_clone?"#0000FF":"#00FF00",
           map:map, coordinates: GeoJSON.coordinates, draggable: true
         }));
-        shape.addListener('click', select_me(GeoJSON_clone));
+        shape.GeoJSON_clone=GeoJSON_clone;
+        shape.addListener('click', select_me);
         (feature.items[row.key[0]] || feature).shape=shape;
       }
       map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0+offset[1],
                                (feature.bbox[2]+feature.bbox[0])/2.0+offset[0]));
       shape = (feature.items[feature.properties.GeoJSON_clone] || feature).shape
-      select_me(feature.properties.GeoJSON_clone).apply(shape);
+      select_me.apply(shape);
     });
   }
 
