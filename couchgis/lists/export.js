@@ -16,6 +16,7 @@ function(head, req) {
   var fields=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
   var EPSG=req.query.EPSG;
+  var include_WKT='include_WKT' in req.query;
   var index=0, next_index=indexes.pop();
   start({'headers':{
     'Content-Type':{
@@ -114,6 +115,7 @@ function(head, req) {
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
       if (include_revision) fields=["_id", "_rev"].concat(fields);
     }
+    if (include_WKT) fields.unshift("_WKT");
     send('<?xml version="1.0"?>');
     send('<?mso-application progid="Excel.Sheet"?>');
     send('<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"');
@@ -137,6 +139,19 @@ function(head, req) {
     for (var f=0;f<features.length;f++) {
       send('<Row>');
       var properties=features[f].properties;
+      if (include_WKT) {
+        var geometry=features[f].geometry, _WKT="";
+        (function toWKT(c) {
+          if (typeof c[0]==="number")
+            return _WKT+=c.join(' ');
+          _WKT+='(';
+          for (var i=0; i<c.length; toWKT(c[i++]))
+            if (i) _WKT+=', ';
+          _WKT+=')';
+        })(geometry.coordinates);
+        if (geometry.type==="Point") properties._WKT="POINT("+_WKT+")";
+        else properties._WKT=geometry.type.toUpperCase()+_WKT;
+      }
       for (var g=0;g<fields.length;g++) {
         var field=fields[g];
         var data=properties[field];
