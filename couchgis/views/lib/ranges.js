@@ -3,7 +3,7 @@
 function toDate(date) {
   if (date=="") return [];
   date=date.split(/[./]/);
-  if (!/[0-9]{4}/.test(date[0])) date.reverse();
+  if (!/\d{4}/.test(date[0])) date.reverse();
   for (var d=0;d<date.length;d++)
     date[d]=parseInt(date[d].replace(/^0/g, ""));
   return date;

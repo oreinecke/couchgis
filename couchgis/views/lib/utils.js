@@ -114,7 +114,7 @@ exports.EPSG=function(GeoJSON) {
   if (!GeoJSON.crs) return 4326;
   var name=GeoJSON.crs.properties.name;
   if (name==="urn:ogc:def:crs:OGC:1.3:CRS84") return 4326;
-  return +GeoJSON.crs.properties.name.match(/EPSG:+([0-9]+)/)[1];
+  return +GeoJSON.crs.properties.name.match(/EPSG:+(\d+)/)[1];
 };
 
 // Transform to WGS84.

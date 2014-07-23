@@ -101,7 +101,7 @@ function(head, req) {
       return true;
     };
     if (keywords.length) contains_keyword=function(doc) {
-      var content=JSON.stringify(doc).match(/"(\\"|[^"])+"|[0-9.e+-]+|true|false/g);
+      var content=JSON.stringify(doc).match(/"(\\"|[^"])+"|[\d.e+-]+|true|false/g);
       for (var c=0, cc; cc=content[c], c<content.length; c++)
         if (cc[0]==='"') content[c]=JSON.parse(cc);
       content=content.join('\n');
