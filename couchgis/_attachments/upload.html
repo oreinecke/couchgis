@@ -436,8 +436,12 @@ $(document).ready(function() {
         shape.setOptions({strokeColor:"#000000"});
         this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
         shape=this;
-        $("#clone-from a").html(this.GeoJSON_clone)
-                          .prop('href',"/_utils/document.html?"+db+'/'+this.GeoJSON_clone);
+        var a=$("#clone-from a");
+        a.prop('href',"/_utils/document.html?"+db+'/'+this.GeoJSON_clone);
+        if (this.GeoJSON_clone) $.getJSON('/'+db+'/'+this.GeoJSON_clone, function(doc) {
+          a.html(doc[doc.type] || doc);
+          if (doc.time) a.append(' ('+doc.time+')');
+        });
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
