@@ -82,8 +82,7 @@ function(head, req) {
       });
     }
   }
-  switch(filetype) {
-  case "geojson":
+  if (filetype==="geojson" || include_WKT) {
     var utils=require('views/lib/utils');
     var projector=require('views/lib/proj4')(utils.projection[EPSG]);
     for (var f=0, geometry=null; f<features.length; f++) {
@@ -96,6 +95,9 @@ function(head, req) {
         coord[1]=newCoord[1];
       });
     }
+  }
+  switch(filetype) {
+  case "geojson":
     return JSON.stringify(utils.unstripLastCoord({
       name:filename, type:"FeatureCollection",
       crs:{type:"name", properties:{name:"urn:ogc:def:crs:EPSG::"+EPSG}},
