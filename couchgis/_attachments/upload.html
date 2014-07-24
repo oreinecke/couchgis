@@ -432,7 +432,6 @@ $(document).ready(function() {
       $("#reduce :button").prop('disabled', false);
       data=JSON.parse(data);
       function select_me() {
-        feature.properties.GeoJSON_clone=this.GeoJSON_clone;
         shape.setOptions({strokeColor:"#000000"});
         this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
         shape=this;
@@ -445,6 +444,13 @@ $(document).ready(function() {
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
+        // Update geometry link; Also check, if GeoJSON_clone points to an id
+        // that is listed in the features array. In that case it is made
+        // unavailable for geometry selection.
+        feature.properties.GeoJSON_clone=this.GeoJSON_clone;
+        for (var f=0; f<features.length && this.GeoJSON_clone; f++)
+          if (features[f]!==feature)
+            features[f].hide_me=this.GeoJSON_clone===features[f].id;
       }
       while (data.rows.length) {
         var row=data.rows.pop();
@@ -467,16 +473,16 @@ $(document).ready(function() {
 
   // skip to next/previous document with similar geometry
   $("#reduce [name=next]").click(function() {
-    var f=$("#show-suggestions a").html()-1, g=f;
+    var f=$("#show-suggestions a").html()-1;
     do f=(f+1)%features.length;
-    while (!features[f].items && f!=g);
+    while (!features[f].items || features[f].hide_me)
     show_geometry(f);
   });
 
   $("#reduce [name=prev]").click(function() {
-    var f=$("#show-suggestions a").html()-1, g=f;
+    var f=$("#show-suggestions a").html()-1;
     do f=(f+features.length-1)%features.length;
-    while (!features[f].items && f!=g);
+    while (!features[f].items || features[f].hide_me)
     show_geometry(f);
   });
 
