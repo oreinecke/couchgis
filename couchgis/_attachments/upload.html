@@ -418,6 +418,7 @@ $(document).ready(function() {
       if (feature.shape) feature.shape.setMap();
       delete feature.shape;
       for (var id in feature.items) {
+        if (feature.items[id].hidden) continue;
         feature.items[id].shape.setMap();
         delete feature.items[id].shape;
       }
@@ -444,18 +445,23 @@ $(document).ready(function() {
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
-        // Update reference count of each feature; A feature is only allowed
-        // for geometry clone selection if no other feature references it.
-        for (var f=0; f<features.length && this.GeoJSON_clone; f++) {
+        for (var f=0; f<features.length; f++) {
           if (!features[f].items || features[f]===feature) continue;
+          // Update reference count of each feature; A feature is only allowed
+          // for geometry clone selection if no other feature references it.
           features[f].cloned += (this.GeoJSON_clone===features[f].id);
           features[f].cloned -= (feature.properties.GeoJSON_clone===features[f].id);
+          // Hide suggestions that already link to other geometries.
+          (features[f].items[feature.id] || {}).hidden
+            = this.GeoJSON_clone && this.GeoJSON_clone!==feature.id;
         }
         feature.properties.GeoJSON_clone=this.GeoJSON_clone;
       }
       while (data.rows.length) {
         var row=data.rows.pop();
         var GeoJSON_clone=feature.items[row.key[0]] && row.key[0];
+        if (GeoJSON_clone && feature.items[GeoJSON_clone].hidden)
+          continue;
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({
           fillColor:GeoJSON_clone!==feature.id?"#0000FF":"#00FF00",
