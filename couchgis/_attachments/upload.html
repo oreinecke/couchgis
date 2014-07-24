@@ -451,7 +451,7 @@ $(document).ready(function() {
         var GeoJSON_clone=feature.items[row.key[0]] && row.key[0];
         var GeoJSON=row.value.GeoJSON;
         var shape=create_shape(GeoJSON.type, expand_options({
-          fillColor:GeoJSON_clone?"#0000FF":"#00FF00",
+          fillColor:GeoJSON_clone!==feature.id?"#0000FF":"#00FF00",
           map:map, coordinates: GeoJSON.coordinates, draggable: true
         }));
         shape.GeoJSON_clone=GeoJSON_clone;
