@@ -444,13 +444,14 @@ $(document).ready(function() {
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
-        // Update geometry link; Also check, if GeoJSON_clone points to an id
-        // that is listed in the features array. In that case it is made
-        // unavailable for geometry selection.
+        // Update reference count of each feature; A feature is only allowed
+        // for geometry clone selection if no other feature references it.
+        for (var f=0; f<features.length && this.GeoJSON_clone; f++) {
+          if (!features[f].items || features[f]===feature) continue;
+          features[f].cloned += (this.GeoJSON_clone===features[f].id);
+          features[f].cloned -= (feature.properties.GeoJSON_clone===features[f].id);
+        }
         feature.properties.GeoJSON_clone=this.GeoJSON_clone;
-        for (var f=0; f<features.length && this.GeoJSON_clone; f++)
-          if (features[f]!==feature)
-            features[f].hide_me=this.GeoJSON_clone===features[f].id;
       }
       while (data.rows.length) {
         var row=data.rows.pop();
@@ -475,14 +476,14 @@ $(document).ready(function() {
   $("#reduce [name=next]").click(function() {
     var f=$("#show-suggestions a").html()-1;
     do f=(f+1)%features.length;
-    while (!features[f].items || features[f].hide_me)
+    while (!features[f].items || features[f].cloned)
     show_geometry(f);
   });
 
   $("#reduce [name=prev]").click(function() {
     var f=$("#show-suggestions a").html()-1;
     do f=(f+features.length-1)%features.length;
-    while (!features[f].items || features[f].hide_me)
+    while (!features[f].items || features[f].cloned)
     show_geometry(f);
   });
 
@@ -519,6 +520,7 @@ $(document).ready(function() {
             for (var id2 in data) {
               if (id2===id) continue;
               feature.items=data;
+              feature.cloned=0;
               found_geometry();
               return;
             }
