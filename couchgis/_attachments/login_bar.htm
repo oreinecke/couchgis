@@ -9,6 +9,7 @@
 
 <script>
 $(document).ready(function() {
+
   var log={
     success: function(resp) {
       var name=resp.userCtx.name;
@@ -52,6 +53,7 @@ $(document).ready(function() {
     $.couch.logout();
     log.success({userCtx:{name:null}});
   });
+
 });
 </script>
 
