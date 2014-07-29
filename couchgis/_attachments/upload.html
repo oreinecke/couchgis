@@ -451,7 +451,7 @@ $(document).ready(function() {
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
-        for (var f=0; f<features.length; f++) {
+        for (var f=0;f<features.length;f++) {
           if (!features[f].items || features[f]===feature) continue;
           // Update reference count of each feature; A feature is only allowed
           // for geometry clone selection if no other feature references it.
