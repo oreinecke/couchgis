@@ -528,7 +528,7 @@ $(document).ready(function() {
 
   // Refine document list if date has changed.
   $("#filter [name=time]").keypress( function(e) {
-    if (e.which!==13) return;
+    if (e.originalEvent && e.which!==13) return;
     filter_documents({ time: $(this).val() });
     var li=$("#time-is");
     // This way the filter shows up at the end of the list instead of at
@@ -598,7 +598,7 @@ $(document).ready(function() {
 
   // Add content-filter on <enter> key press.
   $("#filter [name=content]").keypress( function(e) {
-    if (e.which!==13) return;
+    if (e.originalEvent && e.which!==13) return;
     var cut={
       field:$("#filter [name=field]").val(),
       value:$(this).val().replace(/^\s+|\s+$/g,'') || undefined
