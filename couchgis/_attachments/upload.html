@@ -242,6 +242,35 @@ $(document).ready(function() {
     show_fields();
   }
 
+  // Check if feature.geometry is about to be dropped in the next upload, and
+  // relay documents pointing to its geometry to the one that will replace it.
+  function relay_geometry(feature) {
+    var doc=uploaded_docs[feature.properties._id];
+    // Nothing to be done if the document wasn't in the
+    // database before or doesn't have its own geometry.
+    if (!doc || doc.GeoJSON_clone) return;
+    // Nothing to be done if the document will keep its geometry.
+    if (!feature.properties.GeoJSON_clone) return;
+    if (feature.properties.GeoJSON_clone===doc._id) return;
+    $.getJSON('_view/geojson-doc?key="'+doc._id+'"', function(data) {
+      while (data.rows.length) {
+        var row=data.rows.pop();
+        if (row.key===row.id) continue;
+        if (uploaded_docs[row.id]) for (var f=0;f<features.length;f++) {
+          if (features[f].properties._id!==row.id) continue;
+          features[f].properties.GeoJSON_clone=feature.GeoJSON_clone;
+          break;
+        } else $.getJSON('/'+db+'/'+row.id, function(doc) {
+          uploaded_docs[doc._id]=doc;
+          features.push({ properties:{
+            _id:doc._id, _rev:doc._rev,
+            GeoJSON_clone:feature.properties.GeoJSON_clone
+          }});
+        });
+      }
+    });
+  }
+
   $("#upload :file").change(function(e) {
     $("#modify").hide();
     $("#reduce [name=show]").show();
