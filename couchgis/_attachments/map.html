@@ -159,7 +159,14 @@ $(document).ready(function() {
                 } else if (cl==="field") {
                   var fields=path.decode(th.val()), value=doc;
                   while (fields.length && value!=null) value=value[fields.shift()];
-                  td.append(value+'<br>');
+                  var span=$('<span>').text(value);
+                  // Copy cell content and field name to #filter.
+                  span.addClass('field').click(function() {
+                    $("#filter [name=field]").val(th.text());
+                    $("#filter [name=content]").val(span.text().replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&"))
+                                               .keypress();
+                  });
+                  td.append(span).append('<br>');
                 }
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.
@@ -941,7 +948,8 @@ $(document).ready(function() {
   #table td.geometry:hover,
   #table th.field:hover,
   #table th.title:hover,
-  #table th.title-time:hover {cursor:pointer}
+  #table th.title-time:hover,
+  #table td span.field:hover {cursor:pointer}
   #table .geometry {font-weight:900}
 </style>
 
