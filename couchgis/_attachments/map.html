@@ -161,25 +161,15 @@ $(document).ready(function() {
                   while (fields.length && value!=null) value=value[fields.shift()];
                   var span=$('<span>').text(value);
                   // Copy cell content and field name to #filter.
-                  span.addClass('field').click(function() {
-                    $("#filter [name=field]").val(th.text());
-                    $("#filter [name=content]").val(span.text().replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&"))
-                                               .keypress();
-                  });
+                  span.addClass('field').click({
+                    field:th.text(), value:span.text().replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&")
+                  }, update_geometry.create_filter);
                   td.append(span).append('<br>');
                 }
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.
                 td.html($("#table thead .geometry span").html()).addClass("geometry");
-                td.click(function(item) { return function(e) {
-                  // Center map to the shape and highlight it.
-                  var bbox=item.GeoJSON.bbox;
-                  map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
-                                           (bbox[2]+bbox[0])/2.0+offset[0]));
-                  item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
-                  $("#table tbody").prepend(item.tr);
-                  e.preventDefault();
-                } }(item) );
+                td.click(item, update_geometry.highlight_shape);
               });
             }
             // If colored black, (Multi)LineStrings are difficult to spot on the map.
@@ -210,6 +200,22 @@ $(document).ready(function() {
       })();
     }
   }
+
+  update_geometry.highlight_shape=function(e) {
+    var item=e.data;
+    var bbox=item.GeoJSON.bbox;
+    map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
+                             (bbox[2]+bbox[0])/2.0+offset[0]));
+    item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
+    // Center map to the shape and highlight it.
+    $("#table tbody").prepend(item.tr);
+    e.preventDefault();
+  };
+
+  update_geometry.create_filter=function(e) {
+    $("#filter [name=field]").val(e.data.field);
+    $("#filter [name=content]").val(e.data.value).keypress();
+  };
 
   // diff-updates items inside viewport
   function update_items(error) {
