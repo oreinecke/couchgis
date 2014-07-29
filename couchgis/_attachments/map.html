@@ -655,7 +655,10 @@ $(document).ready(function() {
     else li.hide();
   });
   $("#filter .types").change( function() { $("#cuts").click(); });
-  $("#filter").keypress( function(e) { if (e.which===13) $("#cuts").click(); });
+  $("#filter").keypress( function(e) {
+    if (!e.originalEvent || e.which===13)
+      $("#cuts").click();
+  });
 
   // Add filtered document to #union filter item and copy the filter list into
   // it; this serves neatly as a description of with which documents the union
