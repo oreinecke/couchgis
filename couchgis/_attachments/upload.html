@@ -259,10 +259,13 @@ $(document).ready(function() {
     $.getJSON('_view/geojson-doc?key="'+doc._id+'"', function(data) {
       while (data.rows.length) {
         var row=data.rows.pop();
+        // skip own document
         if (row.key===row.id) continue;
+        // look up existing document in the feature list, or
         if (uploaded_docs[row.id])
           for (var f=0; (feature=features[f]).properties._id!==row.id; f++);
         else {
+          // add document to uploaded_docs and the feature list
           features.push(feature={properties:{_id:row.id}});
           $.getJSON('/'+db+'/'+row.id, function(properties) {
             return function(doc) {
@@ -271,9 +274,13 @@ $(document).ready(function() {
             };
           }(feature.properties));
         }
+        // If the document will be removed, then
         if (properties._deleted===true) {
+          // store its geometry the feature that we have right now
           feature.GeoJSON=uploaded_docs[properties._id].GeoJSON;
+          // tell the submit handler that the feature's geometry has changed,
           delete feature.properties.GeoJSON_clone;
+          // and point all other features to this features geometry.
           properties={GeoJSON_clone:row.id};
         } else feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
       }
