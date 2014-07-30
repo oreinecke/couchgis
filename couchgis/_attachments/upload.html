@@ -279,7 +279,7 @@ $(document).ready(function() {
           // store its geometry the feature that we have right now
           feature.GeoJSON=uploaded_docs[properties._id].GeoJSON;
           // tell the submit handler that the feature's geometry has changed,
-          delete feature.properties.GeoJSON_clone;
+          feature.properties.GeoJSON_clone=null;
           // and point all other features to this features geometry.
           properties={GeoJSON_clone:row.id};
         } else feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
