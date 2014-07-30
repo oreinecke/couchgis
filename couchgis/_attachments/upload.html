@@ -258,7 +258,7 @@ $(document).ready(function() {
         if (row.key===row.id) continue;
         if (uploaded_docs[row.id]) for (var f=0;f<features.length;f++) {
           if (features[f].properties._id!==row.id) continue;
-          features[f].properties.GeoJSON_clone=feature.GeoJSON_clone;
+          features[f].properties.GeoJSON_clone=feature.properties.GeoJSON_clone;
           break;
         } else $.getJSON('/'+db+'/'+row.id, function(doc) {
           uploaded_docs[doc._id]=doc;
