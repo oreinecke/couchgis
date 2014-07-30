@@ -257,17 +257,16 @@ $(document).ready(function() {
       while (data.rows.length) {
         var row=data.rows.pop();
         if (row.key===row.id) continue;
-        if (uploaded_docs[row.id]) for (var f=0;f<features.length;f++) {
-          if (features[f].properties._id!==row.id) continue;
-          features[f].properties.GeoJSON_clone=properties.GeoJSON_clone;
-          break;
-        } else $.getJSON('/'+db+'/'+row.id, function(doc) {
-          uploaded_docs[doc._id]=doc;
-          features.push({ properties:{
-            _id:doc._id, _rev:doc._rev,
-            GeoJSON_clone:properties.GeoJSON_clone
-          }});
-        });
+        if (uploaded_docs[row.id])
+          for (var f=0; (feature=features[f]).properties._id!==row.id; f++);
+        else $.getJSON('/'+db+'/'+row.id, function(properties) {
+          return function(doc) {
+            uploaded_docs[doc._id]=doc;
+            properties._id=doc._id;
+            properties._rev=doc._rev;
+          };
+        }(feature.properties));
+        feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
       }
     });
   }
