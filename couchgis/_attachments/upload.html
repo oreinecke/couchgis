@@ -211,6 +211,8 @@ $(document).ready(function() {
           var row=data.rows.pop();
           uploaded_docs[row.id]=row.doc;
         }
+        for (var f=0;f<features.length;f++)
+          relay_geometry(features[f]);
       });
     } catch(err) {
       $("#upload b").html(err.message+"<br>");
@@ -426,6 +428,7 @@ $(document).ready(function() {
         _id:feature.id,
         _rev:feature.rev
       });
+      relay_geometry(feature);
     }
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       submit.show();
