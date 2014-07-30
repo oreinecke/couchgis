@@ -250,23 +250,32 @@ $(document).ready(function() {
     // Nothing to be done if the document wasn't in the
     // database before or doesn't have its own geometry.
     if (!doc || doc.GeoJSON_clone) return;
-    // Nothing to be done if the document will keep its geometry.
-    if (!properties.GeoJSON_clone) return;
-    if (properties.GeoJSON_clone===doc._id) return;
+    // Something should be done if the document will be removed.
+    if (properties._deleted!==true) {
+      // Nothing to be done if the document will keep its geometry.
+      if (!properties.GeoJSON_clone) return;
+      if (properties.GeoJSON_clone===doc._id) return;
+    }
     $.getJSON('_view/geojson-doc?key="'+doc._id+'"', function(data) {
       while (data.rows.length) {
         var row=data.rows.pop();
         if (row.key===row.id) continue;
         if (uploaded_docs[row.id])
           for (var f=0; (feature=features[f]).properties._id!==row.id; f++);
-        else $.getJSON('/'+db+'/'+row.id, function(properties) {
-          return function(doc) {
-            uploaded_docs[doc._id]=doc;
-            properties._id=doc._id;
-            properties._rev=doc._rev;
-          };
-        }(feature.properties));
-        feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
+        else {
+          features.push(feature={properties:{_id:row.id}});
+          $.getJSON('/'+db+'/'+row.id, function(properties) {
+            return function(doc) {
+              uploaded_docs[doc._id]=doc;
+              properties._rev=doc._rev;
+            };
+          }(feature.properties));
+        }
+        if (properties._deleted===true) {
+          feature.GeoJSON=uploaded_docs[properties._id].GeoJSON;
+          delete feature.properties.GeoJSON_clone;
+          properties={GeoJSON_clone:row.id};
+        } else feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
       }
     });
   }
