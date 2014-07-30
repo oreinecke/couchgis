@@ -18,7 +18,7 @@ $(document).ready(function() {
   var path=require('views/lib/path');
   var db=window.location.pathname.match(/[^/]+/)[0];
   var map;
-  var crs, features=[];
+  var features=[];
   var submit=$("#upload :submit");
   var revert=$("#upload :button");
   var fields={};
@@ -141,8 +141,9 @@ $(document).ready(function() {
         if (GeoJSON.type==="FeatureCollection") features=GeoJSON.features;
         else if (GeoJSON.type==="Feature") features=[GeoJSON];
         else throw{message:"Unknown or useless GeoJSON type: "+GeoJSON.type};
-        crs=GeoJSON.crs;
-        if (!crs) throw{message:"No top-level CRS defined"};
+        if (!GeoJSON.crs) throw{message:"No top-level CRS defined"};
+        for (var f=0;f<features.length;f++)
+          features[f].geometry.crs=GeoJSON.crs;
       } else if (filetype==="xml") {
         // divide xml recursively into <Tag>..</Tag> objects
         var tables=function parse(xml, tags) {
@@ -401,10 +402,8 @@ $(document).ready(function() {
       })(doc);
       // Use either the newly defined GeoJSON_clone or the previous
       // one. Update the geometry itself only if none is referenced.
-      if (!doc.GeoJSON_clone && feature.geometry) {
+      if (!doc.GeoJSON_clone && feature.geometry)
         doc.GeoJSON=feature.geometry;
-        doc.GeoJSON.crs=crs;
-      }
       // Remove GeoJSON_clone if it references itself.
       if (doc.GeoJSON_clone===doc._id) delete doc.GeoJSON_clone;
       else if (doc.GeoJSON_clone) delete doc.GeoJSON;
