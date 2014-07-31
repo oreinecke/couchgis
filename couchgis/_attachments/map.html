@@ -517,18 +517,18 @@ $(document).ready(function() {
     });
     // get doc types and set colors
     $.getJSON("_view/fields-values?group_level=2", function(data) {
-      var options={_id:null};
-      var inputs={};
+      var fields={_id:null};
+      var types={};
       while (data.rows.length) {
         var key=data.rows.shift().key;
-        options[key[1]]=null;
-        inputs[key[0]]=null;
+        fields[key[1]]=null;
+        types[key[0]]=null;
       }
       var optgroup=$("[name=fields]");
-      for (var field in options)
+      for (var field in fields)
         optgroup.append($("<option>").html(field));
       var span=$("#filter .types");
-      for (var type in inputs) {
+      for (var type in types) {
         span.append($('<input>').attr({type:"checkbox",name:type})).append(type);
         filters[0].types.push(type);
         // This is one rare advantage of javascripts 'phony' arrays:
@@ -568,27 +568,27 @@ $(document).ready(function() {
     // Update the list of fields to show only those
     // that are available by the given type selection.
     $.getJSON("_view/fields-values?group_level=2&group=true", function(data) {
-      var options={_id:null};
+      var fields={_id:null};
       while (data.rows.length) {
         var key=data.rows.shift().key;
         if (types.indexOf(key[0])===-1) continue;
-        options[key[1]]=null;
+        fields[key[1]]=null;
       }
       var optgroup=$("#filter [name=fields]");
       var val=$("#filter [name=field]").val();
       $("[name=fields]").html('');
-      for (var field in options)
+      for (var field in fields)
         optgroup.append($("<option>").html(field));
       // The selected option was destroyed three
       // lines above, so I just re-select it here.
       $("#filter [name=field]").val(val);
-      // Remove options that are in the 'columns' <optgroup> already.
+      // Remove fields that are in the 'columns' <optgroup> already.
       $("#table [name=columns] option").each( function() {
-        delete options[$(this).val()];
+        delete fields[$(this).val()];
       });
-      // Fill 'fields' optgroup with reduced set of options.
+      // Fill 'fields' optgroup with reduced set of fields.
       var optgroup=$("#table [name=fields]");
-      for (var field in options)
+      for (var field in fields)
         optgroup.append($('<option>').html(field));
     });
     filter_documents({types:types});
