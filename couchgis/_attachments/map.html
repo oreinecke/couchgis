@@ -549,11 +549,13 @@ $(document).ready(function() {
     if (li.css("display")==="none")
       $("#cuts").append(li.show());
     li.find('a').html($(this).val());
-    li.find(':button').off().click(function() {
-      filter_documents({time:""});
-      $("#filter [name=time]").val('');
-      li.hide();
-    });
+  });
+
+  // Remove document time constraint.
+  $("#time-is :button").click(function() {
+    filter_documents({time:""});
+    $("#filter [name=time]").val('');
+    $("#time-is").hide();
   });
 
   // Refine document list if types have changed.
@@ -602,11 +604,12 @@ $(document).ready(function() {
     // hide filter item if it displays every type anyway
     if (types.length===filters[0].types.length)
       li.hide();
-    li.find(':button').off().click( function() {
-      // Remove all the type checkboxes and run it again.
-      $("#filter .types :checked").prop('checked', false);
-      $("#filter .types").change();
-    });
+  });
+
+  // Remove document type restriction.
+  $("#type-is :button").click( function() {
+    $("#filter .types :checked").prop('checked', false);
+    $("#filter .types").change();
   });
 
   // Add content-filter on <enter> key press.
