@@ -567,7 +567,7 @@ $(document).ready(function() {
     if (!types.length) types=filters[0].types;
     // Update the list of fields to show only those
     // that are available by the given type selection.
-    $.getJSON("_view/fields-values?group_level=2&group=true", function(data) {
+    $.getJSON("_view/fields-values?group_level=2", function(data) {
       var fields={_id:null};
       while (data.rows.length) {
         var key=data.rows.shift().key;
