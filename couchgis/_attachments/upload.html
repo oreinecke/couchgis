@@ -87,44 +87,24 @@ $(document).ready(function() {
       var field=$('<input type="text" name="field">').val(prop);
       if (special) field=$('<b>').addClass('special').html(prop).prop('value',prop);
       var value=$('<input type="text" name="value">').prop('disabled',special);
-      // write new value to selected data set
-      value.change(function(input, prop) {
-        return function() {
-          var v=input.val();
-          // try to parse new value as number
-          try {
-            v=JSON.parse(v);
-            input.val(v);
-          // if that fails just write it as a string
-          } catch(err) {}
-          features[$("#modify a").html()-1].properties[prop]=v;
-        };
-      }(value, prop));
       values[prop]=value;
       fields[prop]=field;
       row.append(checkbox).append(field).append(': ').append(value).append('<br>');
       $("#modify div").append(row);
       if (special) continue;
+      // write new value to displayed feature
+      value.change(prop, function(e) {
+        var v=$(this).val();
+        try {
+          v=JSON.parse(v);
+          $(this).val(String(v));
+        } catch(err) {}
+        features[$("#modify a").html()-1].properties[e.data]=v;
+      });
       // disable input fields on row if unchecked
-      checkbox.change(function(checkbox, field, value, prop) {
-        return function() {
-          var disabled=!checkbox.prop('checked');
-          field.prop('disabled', disabled);
-          value.prop('disabled', disabled);
-          // set a nice and helpful tooltip
-          var title=prop+' '
-          if (disabled) title+='ignorieren';
-          else {
-            if (field.val()!=prop) title+='als "'+field.val()+'" ';
-            title+='übernehmen';
-          }
-          checkbox.prop('title',title);
-        };
-      }(checkbox, field, value, prop));
-      checkbox.change();
-      field.change(function(checkbox) {
-        return function() { checkbox.change(); };
-      }(checkbox));
+      checkbox.change(row, function(e) {
+        e.data.find(":text").prop('disabled', !$(this).prop('checked'));
+      });
     }
     show_feature(0);
     $("#modify").show();
