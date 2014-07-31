@@ -542,13 +542,15 @@ $(document).ready(function() {
   // Refine document list if date has changed.
   $("#filter [name=time]").keypress( function(e) {
     if (e.originalEvent && e.which!==13) return;
-    filter_documents({ time: $(this).val() });
+    var time=$(this).val();
+    filter_documents({ time: time });
     var li=$("#time-is");
     // This way the filter shows up at the end of the list instead of at
     // the beginning. It is completely useless but I certainly like it.
     if (li.css("display")==="none")
       $("#cuts").append(li.show());
     li.find('a').html($(this).val());
+    if (!time) li.hide();
   });
 
   // Remove document time constraint.
