@@ -73,8 +73,7 @@ $(document).ready(function() {
   }
 
   function show_fields() {
-    // expect all property sets to be identical to the first one
-    for (var prop in features[0].properties) {
+    for (var prop in fields) {
       if (fields[prop]) continue;
       // Special fields have non-editable field names.
       var special = /GeoJSON_clone|_id|_rev|_deleted/.test(prop);
@@ -194,16 +193,18 @@ $(document).ready(function() {
       $("#upload b").html(err.message+"<br>");
       return;
     }
+    fields={};
+    values={};
     var keys=[];
     for (var f=0;f<features.length;f++) {
       var properties=features[f].properties;
       if (properties._id) keys.push(properties._id);
-      // condense union of properties into the first feature
-      if (!f) continue;
       for (var prop in properties)
-        if (!(prop in features[0].properties))
-          features[0].properties[prop]=undefined;
+        fields[prop]=false;
     }
+    submit.prop('disabled', false);
+    $("#modify div").html('');
+    show_fields();
     uploaded_docs={};
     // store existing documents
     $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
@@ -215,11 +216,6 @@ $(document).ready(function() {
       for (var f=0;f<features.length;f++)
         relay_geometry(features[f]);
     });
-    submit.prop('disabled', false);
-    fields={};
-    values={};
-    $("#modify div").html('');
-    show_fields();
   }
 
   // Check if feature.geometry is about to be dropped in the next upload, and
@@ -528,8 +524,8 @@ $(document).ready(function() {
     $(this).hide();
     $("#show-suggestions").show();
     $("#show-suggestions :button").prop('disabled', true);
-    // forward GeoJSON_clone property to show_fields()
-    features[0].properties.GeoJSON_clone=features[0].properties.GeoJSON_clone || undefined;
+    // Add GeoJSON_clone field indicator.
+    fields.GeoJSON_clone = fields.GeoJSON_clone || false;
     var keys=[];
     for (var f=0;f<features.length;f++)
       keys.push(features[f].properties.GeoJSON_clone || features[f].id)
