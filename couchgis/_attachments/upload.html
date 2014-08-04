@@ -190,31 +190,31 @@ $(document).ready(function() {
           }
         }
       } else throw{message:"Unknown extension: ."+filetype};
-      uploaded_docs={};
-      var keys=[];
-      for (var f=0;f<features.length;f++) {
-        var properties=features[f].properties;
-        if (properties._id) keys.push(properties._id);
-        // condense union of properties into the first feature
-        if (!f) continue;
-        for (var prop in properties)
-          if (!(prop in features[0].properties))
-            features[0].properties[prop]=undefined;
-      }
-      // store existing documents
-      $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
-        data=JSON.parse(data);
-        while (data.rows.length) {
-          var row=data.rows.pop();
-          uploaded_docs[row.id]=row.doc;
-        }
-        for (var f=0;f<features.length;f++)
-          relay_geometry(features[f]);
-      });
     } catch(err) {
       $("#upload b").html(err.message+"<br>");
       return;
     }
+    var keys=[];
+    for (var f=0;f<features.length;f++) {
+      var properties=features[f].properties;
+      if (properties._id) keys.push(properties._id);
+      // condense union of properties into the first feature
+      if (!f) continue;
+      for (var prop in properties)
+        if (!(prop in features[0].properties))
+          features[0].properties[prop]=undefined;
+    }
+    uploaded_docs={};
+    // store existing documents
+    $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
+      data=JSON.parse(data);
+      while (data.rows.length) {
+        var row=data.rows.pop();
+        uploaded_docs[row.id]=row.doc;
+      }
+      for (var f=0;f<features.length;f++)
+        relay_geometry(features[f]);
+    });
     submit.prop('disabled', false);
     fields={};
     values={};
