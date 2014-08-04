@@ -258,7 +258,12 @@ $(document).ready(function() {
           feature.properties.GeoJSON_clone=null;
           // and point all other features to this features geometry.
           properties={GeoJSON_clone:row.id};
-        } else feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
+        } else {
+          feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
+          if (fields.GeoJSON_clone) continue;
+          fields.GeoJSON_clone=false;
+          show_fields();
+        }
       }
     });
   }
