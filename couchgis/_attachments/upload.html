@@ -67,10 +67,7 @@ $(document).ready(function() {
     $("#modify a").html(f+1);
     var properties=features[f].properties;
     for (var prop in fields) {
-      var val=properties[prop];
-      if (val===undefined)
-        val=(uploaded_docs[properties._id] || {})[prop];
-      val=String(val);
+      var val=String(properties[prop]);
       values[prop].val(val).attr('title', val);
     }
   }
