@@ -536,6 +536,7 @@ $(document).ready(function() {
       keys.push(features[f].properties.GeoJSON_clone || features[f].id)
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
       for (var f=0;f<features.length;f++) {
+        if (!data[keys[f]]) continue;
         var feature=features[f];
         feature.bbox=data[keys[f]].GeoJSON.bbox;
         var options=encodeURIComponent(JSON.stringify({
