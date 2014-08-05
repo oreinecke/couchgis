@@ -188,7 +188,6 @@ relations_. That means, given a fixed geometry, you can check what other
 geometry either lies inside, intersects or circumfences it. After you figured
 out your fixed geometry, click on 'Auswahl merken', and then a button presents
 itself for each relation. I have the following to say to this:
-
 - Each geometry relates to itself by default.
 - You might encounter glitches because of my sloppy implementation: For
   instance, I do not check for intersecting line segments, and the algorithm
@@ -221,7 +220,6 @@ to be uploaded.
 In CouchDB creating new or changing documents is more or less the same, as soon
 as the Bulk Document API is in use. The application works with, and extends its
 principle in some way.
-
 - If neither `_id` nor `_rev` exists, a new document will be attached.
 - If `_id` and `_rev` match an existing document, the application will update
   its fields with the ones specified in the uploaded data. Unmentioned fields
@@ -256,7 +254,6 @@ documents:
 I imply that documents **b** and **c** are attached to **a**'s geometry and
 **a2**'s geometry looks similar to that. Now, here's what could happen, and how
 the bulk upload is fixed before being committed to the database:
-
 - Nothing, if either **b** or **c** are pointed to **a2**,
 - if **a** is pointed to **a2**, then so are **b** and **c**,
 - if `a._deleted` is set, then `b.GeoJSON=a.GeoJSON` and
