@@ -229,6 +229,39 @@ principle in some way.
   typing `=TRUE()` in a cell), it deletes the document. It has to be this
   annoying because it is for your own safety as well!!!
 
+###Search and Link to Existing Geometry
+
+Oftentimes the database already contains a document that has a geometry similar
+to the one being uploaded. It is possible to show existing similar geometries
+and point uploaded documents to re-use those instead of adding new ones. Since
+version 1.0.8, I might not advice against using this feature as strongly as
+before.
+
+As of version 1.0.8, the bulk upload is adapted automatically to impending
+changes to document's geometries. Imagine a database containing the following
+documents:
+
+```json
+[
+  { "_id": "a", "GeoJSON": {...}, etc. },
+  { "_id": "a2", "GeoJSON": {...}, etc. }
+  { "_id": "b", "GeoJSON_clone": "a", etc. },
+  { "_id": "c", "GeoJSON_clone": "a", etc. },
+]
+```
+
+I imply that documents **b** and **c** are attached to **a**'s geometry and
+**a2**'s geometry looks similar to that. Now, here's what could happen, and how
+the bulk upload is fixed before being committed to the database:
+
+- Nothing, if either **b** or **c** are pointed to **a2**,
+- if **a** is pointed to **a2**, then so are **b** and **c**,
+- if `a._deleted` is set, then `b.GeoJSON=a.GeoJSON` and
+  `c.GeoJSON_clone=b._id`, meaning **a**'s geometry will be moved into **b**,
+  and **c** will point to it from now on,
+- if **a** is pointed to **a2** and vice versa, I have no idea and this case is
+  not provided for.
+
 ###Tabular Document Representation
 
 All software mentioned at the beginning can not cope with nested objects, so
