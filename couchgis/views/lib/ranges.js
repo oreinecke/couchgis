@@ -1,9 +1,9 @@
 // Convert date to [YYYY,MM,DD] without any leading zeros.
 
 function toDate(date) {
-  if (date=="") return [];
-  date=date.split(/[./]/);
-  if (!/\d{4}/.test(date[0])) date.reverse();
+  date=date.match(/\d+/g);
+  if (!date) return [];
+  if (date[0].length!==4) date.reverse();
   for (var d=0;d<date.length;d++)
     date[d]=parseInt(date[d].replace(/^0/g, ""));
   return date;
