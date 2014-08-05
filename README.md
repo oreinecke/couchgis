@@ -127,20 +127,23 @@ given as `MONTH_BEG` `YEAR_BEG` `DAY_END` or whatever.
 [Dates or ranges of dates](couchgis/views/lib/ranges.js) are expressed as a
 string as such:
 - Dates can be given in DD.MM.YYYY, YYYY.MM.DD, YYYY/MM/DD, DD/MM/YYYY i.e. I
-  only expect the year to be four digits, the digits to be separated by either
-  a slash or a dot, and I don't care about the order as long as it follows
-  hierarchy.
+  only expect the year to be four digits, the digits to be consecutive, and I
+  don't care about the order as long as it follows hierarchy.
 - Date intervals are written as `"<date> - <date>"` ("to" or something would
-  hinder internationalization even more).
+  hinder internationalization even more). Hence **the dash must not be used
+  as a separator!**
 - If the day is left out, `"03/2004"` equals `"01/03/2004 - 31/03/2004"`, ditto
   for months.
 - If the entire date is left out, it is treated as +/- infinity. `"- 03/2004"`
   then amounts to any date before and including 31/03/2004.
-- Multiple ranges may be separated by comma/ampersand/semicolon. I do no
+- Multiple ranges must be separated by comma/ampersand/semicolon. I do not
   guarantee any predictable behaviour if ranges overlap, because for
   performance reasons I assume they don't.
 - Spaces and leading zeros are ignored. Use them in the documents for clarity
   but avoid typing them in a search.
+
+Any character other than dash/comma/ampersand/semicolon can be freely used.
+This way document times may also read "von ca. 1970 - 2000" or something.
 
 How to Filter Documents
 -----------------------
