@@ -14,7 +14,7 @@ function toDate(date) {
 function toRange(range) {
   if (!range) return { begin:[], end:[] };
   if (typeof(range)==="object") return range;
-  range=String(range).split('-');
+  range=range.split('-');
   return {
     begin:toDate(range[0]),
     end:toDate(range[range.length-1])
