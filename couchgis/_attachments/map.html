@@ -672,7 +672,7 @@ $(document).ready(function() {
     var span=union.find("span");
     if (union.css('display')!=='none')
       span.append(' <b>&cup;</b> ');
-    $("#cuts > [id!='union' id!='keep-selection']:visible").each( function() {
+    $("#cuts > [id!=keep-selection][id!=union]:visible").each( function() {
       var li=$("<li>").html($(this).html());
       li.find(":button").remove();
       span.append(li.html());
