@@ -1,6 +1,7 @@
 // some nice colors for different types
-var fillColors=['#FF0000','#FFFF00'];
+var fillColors=['#80FFFF','#00FFFF','#FFFF00'];
 fillColors["Feldblock"]     = '#00FF80';
+fillColors["Flurstück"]     = '#FF0000';
 fillColors["Fund"]          = '#8000FF';
 fillColors["Maßnahme"]      = '#80FF00';
 fillColors["Probefläche"]   = '#FF8000';
