@@ -241,6 +241,7 @@ exports.simplify=function(GeoJSON, error) {
 
 exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
   var on_boundary={message:"Point on polygon boundary."};
+  var abs=Math.abs;
   var p_u=point[0], p_v=point[1];
   try {
     if (known_point) {
@@ -262,15 +263,17 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
           if (a_u<bbox_0 && b_u<bbox_0 || a_u>bbox_2 && b_u>bbox_2 ||
               a_v<bbox_1 && b_v<bbox_1 || a_v>bbox_3 && b_v>bbox_3) continue;
           var pa_u=p_u-a_u, pa_v=p_v-a_v;
-          var pb_u=p_u-b_u, pb_v=p_v-b_v;
-          if (-5e-7<pa_u && pa_u<5e-7 && -5e-7<pa_v && pa_v<5e-7)
-            throw on_boundary;
-          // No intersection if a and b are on the same side of q-p.
-          if ( (qp_v*pa_u>=qp_u*pa_v) === (qp_v*pb_u>=qp_u*pb_v) ) continue;
-          var qa_u=q_u-a_u, qa_v=q_v-a_v;
+          // On boundary if p is close to a.
+          if (abs(pa_u)<5e-7 && abs(pa_v)<5e-7) throw on_boundary;
+          var ba_u=b_u-a_u, ba_v=b_v-a_v;
+          var A=ba_u*pa_v-ba_v*pa_u;
+          // Throw on_boundary if p is close to a-b.
+          if (abs(A)<(abs(ba_u)+abs(ba_v))*2e-7) throw on_boundary;
           var qb_u=q_u-b_u, qb_v=q_v-b_v;
           // No intersection if p and q are on the same side of a-b.
-          if ( (qa_v*qb_u>=qa_u*qb_v) === (pa_v*pb_u>=pa_u*pb_v) ) continue;
+          if ( (ba_u*qb_v>=ba_v*qb_u) === (A>=0) ) continue;
+          // No intersection if a and b are on the same side of p-q.
+          if ( (qp_u*pa_v>=qp_v*pa_u) === (qp_u*qb_v>=qp_v*qp_u) ) continue;
           inside^=1;
         }
       });
@@ -286,29 +289,28 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
         //        \
         //       b x
         var pa_u=p_u-a[0], pa_v=p_v-a[1];
-        if (-5e-7<pa_u && pa_u<5e-7 && -5e-7<pa_v && pa_v<5e-7)
-          throw on_boundary;
+        if (abs(pa_u)<5e-7 && abs(pa_v)<5e-7) throw on_boundary;
         var bp_u=b[0]-p_u, ba_u=b[0]-a[0],
             bp_v=b[1]-p_v, ba_v=b[1]-a[1];
-        // a, p and b are horizontally aligned
-        if (pa_v===0 && bp_v===0) continue;
-        // p and a are horizontally aligned
-        if (pa_v===0) inside ^= pa_u<=0;
-        // b and p are horizontally aligned
-        else if (bp_v===0) inside ^= bp_u>=0;
         // a and b are either both below or above p
-        else if (pa_v>0 ^ bp_v>0) continue;
+        if (pa_v>5e-7 && bp_v<-5e-7 || pa_v<-5e-7 && bp_v>5e-7) continue;
         // a and b are both to the left of p
-        if (pa_u>0 && bp_u<0) continue;
+        if (pa_u>5e-7 && bp_u<-5e-7) continue;
         // a and be are both to the right of p
-        if (pa_u<=0 && bp_u>=0) inside^=1;
-        // check if (c-p)u >= 0 if everything else fails
-        else inside ^= ba_v<0 ^ bp_u*pa_v>pa_u*bp_v;
+        if (pa_u<-5e-7 && bp_u>5e-7) inside^=1;
+        else {
+          // Check if (c-p)u >= 0 if everything else fails.
+          var A=bp_u*pa_v-bp_v*pa_u;
+          // Throw on_boundary if p is close to a-b.
+          if (abs(A)<(abs(ba_u)+abs(ba_v))*2e-7)
+            throw on_boundary;
+          inside ^= ba_v<0 ^ A>0;
+        }
       }
     });
-    return inside;
   } catch(err) {
     if (err===on_boundary) return 0.5;
     throw(err);
   }
+  return inside;
 };
