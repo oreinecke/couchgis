@@ -290,8 +290,7 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
         //       b x
         var pa_u=p_u-a[0], pa_v=p_v-a[1];
         if (abs(pa_u)<5e-7 && abs(pa_v)<5e-7) throw on_boundary;
-        var bp_u=b[0]-p_u, ba_u=b[0]-a[0],
-            bp_v=b[1]-p_v, ba_v=b[1]-a[1];
+        var bp_u=b[0]-p_u, bp_v=b[1]-p_v;
         // a and b are either both below or above p
         if (pa_v>5e-7 && bp_v<-5e-7 || pa_v<-5e-7 && bp_v>5e-7) continue;
         // a and b are both to the left of p
@@ -299,6 +298,7 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
         // a and be are both to the right of p
         if (pa_u<-5e-7 && bp_u>5e-7) inside^=1;
         else {
+          var ba_u=b[0]-a[0], ba_v=b[1]-a[1];
           // Check if (c-p)u >= 0 if everything else fails.
           var A=bp_u*pa_v-bp_v*pa_u;
           // Throw on_boundary if p is close to a-b.
