@@ -273,7 +273,7 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
           // No intersection if p and q are on the same side of a-b.
           if ( (ba_u*qb_v>=ba_v*qb_u) === (A>=0) ) continue;
           // No intersection if a and b are on the same side of p-q.
-          if ( (qp_u*pa_v>=qp_v*pa_u) === (qp_u*qb_v>=qp_v*qp_u) ) continue;
+          if ( (pa_u*qp_v>=pa_v*qp_u) === (qb_u*qp_v>=qb_v*qp_u) ) continue;
           inside^=1;
         }
       });
