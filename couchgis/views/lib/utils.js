@@ -268,7 +268,7 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
           var ba_u=b_u-a_u, ba_v=b_v-a_v;
           var A=ba_u*pa_v-ba_v*pa_u;
           // Throw on_boundary if p is close to a-b.
-          if (abs(A)<(abs(ba_u)+abs(ba_v))*2e-7) throw on_boundary;
+          if (abs(A)<(abs(ba_u)+abs(ba_v))*5e-7) throw on_boundary;
           var qb_u=q_u-b_u, qb_v=q_v-b_v;
           // No intersection if p and q are on the same side of a-b.
           if ( (ba_u*qb_v>=ba_v*qb_u) === (A>=0) ) continue;
@@ -302,7 +302,7 @@ exports.pointInPolygon=function(GeoJSON, point, known_point, inside) {
           // Check if (c-p)u >= 0 if everything else fails.
           var A=bp_u*pa_v-bp_v*pa_u;
           // Throw on_boundary if p is close to a-b.
-          if (abs(A)<(abs(ba_u)+abs(ba_v))*2e-7)
+          if (abs(A)<(abs(ba_u)+abs(ba_v))*5e-7)
             throw on_boundary;
           inside ^= ba_v<0 ^ A>0;
         }
