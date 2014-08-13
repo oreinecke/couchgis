@@ -165,7 +165,7 @@ function(head, req) {
     var doc=row.value.doc;
     if (!doc) continue;
     if (!type_matches(doc.type)) continue;
-    if (!time_matches(doc.time)) continue;
+    if (!time_matches(doc.ranges)) continue;
     if (!defines_field(doc)) continue;
     if (!matches_value(doc)) continue;
     if (!contains_keyword(doc)) continue;

@@ -141,7 +141,6 @@ $(document).ready(function() {
               // Group docs with identical GIS into one li.
               var doc=data.rows.pop().value.doc;
               if (!fillColor) fillColor=fillColors[doc.type];
-              doc.time=ranges.toString(doc.time);
               headers.each(function(i) {
                 var th=$(this);
                 var td=$(columns[i]);

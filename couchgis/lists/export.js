@@ -10,7 +10,6 @@ function(head, req) {
   if (indexes)
     indexes=require('views/lib/indexes').decompress(indexes).reverse();
   else indexes=[];
-  var ranges=require('views/lib/ranges');
   var path=require('views/lib/path');
   var include_revision='include_revision' in req.query;
   var fields=req.query.fields;
@@ -49,7 +48,7 @@ function(head, req) {
       else continue;
       if (doc_ids.indexOf(doc._id)!==-1) continue;
       if (filetype==="xml") doc_ids.push(doc._id);
-      doc.time=ranges.toString(doc.time) || undefined;
+      delete doc.ranges;
       if (!include_revision) {
         delete doc._rev;
         delete doc._id;
