@@ -1047,12 +1047,15 @@ $(document).ready(function() {
     <tbody></tbody>
   </table>
   <form id="export">
-    <span>Auswahl als <input type="text" value="export" name="filename"></span>
+    Auswahl als
+    <input type="text" value="export" name="filename">
     <span>
       <input type="radio" name="filetype" value="geojson" checked>.geojson
       <input type="radio" name="filetype" value="xml">.xml-Tabelle</span>
+      <input type="radio" name="filetype" value="couchdb">CouchDB
     <input type="button" value="speichern" name="download">
     <input type="button" value="URL erzeugen" name="get-url">
+    <input type="button" value="replizieren" name="replicate" style="display:none">
     <input type="text" name="url" style="display:none">
     <span>
       <input type="radio" name="select-fields" checked>alle
