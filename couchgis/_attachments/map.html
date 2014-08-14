@@ -936,6 +936,19 @@ $(document).ready(function() {
     });
   });
 
+  $("#export [name=filetype]").change( function() {
+    var elements=$("#export [name=columns]")
+                 .add("#export [name=download]")
+                 .add("#export [name=get-url]");
+    if ($(this).val()==="couchdb") {
+      elements.hide();
+      $("#export [name=replicate]").show();
+    } else {
+      elements.show();
+      $("#export [name=replicate]").hide();
+    }
+  });
+
   $("#export [name=filename]").keypress( function(e) {
     if (e.which===13) $("#export [name=download]").click();
   });
@@ -1058,10 +1071,10 @@ $(document).ready(function() {
     <input type="button" value="URL erzeugen" name="get-url">
     <input type="button" value="replizieren" name="replicate" style="display:none">
     <input type="text" name="url" style="display:none">
-    <span>
+    <span name="columns">
       <input type="radio" name="select-fields" checked>alle
       <input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</span>
-    <span>
+    <span name="columns">
       <input type="checkbox" name="include-revision" checked>_id, _rev
       <input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</span>
   </form>
