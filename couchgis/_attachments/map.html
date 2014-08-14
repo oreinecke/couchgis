@@ -943,9 +943,19 @@ $(document).ready(function() {
     if ($(this).val()==="couchdb") {
       elements.hide();
       $("#export [name=replicate]").show();
+      $.getJSON("/_all_dbs", function(dbs) {
+        // remove _special dbs and own from suggestion list
+        for (var d=0;d<dbs.length;d++)
+          if (dbs[d]===list.db || dbs[d][0]==="_") dbs.splice(d--,1);
+        $("#export [name=filename]").autocomplete({
+          source:dbs, minLength:0,
+          position:{my:"left bottom", at:"left top"}
+        });
+      });
     } else {
       elements.show();
       $("#export [name=replicate]").hide();
+      $("#export [name=filename]").autocomplete({source:[]});
     }
   });
 
