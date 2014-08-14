@@ -871,7 +871,8 @@ $(document).ready(function() {
 
   $("form").submit( function(e) {e.preventDefault();} );
 
-  $("#export :button").click( function() {
+  $("#export [name=download]").add("#export [name=get-url]")
+                              .click( function() {
     var url="_list/export/geojson";
     url+="?filename="+$("#export [name=filename]").val();
     url+="&filetype="+$("#export [name=filetype]:checked").val();
