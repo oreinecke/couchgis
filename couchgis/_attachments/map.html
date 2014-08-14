@@ -984,7 +984,9 @@ $(document).ready(function() {
   });
 
   $("#export [name=filename]").keypress( function(e) {
-    if (e.which===13) $("#export [name=download]").click();
+    if (e.which!==13) return;
+    $("#export [name=download]:visible").click();
+    $("#export [name=replicate]:visible").click();
   });
 
   // Hide url text input and display 'get-url' again.
