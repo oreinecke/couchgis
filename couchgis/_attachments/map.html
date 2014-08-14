@@ -959,6 +959,30 @@ $(document).ready(function() {
     }
   });
 
+  $("#export [name=replicate]").click( function() {
+    var data={
+      source:list.db, create_target:true,
+      target:$("#export [name=filename]").val(),
+      doc_ids:["_design/"+list.app]
+    };
+    var documents=filters[filters.length-1].documents;
+    for (var d=0, id=null; d<documents.length; d++) {
+      if (id!==documents[d][0])
+        data.doc_ids.push(id=documents[d][0]);
+      if (id!==documents[d][1])
+        data.doc_ids.push(documents[d][1]);
+    }
+    $.ajax("/_replicate", {
+      type:"POST",
+      dataType:"json",
+      contentType:"application/json",
+      data:JSON.stringify(data),
+      success:function(data) {
+        console.log(data);
+      }
+    });
+  });
+
   $("#export [name=filename]").keypress( function(e) {
     if (e.which===13) $("#export [name=download]").click();
   });
