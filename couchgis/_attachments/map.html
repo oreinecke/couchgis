@@ -197,8 +197,10 @@ $(document).ready(function() {
     for (var id in items) {
       var item=items[id];
       if (item.shape!==this) continue;
-      $("#table tbody").prepend(item.tr);
-      window.setTimeout(function() { item.tr.find('a').first().focus(); }, 1);
+      window.setTimeout(function() {
+        $("#table tbody").prepend(item.tr);
+        item.tr.find('a').first().focus();
+      }, 1);
       return;
     }
   };
