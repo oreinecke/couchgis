@@ -187,7 +187,7 @@ $(document).ready(function() {
                 $("#table tbody").prepend(tr);
                 // IE-10.0 loses this <a>'s focus because the map was clicked
                 // once before. It works just fine if we delay it by 1ms.
-                window.setTimeout(function() { tr.find('a').last().focus(); }, 1);
+                window.setTimeout(function() { tr.find('a').first().focus(); }, 1);
               };
             }(item.tr));
           } else item.shape.setOptions(options);
