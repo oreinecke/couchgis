@@ -181,15 +181,7 @@ $(document).ready(function() {
           var options=expand_options({ coordinates:row.value.GeoJSON.coordinates, map:map});
           if (item.shape==null) {
             item.shape=create_shape(row.value.GeoJSON.type, options);
-            item.shape.addListener('click', function(tr) {
-              return function() {
-                this.setOptions({zIndex:-new Date().getTime()});
-                $("#table tbody").prepend(tr);
-                // IE-10.0 loses this <a>'s focus because the map was clicked
-                // once before. It works just fine if we delay it by 1ms.
-                window.setTimeout(function() { tr.find('a').first().focus(); }, 1);
-              };
-            }(item.tr));
+            item.shape.addListener('click', update_geometry.highlight_row);
           } else item.shape.setOptions(options);
           if (!timeout) continue
           window.setTimeout(update_one_geometry, timeout);
@@ -199,6 +191,17 @@ $(document).ready(function() {
       })();
     }
   }
+
+  update_geometry.highlight_row=function() {
+    this.setOptions({zIndex:-new Date().getTime()});
+    for (var id in items) {
+      var item=items[id];
+      if (item.shape!==this) continue;
+      $("#table tbody").prepend(item.tr);
+      window.setTimeout(function() { item.tr.find('a').first().focus(); }, 1);
+      return;
+    }
+  };
 
   update_geometry.highlight_shape=function(e) {
     var item=e.data;
