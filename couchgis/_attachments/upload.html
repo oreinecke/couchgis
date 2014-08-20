@@ -249,6 +249,8 @@ $(document).ready(function() {
             };
           }(feature.properties));
         }
+        // Do nothing if this one is also staged for deletion.
+        if (feature.properties._deleted===true) continue;
         // If the document will be removed, then
         if (properties._deleted===true) {
           // store its geometry the feature that we have right now
