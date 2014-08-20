@@ -252,7 +252,7 @@ $(document).ready(function() {
         // If the document will be removed, then
         if (properties._deleted===true) {
           // store its geometry the feature that we have right now
-          feature.GeoJSON=uploaded_docs[properties._id].GeoJSON;
+          feature.geometry=uploaded_docs[properties._id].GeoJSON;
           // tell the submit handler that the feature's geometry has changed,
           feature.properties.GeoJSON_clone=null;
           // and point all other features to this features geometry.
