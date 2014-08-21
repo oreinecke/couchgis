@@ -509,9 +509,8 @@ $(document).ready(function() {
     options.keys=[];
     for (var d=0;d<documents.length;d++) {
       var doc=documents[d];
-      if (doc.keep_me) continue;
-      if (doc.skip_me) delete doc.skip_me;
-      else options.keys.push(doc);
+      if (!doc.keep_me && !doc.skip_me) options.keys.push(doc);
+      delete doc.skip_me;
     }
     list("tabulate/geojson", options, function(data) {
       var new_documents=[];
