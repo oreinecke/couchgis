@@ -361,6 +361,7 @@ $(document).ready(function() {
       // I have written this part using an anonymous function because it is
       // most concise and every attempt to do this without resulted in
       // additional clutter. Also I expect filters.length not to exceed 20.
+      if (new_filter.redo===filter) return false;
       if (filter[filter_name]==null) return true;
       if (filter_name==="union") {
         filter.union=new_filter.union;
