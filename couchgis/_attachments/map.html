@@ -495,12 +495,18 @@ $(document).ready(function() {
           var doc_ids={};
           while (data.rows.length)
             doc_ids[data.rows.pop().id]=true;
+          var new_documents=[];
+          var redo=false;
+          for (var prop in options)
+             redo |= prop!=="types";
           for (var d=0;d<documents.length;d++) {
             var doc=documents[d];
-            if (!doc_ids[doc[1]]) doc.skip_me=true;
+            if (doc[1] in doc_ids) new_documents.push(doc);
+            else doc.skip_me=redo;
           }
+          if (redo) recall_arguments.push({redo:options});
+          else options.documents=new_documents;
           filters.push(options);
-          recall_arguments.push({redo:options});
           filter_documents.apply(this, recall_arguments);
         });
       });
