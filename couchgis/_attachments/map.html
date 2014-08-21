@@ -124,6 +124,7 @@ $(document).ready(function() {
       successful=true;
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name=delayed]").prop('checked');
+      var headers=$("#table th");
       (function update_one_geometry() {
         while (data.rows.length) {
           var row=data.rows.pop();
@@ -132,7 +133,6 @@ $(document).ready(function() {
             data.rows.push(row);
             var tr=item.tr;
             tr.html('');
-            var headers=$("#table th");
             // append <th>'s from headers as <td>'s and copy class name
             headers.each(function() { tr.append($("<td>")); });
             var columns=tr.find("td");
