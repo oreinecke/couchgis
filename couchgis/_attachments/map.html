@@ -258,8 +258,8 @@ $(document).ready(function() {
       // prepare new viewport
       var new_vp={ bbox:options.bbox, prefix:[] };
       var documents=filters[filters.length-1].documents;
-      // I need the last prop of data after the loop again. This is one
-      // exceptional case where no 'var' is found in a for-statement.
+      // I need the last prop of data after the loop again. And
+      // yes, I know it looks silly and it makes no difference.
       var id; for (id in data) {
         new_vp.prefix.push(id);
         if (items[id]) {
