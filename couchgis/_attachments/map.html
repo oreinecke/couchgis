@@ -478,8 +478,12 @@ $(document).ready(function() {
     if (function() { for (var prop in options) return; return true; }())
       return filter_documents.apply(this, recall_arguments);
     options.keys=[];
-    for (var d=0;d<documents.length;d++)
-      if (!documents[d].keep_me) options.keys.push(documents[d]);
+    for (var d=0;d<documents.length;d++) {
+      var doc=documents[d];
+      if (doc.keep_me) continue;
+      if (doc.skip_me) delete doc.skip_me;
+      else options.keys.push(doc);
+    }
     list("tabulate/geojson", options, function(data) {
       var new_documents=[];
       var doc_id=data.reverse().pop();
