@@ -477,6 +477,35 @@ $(document).ready(function() {
     // Avoid query if all filters have been removed from options.
     if (function() { for (var prop in options) return; return true; }())
       return filter_documents.apply(this, recall_arguments);
+    // Pre-filter documents with indexed type and year.
+    if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
+      $.getJSON("_view/types-year?group_level=2", function(data) {
+        var keys=[];
+        while (data.rows.length) {
+          var row=data.rows[data.rows.length-1];
+          var key=data.rows.pop().key;
+          if (options.types && options.types.indexOf(key[0])===-1)
+            continue;
+          if (!ranges.intersects(key[1], options.time))
+            continue;
+          keys.push(key);
+        }
+        keys=encodeURIComponent(JSON.stringify(keys));
+        $.getJSON("_view/types-year?reduce=false&keys="+keys, function(data) {
+          var doc_ids={};
+          while (data.rows.length)
+            doc_ids[data.rows.pop().id]=true;
+          for (var d=0;d<documents.length;d++) {
+            var doc=documents[d];
+            if (!doc_ids[doc[1]]) doc.skip_me=true;
+          }
+          filters.push(options);
+          recall_arguments.push({redo:options});
+          filter_documents.apply(this, recall_arguments);
+        });
+      });
+      return;
+    }
     options.keys=[];
     for (var d=0;d<documents.length;d++) {
       var doc=documents[d];
