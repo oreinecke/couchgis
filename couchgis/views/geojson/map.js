@@ -24,7 +24,7 @@ function(doc) {
       var simplified_GeoJSON=utils.stripLastCoord(utils.simplify(utils.clone(GeoJSON),error));
       // Store EPSG used to transform coordinates from source geometry.
       if (simplified_GeoJSON.error===0) simplified_GeoJSON.EPSG=utils.EPSG({crs:crs});
-      emit([id,+Number(simplified_GeoJSON.error).toExponential(1)], {GeoJSON:simplified_GeoJSON});
+      emit([id,+simplified_GeoJSON.error.toExponential(1)], {GeoJSON:simplified_GeoJSON});
       error=simplified_GeoJSON.error;
     }
   }
