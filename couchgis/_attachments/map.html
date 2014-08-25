@@ -481,13 +481,13 @@ $(document).ready(function() {
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
       $.getJSON("_view/types-year?group_level=2", function(data) {
         var keys=[];
+        var time=options.time || filters[position-1].time;
+        var types=options.types || filters[position-1].types;
         while (data.rows.length) {
           var row=data.rows[data.rows.length-1];
           var key=data.rows.pop().key;
-          if (options.types && options.types.indexOf(key[0])===-1)
-            continue;
-          if (!ranges.intersects(key[1], options.time))
-            continue;
+          if (types.indexOf(key[0])===-1) continue;
+          if (!ranges.intersects(key[1], time)) continue;
           keys.push(key);
         }
         keys=encodeURIComponent(JSON.stringify(keys));
