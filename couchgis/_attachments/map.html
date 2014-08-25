@@ -479,7 +479,7 @@ $(document).ready(function() {
       return filter_documents.apply(this, recall_arguments);
     // Pre-filter documents with indexed type and year.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
-      $.getJSON("_view/types-year?group_level=2", function(data) {
+      $.getJSON("_view/type-year?group_level=2", function(data) {
         var keys=[];
         var time=options.time || filters[position-1].time;
         var types=options.types || filters[position-1].types;
