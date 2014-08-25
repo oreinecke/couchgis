@@ -504,7 +504,7 @@ $(document).ready(function() {
             if (doc[1] in doc_ids) new_documents.push(doc);
             else doc.skip_me=redo;
           }
-          if (redo) recall_arguments.push({redo:options});
+          if (redo) recall_arguments.unshift({redo:options});
           else options.documents=new_documents;
           filters.push(options);
           filter_documents.apply(this, recall_arguments);
