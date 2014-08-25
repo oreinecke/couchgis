@@ -501,7 +501,8 @@ $(document).ready(function() {
              redo |= prop!=="types";
           for (var d=0;d<documents.length;d++) {
             var doc=documents[d];
-            if (doc[1] in doc_ids) new_documents.push(doc);
+            if (doc.keep_me || doc[1] in doc_ids)
+              new_documents.push(doc);
             else doc.skip_me=redo;
           }
           if (redo) recall_arguments.unshift({redo:options});
