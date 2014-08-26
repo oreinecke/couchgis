@@ -19,5 +19,5 @@ function(doc) {
     var remainder=range.end[0]%granularity;
     if (remainder) range.end[0]+=granularity-remainder;
   }
-  emit([doc.type, [range]]);
+  emit([doc.type, ranges.toString([range])]);
 }
