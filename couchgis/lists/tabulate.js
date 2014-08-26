@@ -157,8 +157,11 @@ function(head, req) {
   var send_separator=function() {
     send_separator=function() {send(',\n');};
   };
-  var send_fields=function() {
+  var send_fields=pass;
+  if (req.path.pop()==="geojson") send_fields=function() {
     send('"'+row.id+'"');
+  }; else send_fields=function() {
+    send(JSON.stringify(row.key));
   };
   send('[');
   while (row=getRow()) {
