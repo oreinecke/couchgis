@@ -150,7 +150,7 @@ $(document).ready(function() {
                   // and set link text to a useful item explanation.
                   var a=$("<a>").attr({
                     href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
-                  }).html( doc[doc.type]||doc.type );
+                  }).text( doc[doc.type]||doc.type );
                   if (cl==="title-time" && doc.time)
                     a.append(' ('+doc.time+')');
                   td.append(a).append('<br>');
@@ -572,7 +572,7 @@ $(document).ready(function() {
       }
       var optgroup=$("[name=fields]");
       for (var field in fields)
-        optgroup.append($("<option>").html(field));
+        optgroup.append($("<option>").text(field));
       var span=$("#filter .types");
       for (var type in types) {
         span.append($('<input>').attr({type:"checkbox",name:type})).append(type);
@@ -595,7 +595,7 @@ $(document).ready(function() {
     // the beginning. It is completely useless but I certainly like it.
     if (li.css("display")==="none")
       $("#cuts").append(li.show());
-    li.find('a').html($(this).val());
+    li.find('a').text($(this).val());
     if (!time) li.hide();
   });
 
@@ -628,7 +628,7 @@ $(document).ready(function() {
       var val=$("#filter [name=field]").val();
       $("[name=fields]").html('');
       for (var field in fields)
-        optgroup.append($("<option>").html(field));
+        optgroup.append($("<option>").text(field));
       // The selected option was destroyed three
       // lines above, so I just re-select it here.
       $("#filter [name=field]").val(val);
@@ -639,13 +639,13 @@ $(document).ready(function() {
       // Fill 'fields' optgroup with reduced set of fields.
       var optgroup=$("#table [name=fields]");
       for (var field in fields)
-        optgroup.append($('<option>').html(field));
+        optgroup.append($('<option>').text(field));
     });
     filter_documents({types:types});
     // It sure would be nice to see the new filter appear
     // in the list, and I am in a good mood right now.
     var li=$("#type-is");
-    li.find('a').html(types.join('/'));
+    li.find('a').text(types.join('/'));
     // append filter item at the end instead of inserting it
     if (li.css("display")==="none")
       $("#cuts").append(li.show());
@@ -679,7 +679,7 @@ $(document).ready(function() {
     filter_documents({cuts:[cut]});
     var li=$(id).clone();
     li.css('display','inline').prop('id',"");
-    li.append(cut.value).find('[name=field]').html(cut.field);
+    li.append(cut.value).find('[name=field]').text(cut.field);
     $("#cuts").append(li);
     li.find(':button').click(function() {
       // Tell filter_documents() to remove cut from the queue and set form
@@ -747,7 +747,7 @@ $(document).ready(function() {
     var li=$("#spatial-"+relation).css('display', 'block')
                                   .find("span")
                                   .html(union.find("span").html());
-    union.hide().find("span").html("");
+    union.hide().find("span").html('');
     filter_documents({union:[]}, {spatial:relation,keys:keys});
   });
 
