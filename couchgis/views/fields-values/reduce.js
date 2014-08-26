@@ -1,4 +1,4 @@
-function reduce(keys, values, rereduce) {
+function reduce(keys, values) {
   var result=values[0];
   for (var v=1;v<values.length;v++) {
     var value=values[v];

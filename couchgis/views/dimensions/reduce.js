@@ -1,7 +1,7 @@
 // Unifies bboxes for viewport initialization.
 // Also unifies time ranges as general info.
 
-function(keys, values, rereduce) {
+function(keys, values) {
   ;function lesser(a, b) {
     // Do not expand to -infinity, because
     // these are covered by any range anyway.
