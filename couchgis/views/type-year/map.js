@@ -1,12 +1,13 @@
 // Sample [type, year] at "reasonable granularity".
 
 function(doc) {
-  var ranges=require('views/lib/ranges').toRanges(doc.time);
-  var range=ranges.shift();
-  range.begin.splice(1);
-  if (ranges.length)
-    range.end=ranges.pop().end.slice(0,1);
-  else range.end.splice(1);
+  var ranges=require('views/lib/ranges');
+  var range=function(ranges) {
+    return {
+      begin:ranges[0].begin.slice(0,1),
+      end:ranges.pop().end.slice(0,1)
+    };
+  }(ranges.toRanges(doc.time));
   var granularity=(function(years) {
     if (years>50) return 100;
     if (years>10) return 50;
