@@ -212,10 +212,10 @@ How Document Editing Works
 
 The [upload page](couchgis/_attachments/upload.html) covers editing and
 uploading new documents. Accepted formats are GeoJSON Feature/FeatureCollection
-and the ghastly Microsoft Excel 2003 XML Table. Not surprisingly, the form
-pretty much explains itself, and even if documents have been deleted or messed
-up, there's always a revert button. Also you can review the data that is going
-to be uploaded.
+and the ghastly Microsoft Excel 2003 XML spreadsheet. Not surprisingly, the
+form pretty much explains itself, and even if documents have been deleted or
+messed up, there's always a revert button. Also, you can review the data that
+is going to be uploaded.
 
 In CouchDB creating new or changing documents is more or less the same, as soon
 as the Bulk Document API is in use. The application works with, and extends its
