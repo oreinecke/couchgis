@@ -89,23 +89,21 @@ $(document).ready(function() {
 
   // query for GeoJSON and full documents
   function update_geometry() {
-    var keys=[];
+    var geometries=[], documents=[];
     for (var id in items) {
       var item=items[id];
       if (!item.keep_shape)
-        keys.push(item.keys[0]);
+        geometries.push(item.keys[0]);
       if (!item.keep_documents)
-        keys=keys.concat(item.keys.slice(1));
+        documents=documents.concat(item.keys.slice(1));
     }
-    if (!keys.reverse().length) {
-      call.that_last_one();
-      return;
-    }
+    if (geometries.reverse().length + documents.reverse().length === 0)
+      return call.that_last_one();
     var successful=false;
     function ajax() {
       $.ajax("_view/geojson", {
         type:"POST",
-        data:'{"keys":'+JSON.stringify(keys)+'}',
+        data:'{"keys":'+JSON.stringify(documents.concat(geometries))+'}',
         dataType:"json",
         success:success,
         complete:function() {
