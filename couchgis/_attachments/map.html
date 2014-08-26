@@ -479,19 +479,14 @@ $(document).ready(function() {
       return filter_documents.apply(this, recall_arguments);
     // Pre-filter documents with indexed type and year.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
-      $.getJSON("_view/type-year?group_level=2", function(data) {
-        var keys=[];
-        var time=options.time || filters[position-1].time;
-        var types=options.types || filters[position-1].types;
-        while (data.rows.length) {
-          var row=data.rows[data.rows.length-1];
-          var key=data.rows.pop().key;
-          if (types.indexOf(key[0])===-1) continue;
-          if (!ranges.intersects(key[1], time)) continue;
-          keys.push(key);
-        }
-        keys=encodeURIComponent(JSON.stringify(keys));
-        $.getJSON("_view/types-year?reduce=false&keys="+keys, function(data) {
+      $.get("_list/tabulate/type-year", {
+        group_level:2, options: JSON.stringify({
+          types: options.types || filters[1] && filters[1].types,
+          time: options.time || filters[1] && filters[1].time
+        })
+      }, function(keys) {
+        keys=encodeURIComponent(keys);
+        $.getJSON("_view/type-year?reduce=false&keys="+keys, function(data) {
           var doc_ids={};
           while (data.rows.length)
             doc_ids[data.rows.pop().id]=true;
@@ -510,7 +505,7 @@ $(document).ready(function() {
           filters.push(options);
           filter_documents.apply(this, recall_arguments);
         });
-      });
+      }, "text");
       return;
     }
     options.keys=[];
