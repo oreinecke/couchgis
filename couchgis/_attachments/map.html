@@ -475,30 +475,43 @@ $(document).ready(function() {
     // Avoid query if all filters have been removed from options.
     if (function() { for (var prop in options) return; return true; }())
       return filter_documents.apply(this, recall_arguments);
-    // Pre-filter documents with indexed type and year.
+    // Pre-filter documents with indexed type and year. This improves
+    // response time if it's used for the first or second filter item.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
+      // Obtain simplified [type,year] pairs from
+      // _view/type-year matching options' filters.
       $.get("_list/tabulate/type-year", {
         group_level:2, options: JSON.stringify({
+          // Fetch filter from options or filters[1], but not from
+          // filters[0] because those would only slow the list down.
           types: options.types || filters[1] && filters[1].types,
           time: options.time || filters[1] && filters[1].time
         })
       }, function(keys) {
+        // _list/tabulate already returns a valid JSON array of keys, so
+        // it just needs to be URIencoded and run by the unreduced view.
         keys=encodeURIComponent(keys);
         $.getJSON("_view/type-year?reduce=false&keys="+keys, function(data) {
+          // Hash matching document ids into doc_ids.
           var doc_ids={};
           while (data.rows.length)
             doc_ids[data.rows.pop().id]=true;
-          var new_documents=[];
+          // If only the type and nothing else has been pre-
+          // filtered, there is no need to reissue the filter.
           var redo=false;
           for (var prop in options)
              redo |= prop!=="types";
+          var new_documents=[];
           for (var d=0;d<documents.length;d++) {
             var doc=documents[d];
             if (doc.keep_me || doc[1] in doc_ids)
               new_documents.push(doc);
+            // Tag document to be skipped once next time.
             else doc.skip_me=redo;
           }
+          // Issue filter again if other filters were involved,
           if (redo) recall_arguments.unshift({redo:options});
+          // otherwise set up the new filter and we're done.
           else options.documents=new_documents;
           filters.push(options);
           filter_documents.apply(this, recall_arguments);
