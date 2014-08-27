@@ -612,6 +612,8 @@ $(document).ready(function() {
     // that are available by the given type selection.
     $.getJSON("_view/fields-values?group_level=2", function(data) {
       var fields={_id:null};
+      for (var t=0;t<types.length;t++)
+        fields[types[t]]=null;
       while (data.rows.length) {
         var key=data.rows.shift().key;
         if (types.indexOf(key[0])===-1) continue;
