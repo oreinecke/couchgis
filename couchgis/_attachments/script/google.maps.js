@@ -58,7 +58,7 @@ function MultiPolygon(options) {
 }
 
 // correct for small shift in Google Maps aerials of unknown reason
-var offset=[-0.00178,-0.00121];
+var offset=[-0.00165, -0.00172];
 
 // Replace all 2-element arrays inside GeoJSON.coordinates with
 // LatLngs; This is written with extra-ugly comma operators and

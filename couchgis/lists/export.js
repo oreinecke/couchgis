@@ -36,9 +36,7 @@ function(head, req) {
     delete geometry.error;
     delete geometry.bbox;
     // If no EPSG was specified in the query, export to the first EPSG of all
-    // geometries; Chances are, that it's the only EPSG at the same time. In
-    // this case projecting coordinates back and forth causes a numeric
-    // inaccuracy of 2mm (otherwhise 1m).
+    // geometries; Chances are, that it's the only EPSG at the same time.
     if (!EPSG) EPSG=geometry.EPSG;
     delete geometry.EPSG;
     while (row && !row.value.doc) row=getRow();
