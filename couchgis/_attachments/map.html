@@ -208,8 +208,7 @@ $(document).ready(function() {
   update_geometry.highlight_shape=function(e) {
     var item=e.data;
     var bbox=item.GeoJSON.bbox;
-    map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0+offset[1],
-                             (bbox[2]+bbox[0])/2.0+offset[0]));
+    map.setCenter(new LatLng( (bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0 ));
     item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
     // Center map to the shape and highlight it.
     $("#table tbody").prepend(item.tr);
@@ -228,10 +227,7 @@ $(document).ready(function() {
     var options={
       limit:parseFloat($("#settings [name=limit]").val()),
       error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
-      bbox:[
-        SW.lng()-offset[0], SW.lat()-offset[1],
-        NE.lng()-offset[0], NE.lat()-offset[1]
-      ],
+      bbox:[ SW.lng(), SW.lat(), NE.lng(), NE.lat() ],
     };
     var vp;
     // pop viewports until one is found that surrounds bbox

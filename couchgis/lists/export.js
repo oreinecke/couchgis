@@ -81,13 +81,13 @@ function(head, req) {
   }
   if (filetype==="geojson" || include_WKT) {
     var utils=require('views/lib/utils');
-    var projector=require('views/lib/proj4')(utils.projection[EPSG]);
+    var proj4=utils.proj4(utils.projection[EPSG]);
     for (var f=0, geometry=null; f<features.length; f++) {
       // ensure each geometry is projected only once
       if (geometry===features[f].geometry) continue;
       geometry=features[f].geometry;
       utils.eachPoint(geometry, function(coord) {
-        var newCoord=projector.forward(coord);
+        var newCoord=proj4.forward(coord);
         coord[0]=newCoord[0];
         coord[1]=newCoord[1];
       });

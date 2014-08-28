@@ -114,13 +114,32 @@ exports.EPSG=function(GeoJSON) {
   return +GeoJSON.crs.properties.name.match(/EPSG:+(\d+)/)[1];
 };
 
+// Transform coordinates with proj4js, and correct a
+// small discrepancy between aerials of Google Maps
+// and Geographischer Informationsdienst Sachsen.
+
+exports.proj4=function(projection) {
+  var offset=[0.00165, 0.00172];
+  var proj4=require('./proj4').apply(this, arguments);
+  if (!proj4.forward || !proj4.inverse)
+    return proj4;
+  function forward(c) {
+    return proj4.forward([c[0]+offset[0], c[1]+offset[1]]);
+  }
+  function inverse(c) {
+    c=proj4.inverse(c);
+    return [c[0]-offset[0], c[1]-offset[1]];
+  }
+  return { forward:forward, inverse:inverse };
+};
+
 // Transform to WGS84.
 
 exports.toWGS84=function(GeoJSON) {
   try {
-    var projector=require('./proj4')(exports.projection[exports.EPSG(GeoJSON)]);
+    var proj4=exports.proj4(exports.projection[exports.EPSG(GeoJSON)]);
     exports.eachPoint(GeoJSON, function(coord) {
-      var newCoord=projector.inverse(coord);
+      var newCoord=proj4.inverse(coord);
       coord[0]=newCoord[0];
       coord[1]=newCoord[1];
     });
