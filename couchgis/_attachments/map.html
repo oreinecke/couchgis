@@ -151,7 +151,7 @@ $(document).ready(function() {
                   }).text( doc[doc.type]||doc.type );
                   if (cl==="title-time" && doc.time)
                     a.append(' ('+doc.time+')');
-                  td.append(a).append('<br>');
+                  td.append(a, '<br>');
                 // evaluate columns
                 } else if (cl==="field") {
                   var fields=path.decode(th.val()), value=doc;
@@ -161,7 +161,7 @@ $(document).ready(function() {
                   span.addClass('field').click({
                     field:th.text(), value:span.text().replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&")
                   }, update_geometry.create_filter);
-                  td.append(span).append('<br>');
+                  td.append(span, '<br>');
                 }
                 if (cl!=="geometry") return;
                 // Set-up link to geometry: I use a very bold bullet point.
@@ -577,7 +577,7 @@ $(document).ready(function() {
         optgroup.append($("<option>").text(field));
       var span=$("#filter .types");
       for (var type in types) {
-        span.append($('<input>').attr({type:"checkbox",name:type})).append(type);
+        span.append($('<input>').attr({type:"checkbox",name:type}), type);
         filters[0].types.push(type);
         // This is one rare advantage of javascripts 'phony' arrays:
         // I can use fillColors first as a set and then assign keys

@@ -84,7 +84,7 @@ $(document).ready(function() {
       var value=$('<input type="text" name="value">').prop('disabled',special);
       values[prop]=value;
       fields[prop]=field;
-      row.append(checkbox).append(field).append(': ').append(value).append('<br>');
+      row.append(checkbox, field, ': ', value, '<br>');
       $("#modify div").append(row);
       if (special) continue;
       // write new value to displayed feature
@@ -302,7 +302,7 @@ $(document).ready(function() {
       dataType:"text",
       url:$("#upload :text").val(),
       error:function(jqXHR, text, error) {
-        $("#upload b").append(text+' '+error+"<br>");
+        $("#upload b").append(text+' '+error, "<br>");
       },
       success:function(data, text, jqXHR) {
         var filetype=jqXHR.getResponseHeader('Content-type');

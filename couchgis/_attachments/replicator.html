@@ -44,7 +44,7 @@ $(document).ready(function() {
           function append(obj, keys) {
             for (var k=0;k<keys.length;k++)
               if (obj[keys[k]]!=null)
-                r.append(keys[k]+": <b>"+obj[keys[k]]+"</b><br>");
+                r.append(keys[k]+": <b>"+obj[keys[k]], "</b><br>");
           }
           append(data, ["ok", "no_changes"]);
           if (!data.history || data.no_changes) return;
