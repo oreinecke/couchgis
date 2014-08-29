@@ -823,14 +823,13 @@ $(document).ready(function() {
       select.find("[name=fields]").prepend(option);
     } else {
       var last=$("#table thead th").last();
-      $("#table thead tr").append(
-        $('<th>').html(path.pretty(option.val(),'<br>'))
-                 .val(option.val())
-                 .addClass("field")
-                 .click( function() { select.val($(this).text()).change(); })
-      );
-      // move column selection to the right
-      $("#table thead tr").append(last);
+      var th=$('<th>').text(option.val())
+                      .val(option.val())
+                      .addClass("field")
+                      .click( function() { select.val($(this).text()).change(); });
+      th.html(path.pretty(th.html(), '<br>'));
+      // append new header and move column selection to the right
+      $("#table thead tr").append(th, last);
       // move option to the columns optgroup
       select.find("[name=columns]").append(option);
     }
