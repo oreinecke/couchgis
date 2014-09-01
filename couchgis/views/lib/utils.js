@@ -98,9 +98,12 @@ exports.size=function(GeoJSON) {
 
 exports.projection={
   4326: "+proj=longlat +datum=WGS84 +ellps=WGS84 +nodefs",
-  3396: "+proj=tmerc +lat_0=0 +lon_0=9  +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +units=m +no_defs",
-  3397: "+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +units=m +no_defs",
+  3396: "+proj=tmerc +lat_0=0 +lon_0=9  +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +units=m +no_defs"
+       +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7",
+  3397: "+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +units=m +no_defs"
+       +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7",
   31469:"+proj=tmerc +lat_0=0 +lon_0=15 +k=1 +x_0=5500000 +y_0=0 +ellps=bessel +units=m +no_defs"
+       +"+towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7"
 };
 exports.projection[31468] = exports.projection[3397];
 exports.projection[31467] = exports.projection[3396];
@@ -119,16 +122,16 @@ exports.EPSG=function(GeoJSON) {
 // and Geographischer Informationsdienst Sachsen.
 
 exports.proj4=function(projection) {
-  var offset=[0.00165, 0.00172];
+  var offset=[13.2e-5, 7.5e-5];
   var proj4=require('./proj4').apply(this, arguments);
   if (!proj4.forward || !proj4.inverse)
     return proj4;
   function forward(c) {
-    return proj4.forward([c[0]+offset[0], c[1]+offset[1]]);
+    return proj4.forward([c[0]-offset[0], c[1]-offset[1]]);
   }
   function inverse(c) {
     c=proj4.inverse(c);
-    return [c[0]-offset[0], c[1]-offset[1]];
+    return [c[0]+offset[0], c[1]+offset[1]];
   }
   return { forward:forward, inverse:inverse };
 };
