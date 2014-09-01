@@ -100,8 +100,14 @@ to which you can set `doc.GeoJSON.crs.properties.name`:
 ArcGIS seems to stick to legacy identifiers and QGIS uses OGC CRS URNs, so I
 just check for EPSG and one or two colons and a bunch of digits.
 
+As a side note, it seems that ArgGIS and QGIS have a different definition of
+WGS84. Also, QGIS and [Proj4js][3] (which I use for coordinate transformation)
+seem to coincide on that definition. So it is safe to import data in WGS84, as
+long as it is from QGIS, but for ArcGIS I cannot guarantee anything.
+
 [1]: http://geojson.org/geojson-spec.html
 [2]: http://geojson.org/geojson-spec.html#named-crs
+[3]: http://proj4js.org/
 
 ###`doc.type`
 
