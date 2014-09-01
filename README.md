@@ -81,7 +81,7 @@ different time.
 
 Multiple geometry clones may be separated by comma/space/ampersand/semicolon.
 These documents may be listed twice or more in the map page, but are only
-exported once as a table row.
+exported once into a spreadsheet.
 
 `doc.GeoJSON.type` is restricted to Point, LineString, Polygon,
 MultiLineString, MultiPolygon. It could make sense, and it would be easy, to
@@ -125,10 +125,10 @@ sense to have it set.
 
 ###`doc.time`
 
-In every table that I had to review, date information was a mess. There's
-always a column for day/month/year, probably with one of them missing, and the
-year had either four or two digits. Or worse, somehow a start and end date was
-given as `MONTH_BEG` `YEAR_BEG` `DAY_END` or whatever.
+In every attribute table that I had to review, date information was a mess.
+There's always a column for day/month/year, probably with one of them missing,
+and the year had either four or two digits. Or worse, somehow a start and end
+date was given as `MONTH_BEG` `YEAR_BEG` `DAY_END` or whatever.
 
 [Dates or ranges of dates](couchgis/views/lib/ranges.js) are expressed as a
 string as such:
