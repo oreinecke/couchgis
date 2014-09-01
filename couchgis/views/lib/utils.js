@@ -107,6 +107,7 @@ exports.projection={
 };
 exports.projection[31468] = exports.projection[3397];
 exports.projection[31467] = exports.projection[3396];
+exports.projection[31495] = exports.projection[31469];
 
 // Acquire EPSG numbers from GeoJSON.crs.
 
