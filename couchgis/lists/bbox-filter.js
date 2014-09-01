@@ -74,7 +74,11 @@ function(head, req) {
     if ( /within|intersects/.test(options.relation) ) {
       var points=[];
       utils.stripLastCoord(related_GeoJSON);
-      utils.eachPoint(related_GeoJSON, function(coord) { points.push(coord); });
+      utils.eachPoint(related_GeoJSON, function(point, type) {
+        if ( flip_sideness && type!=="Polygon" && type!=="MultiPolygon")
+          point.exclude_from_boundary=true;
+        points.push(point);
+      });
       relates=function(GeoJSON) {
         utils.unstripLastCoord(GeoJSON);
         var last_point, inside=flip_sideness;
@@ -83,9 +87,10 @@ function(head, req) {
           inside=utils.pointInPolygon(GeoJSON, point, last_point, inside);
           if (!inside) return false;
           else if (inside===0.5) {
-            inside=false;
+            inside=flip_sideness;
             last_point=undefined;
-            if (flip_sideness) return false;
+            if ( point.exclude_from_boundary )
+              return false;
           } else last_point=point;
         }
         return true;
@@ -112,13 +117,14 @@ function(head, req) {
       var point_outside={message:"Point outside related polygons."};
       relates=function(GeoJSON) {
         var last_point, inside=flip_sideness;
-        try { utils.eachPoint(GeoJSON, function(point) {
+        try { utils.eachPoint(GeoJSON, function(point, type) {
           inside=utils.pointInPolygon(related_Polygons, point, last_point, inside);
           if (!inside) throw point_outside;
           else if (inside===0.5) {
-            inside=false;
+            inside=flip_sideness;
             last_point=undefined;
-            if (flip_sideness) throw point_outside;
+            if ( flip_sideness && type!=="Polygon" && type!=="MultiPolygon" )
+              throw point_outside;
           } else last_point=point;
         }); } catch (err) {
           if (err===point_outside) return false;
