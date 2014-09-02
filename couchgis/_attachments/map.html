@@ -992,7 +992,7 @@ $(document).ready(function() {
                  .add("#export [name=get-url]");
     if ($(this).val()==="couchdb") {
       elements.hide();
-      $("#export [name=replicate]").show();
+      $("#export [name^=replicate]").show();
       $.getJSON("/_all_dbs", function(dbs) {
         // remove _special dbs and own from suggestion list
         for (var d=0;d<dbs.length;d++)
@@ -1004,7 +1004,7 @@ $(document).ready(function() {
       });
     } else {
       elements.show();
-      $("#export [name=replicate]").hide();
+      $("#export [name^=replicate]").hide();
       $("#export [name=filename]").autocomplete({source:[]});
     }
   });
@@ -1153,6 +1153,7 @@ $(document).ready(function() {
     <input type="button" value="speichern" name="download">
     <input type="button" value="URL erzeugen" name="get-url">
     <input type="button" value="replizieren" name="replicate" style="display:none">
+    <a name="replicate-status" style="display:none"></a>
     <input type="text" name="url" style="display:none">
     <span name="columns">
       <input type="radio" name="select-fields" checked>alle
