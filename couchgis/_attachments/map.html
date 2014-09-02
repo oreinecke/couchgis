@@ -1010,6 +1010,7 @@ $(document).ready(function() {
   });
 
   $("#export [name=replicate]").click( function() {
+    $(this).prop('disabled', true);
     var data={
       source:list.db, create_target:true,
       target:$("#export [name=filename]").val(),
@@ -1034,6 +1035,7 @@ $(document).ready(function() {
           lines.push(prop+': <b>'+resp[prop]+'</b>');
         }
         $("#export [name=replicate-status]").html(lines.join(', '));
+        $("#export [name=replicate]").prop('disabled', false);
       }
     });
   });
