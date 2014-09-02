@@ -314,6 +314,10 @@ $(document).ready(function() {
   // ii) inserted in the middle and merged with filters following it
   // iii) nothing of the above if an identical filter is already used.
   function filter_documents(new_filter) {
+    $("#filter :input").each(function() {
+      if (this!==document.activeElement)
+        $(this).prop('disabled', true);
+    });
     // Generate geometry id list from latest document list and
     // reset viewports because they are most likely invalidated.
     if (!new_filter) {
@@ -335,6 +339,7 @@ $(document).ready(function() {
         d--;
       }
 //    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
+      $("#filter :input").prop('disabled', false);
       Maps.event.trigger(map, 'bounds_changed');
       return;
     }
