@@ -31,20 +31,21 @@ exports.eachCoords=function(GeoJSON, action) {
 exports.eachPoint=function(GeoJSON, action) {
   function apply_action(geometry) {
     var c=geometry.coordinates;
+    var t=geometry.type;
     // Point
     if (typeof(c[0])==="number") action(c);
     // MultiPoint/LineString
     else if (typeof(c[0][0])==="number")
-      for (var i=c.length-1; i!==-1; i--) action(c[i]);
+      for (var i=c.length-1; i!==-1; i--) action(c[i], t);
     // Polygon/MultiLineString
     else if (typeof(c[0][0][0])==="number")
       for (var i=c.length-1, ci; ci=c[i], i!==-1; i--)
-      for (var j=ci.length-1; j!==-1; j--) action(ci[j]);
+      for (var j=ci.length-1; j!==-1; j--) action(ci[j], t);
     // MultiPolygon
     else if (typeof(c[0][0][0][0])==="number")
       for (var i=c.length-1, ci; ci=c[i], i!==-1; i--)
       for (var j=ci.length-1, cij; cij=ci[j], j!==-1; j--)
-      for (var k=cij.length-1; k!==-1; k--) action(cij[k]);
+      for (var k=cij.length-1; k!==-1; k--) action(cij[k], t);
   }
   if (GeoJSON.type==="GeometryCollection")
     for (var g=0;g<GeoJSON.geometries.length;g++)
