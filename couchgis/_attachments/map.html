@@ -1024,8 +1024,16 @@ $(document).ready(function() {
       dataType:"json",
       contentType:"application/json",
       data:JSON.stringify(data),
-      success:function(data) {
-        console.log(data);
+      complete:function(jqXHR, textStatus) {
+        JQXHR=jqXHR;
+        var resp=jqXHR.responseJSON || {status:textStatus};
+        var lines=[];
+        for (var prop in resp) {
+          if (typeof resp[prop] === "object") continue;
+          if (typeof resp[prop] === "function") continue;
+          lines.push(prop+': <b>'+resp[prop]+'</b>');
+        }
+        $("#export [name=replicate-status]").html(lines.join(', '));
       }
     });
   });
