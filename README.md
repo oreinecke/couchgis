@@ -195,9 +195,13 @@ geometry either lies inside, intersects or circumfences it. After you figured
 out your fixed geometry, click on 'Auswahl merken', and then a button presents
 itself for each relation. I have the following to say to this:
 - Each geometry relates to itself by default.
-- You might encounter glitches because of my sloppy implementation: For
-  instance, I do not check for intersecting line segments, and the algorithm
-  gets confused by identical points, and there's probably more.
+- You might encounter glitches due to my sloppy implementation: For instance, I
+  do not check for intersecting line segments, points identical to other
+  points or points on line segments etc.
+- I've built in a tolerance (or snap if you will) of 6-10cm depending on
+  latitude. This is a good thing, because coordinates usually aren't that
+  precise, hence that kind of a distance shouldn't decide if geometries are
+  related.
 - Let the interface encourage you to select the documents as tightly as
   possible, before they are filtered geometrically. I've tried to make the
   filter perform as fast as it gets, but there's of course limitations. If it
@@ -210,8 +214,8 @@ is outperformed easily by any compiled version thereof. However, it is not
 nearly as painful to use as in Quantum GIS: you don't have to split _one layer_
 into _two layers_, and you don't have to store the result in _yet another_
 shapefile, and if you've made a mistake, you don't have to _navigate through
-the same menu again, and set up a dialog exactly as you did before_. So this is
-for people who like to trade a little convenience for performance.
+the same menu again, and set up a dialog exactly as you did before_. So it
+trades a little convenience for performance.
 
 How Document Editing Works
 --------------------------
