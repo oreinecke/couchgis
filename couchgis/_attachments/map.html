@@ -599,7 +599,7 @@ $(document).ready(function() {
   $("#filter [name=time]").keypress( function(e) {
     if (e.originalEvent && e.which!==13) return;
     var time=$(this).val();
-    filter_documents({ time: time });
+    filter_documents({ time:time });
     var li=$("#time-is");
     // This way the filter shows up at the end of the list instead of at
     // the beginning. It is completely useless but I certainly like it.
@@ -611,7 +611,7 @@ $(document).ready(function() {
 
   // Remove document time constraint.
   $("#time-is :button").click(function() {
-    filter_documents({time:""});
+    filter_documents({ time:"" });
     $("#filter [name=time]").val('');
     $("#time-is").hide();
   });
@@ -653,7 +653,7 @@ $(document).ready(function() {
       for (var field in fields)
         optgroup.append($('<option>').text(field));
     });
-    filter_documents({types:types});
+    filter_documents({ types:types });
     // It sure would be nice to see the new filter appear
     // in the list, and I am in a good mood right now.
     var li=$("#type-is");
@@ -688,7 +688,7 @@ $(document).ready(function() {
       if (field[0]!=='_') return "#has-defined";
     }(cut.field, cut.value);
     if (!id) return;
-    filter_documents({cuts:[cut]});
+    filter_documents({ cuts:[cut] });
     var li=$(id).clone();
     li.css('display','inline').prop('id',"");
     li.append(cut.value).find('[name=field]').text(cut.field);
@@ -702,7 +702,7 @@ $(document).ready(function() {
       $("#filter [name=field]").change();
       $("#filter [name=content]").val( cut.value || "" );
       cut.remove_me=true;
-      filter_documents({cuts:[cut]});
+      filter_documents({ cuts:[cut] });
       li.remove();
     });
     $("#cuts").append(li);
@@ -737,14 +737,14 @@ $(document).ready(function() {
     });
     $("#cuts").prepend(union.css('display', 'block'));
     $("#cuts > [id^=spatial-]").hide();
-    filter_documents({union:filters[filters.length-1].documents}, {spatial:false});
+    filter_documents( {union:filters[filters.length-1].documents}, {spatial:false} );
   });
 
   // Discard stored selection and hide #union filter item.
   $("#discard-selection").click( function() {
     // also clear selection summary
     $("#union").hide().find("span").html('');
-    filter_documents({union:[]});
+    filter_documents({ union:[] });
   });
 
   // Filter geometry by spatial relation.
@@ -760,12 +760,12 @@ $(document).ready(function() {
                                   .find("span")
                                   .html(union.find("span").html());
     union.hide().find("span").html('');
-    filter_documents({union:[]}, {spatial:relation,keys:keys});
+    filter_documents( {union:[]}, {spatial:relation, keys:keys} );
   });
 
   // Remove spatial filter.
   $("#cuts > [id^=spatial-] :button").click( function() {
-    filter_documents({spatial:false});
+    filter_documents({ spatial:false });
     $("#cuts > [id^=spatial-]").hide();
   });
 
