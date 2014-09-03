@@ -315,14 +315,14 @@ $(document).ready(function() {
   // iii) nothing of the above if an identical filter is already used.
   function filter_documents(new_filter) {
     // Use this to filter_documents with the rest of the commands.
-    var recall_arguments=filter_documents.stashed_arguments;
-    if (!recall_arguments) {
-      filter_documents.stashed_arguments=Array.prototype.slice.apply(arguments, [1]);
-      recall_arguments=filter_documents.stashed_arguments;
-    } else if (arguments[0]!==recall_arguments) {
-      Array.prototype.push.apply(recall_arguments, arguments);
+    var commands=filter_documents.commands;
+    if (!commands) {
+      commands=Array.prototype.slice.apply(arguments, [1]);
+      filter_documents.commands=commands;
+    } else if (arguments[0]!==commands) {
+      Array.prototype.push.apply(commands, arguments);
       return;
-    } else new_filter=recall_arguments.shift();
+    } else new_filter=commands.shift();
     // Generate geometry id list from latest document list and
     // reset viewports because they are most likely invalidated.
     if (!new_filter) {
@@ -344,7 +344,7 @@ $(document).ready(function() {
         d--;
       }
 //    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
-      delete filter_documents.stashed_arguments;
+      delete filter_documents.commands;
       Maps.event.trigger(map, 'bounds_changed');
       return;
     }
@@ -456,7 +456,7 @@ $(document).ready(function() {
             new_filter.documents=new_documents;
             new_filter.passed=passed;
             new_filter.failed=failed;
-            filter_documents(recall_arguments);
+            filter_documents(commands);
           });
         });
       }, "json");
@@ -470,7 +470,7 @@ $(document).ready(function() {
       if ('cuts' in filter) options.cuts=options.cuts.concat(filter.cuts);
       // Issue spatial to be applied when the other filters are done.
       if (new_filter.spatial===false) continue;
-      if ('spatial' in filter) recall_arguments.push(filter);
+      if ('spatial' in filter) commands.push(filter);
     }
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
@@ -478,7 +478,7 @@ $(document).ready(function() {
     if (equal_filter) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
     if (function() { for (var prop in options) return; return true; }())
-      return filter_documents(recall_arguments);
+      return filter_documents(commands);
     // Pre-filter documents with indexed type and year. This improves
     // response time if it's used for the first or second filter item.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
@@ -514,11 +514,11 @@ $(document).ready(function() {
             else doc.skip_me=redo;
           }
           // Issue filter again if other filters were involved,
-          if (redo) recall_arguments.unshift({redo:options});
+          if (redo) commands.unshift({redo:options});
           // otherwise set up the new filter and we're done.
           else options.documents=new_documents;
           filters.push(options);
-          filter_documents(recall_arguments);
+          filter_documents(commands);
         });
       }, "text");
       return;
@@ -543,7 +543,7 @@ $(document).ready(function() {
       options.documents=new_documents;
       delete options.keys;
       filters.push(options);
-      filter_documents(recall_arguments);
+      filter_documents(commands);
     });
   }
 
