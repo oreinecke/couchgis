@@ -335,17 +335,20 @@ $(document).ready(function() {
         d--;
       }
 //    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
-      delete filter_documents.next;
+      delete filter_documents.stashed_arguments;
       Maps.event.trigger(map, 'bounds_changed');
       return;
     }
-    if (!filter_documents.next)
-      filter_documents.next=Array.prototype.slice.apply(arguments, [1]);
-    else if (filter_documents.next.indexOf(new_filter)===-1) {
-      Array.prototype.push.apply(filter_documents.next, arguments);
+    // Use this to recall filter_documents with first argument removed.
+    var recall_arguments=filter_documents.stashed_arguments;
+    if (!recall_arguments) {
+      filter_documents.stashed_arguments=Array.prototype.slice.apply(arguments, [1]);
+      recall_arguments=filter_documents.stashed_arguments;
+    } else if (recall_arguments.indexOf(new_filter)===-1) {
+      Array.prototype.push.apply(recall_arguments, arguments);
       return;
-    } else if (filter_documents.next[0]===new_filter)
-      filter_documents.next.shift();
+    } else if (new_filter===recall_arguments[0])
+      recall_arguments.shift();
     // Aquire first property as name of new_filter.
     var filter_name=function() {for (var prop in new_filter) return prop;}();
     // In any case, we can use the full, non-filtered document list.
@@ -408,8 +411,6 @@ $(document).ready(function() {
       // If the last filter was compatible, we can use its document list.
       documents=filters[position++].documents;
     filters.push(new_filter);
-    // Use this to recall filter_documents with first argument removed.
-    var recall_arguments=filter_documents.next;
     // Divert spatial filters to the request chain below.
     if (new_filter.spatial) {
       var data='{"keys":[["'+new_filter.keys.join('",0],["')+'",0]]}';
