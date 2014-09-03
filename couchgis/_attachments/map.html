@@ -314,6 +314,15 @@ $(document).ready(function() {
   // ii) inserted in the middle and merged with filters following it
   // iii) nothing of the above if an identical filter is already used.
   function filter_documents(new_filter) {
+    // Use this to filter_documents with the rest of the commands.
+    var recall_arguments=filter_documents.stashed_arguments;
+    if (!recall_arguments) {
+      filter_documents.stashed_arguments=Array.prototype.slice.apply(arguments, [1]);
+      recall_arguments=filter_documents.stashed_arguments;
+    } else if (arguments[0]!==recall_arguments) {
+      Array.prototype.push.apply(recall_arguments, arguments);
+      return;
+    } else new_filter=recall_arguments.shift();
     // Generate geometry id list from latest document list and
     // reset viewports because they are most likely invalidated.
     if (!new_filter) {
@@ -339,16 +348,6 @@ $(document).ready(function() {
       Maps.event.trigger(map, 'bounds_changed');
       return;
     }
-    // Use this to recall filter_documents with first argument removed.
-    var recall_arguments=filter_documents.stashed_arguments;
-    if (!recall_arguments) {
-      filter_documents.stashed_arguments=Array.prototype.slice.apply(arguments, [1]);
-      recall_arguments=filter_documents.stashed_arguments;
-    } else if (recall_arguments.indexOf(new_filter)===-1) {
-      Array.prototype.push.apply(recall_arguments, arguments);
-      return;
-    } else if (new_filter===recall_arguments[0])
-      recall_arguments.shift();
     // Aquire first property as name of new_filter.
     var filter_name=function() {for (var prop in new_filter) return prop;}();
     // In any case, we can use the full, non-filtered document list.
@@ -457,7 +456,7 @@ $(document).ready(function() {
             new_filter.documents=new_documents;
             new_filter.passed=passed;
             new_filter.failed=failed;
-            filter_documents(recall_arguments[0]);
+            filter_documents(recall_arguments);
           });
         });
       }, "json");
@@ -479,7 +478,7 @@ $(document).ready(function() {
     if (equal_filter) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
     if (function() { for (var prop in options) return; return true; }())
-      return filter_documents(recall_arguments[0]);
+      return filter_documents(recall_arguments);
     // Pre-filter documents with indexed type and year. This improves
     // response time if it's used for the first or second filter item.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
@@ -519,7 +518,7 @@ $(document).ready(function() {
           // otherwise set up the new filter and we're done.
           else options.documents=new_documents;
           filters.push(options);
-          filter_documents(recall_arguments[0]);
+          filter_documents(recall_arguments);
         });
       }, "text");
       return;
@@ -544,7 +543,7 @@ $(document).ready(function() {
       options.documents=new_documents;
       delete options.keys;
       filters.push(options);
-      filter_documents(recall_arguments[0]);
+      filter_documents(recall_arguments);
     });
   }
 
