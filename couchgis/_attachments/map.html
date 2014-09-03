@@ -457,7 +457,7 @@ $(document).ready(function() {
             new_filter.documents=new_documents;
             new_filter.passed=passed;
             new_filter.failed=failed;
-            filter_documents.apply(this, recall_arguments);
+            filter_documents(recall_arguments[0]);
           });
         });
       }, "json");
@@ -479,7 +479,7 @@ $(document).ready(function() {
     if (equal_filter) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
     if (function() { for (var prop in options) return; return true; }())
-      return filter_documents.apply(this, recall_arguments);
+      return filter_documents(recall_arguments[0]);
     // Pre-filter documents with indexed type and year. This improves
     // response time if it's used for the first or second filter item.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
@@ -519,7 +519,7 @@ $(document).ready(function() {
           // otherwise set up the new filter and we're done.
           else options.documents=new_documents;
           filters.push(options);
-          filter_documents.apply(this, recall_arguments);
+          filter_documents(recall_arguments[0]);
         });
       }, "text");
       return;
@@ -544,7 +544,7 @@ $(document).ready(function() {
       options.documents=new_documents;
       delete options.keys;
       filters.push(options);
-      filter_documents.apply(this, recall_arguments);
+      filter_documents(recall_arguments[0]);
     });
   }
 
