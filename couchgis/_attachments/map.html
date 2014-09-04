@@ -1042,7 +1042,7 @@ $(document).ready(function() {
           if (typeof resp[prop] === "function") continue;
           lines.push(prop+': <b>'+resp[prop]+'</b>');
         }
-        $("#export [name=replicate-status]").html(lines.join(', '));
+        $("#export [name=replicate-status]").html(lines.join(',<br>'));
         $("#export [name=replicate]").prop('disabled', false);
         if (textStatus!=="success") return;
         $("#export [name=replicate]").hide();
