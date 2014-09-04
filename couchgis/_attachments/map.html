@@ -998,6 +998,12 @@ $(document).ready(function() {
     });
   });
 
+  // Hide url text input and display 'get-url' again.
+  $("#export [name=url]").focusout( function() {
+    $(this).hide();
+    $("#export [name=get-url]").show();
+  });
+
   $("#export [name=filetype]").change( function() {
     var elements=$("#export [name=columns]")
                  .add("#export [name=download]")
@@ -1067,12 +1073,6 @@ $(document).ready(function() {
     if (e.which!==13) return;
     $("#export [name=download]:visible").click();
     $("#export [name=replicate]:visible").click();
-  });
-
-  // Hide url text input and display 'get-url' again.
-  $("#export [name=url]").focusout( function() {
-    $(this).hide();
-    $("#export [name=get-url]").show();
   });
 
 });
