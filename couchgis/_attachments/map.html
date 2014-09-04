@@ -1048,9 +1048,15 @@ $(document).ready(function() {
         $("#export [name=replicate]").hide();
         $("#export [name=replicant]").attr({
           href:"../../../"+data.target+'/'+list.app+"/index.html"
-        }).show();
+        }).show().focus();
       }
     });
+  });
+
+  // Hide db link and display 'replicate' again.
+  $("#export [name=replicant]").focusout( function() {
+    $(this).hide();
+    $("#export [name=replicate]").show();
   });
 
   $("#export [name=filename]").keypress( function(e) {
