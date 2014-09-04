@@ -42,7 +42,7 @@ $(document).ready(function() {
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.split('/');
   list.db=list.parts[1];
-  list.app=list.parts[3];
+  list.app=list.parts[2]+'/'+list.parts[3];
   delete list.parts;
 
   // It is very likely that the oftentimes inexperienced user clicks and
@@ -956,7 +956,7 @@ $(document).ready(function() {
     var translate_url=({
       'download':function(url) { window.open(url+"&download", "_self"); },
       'get-url':function(url) {
-        url=window.location.origin+'/'+list.db+'/_design/'+list.app+'/'+url;
+        url=window.location.origin+'/'+list.db+'/'+list.app+'/'+url;
         // hide download button
         $("#export [name=get-url]").hide();
         // display the url in a selected text input
@@ -1022,7 +1022,7 @@ $(document).ready(function() {
     var data={
       source:list.db, create_target:true,
       target:$("#export [name=filename]").val(),
-      doc_ids:["_design/"+list.app]
+      doc_ids:[list.app]
     };
     var documents=filters[0].documents;
     for (var d=0;d<documents.length;d++)
