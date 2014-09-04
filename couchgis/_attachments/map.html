@@ -1185,9 +1185,6 @@ $(document).ready(function() {
       <input type="radio" name="filetype" value="couchdb">CouchDB</span>
     <input type="button" value="speichern" name="download">
     <input type="button" value="URL erzeugen" name="get-url">
-    <input type="button" value="replizieren" name="replicate" style="display:none">
-    <a name="replicant" target="_blank" style="display:none">zur Datenbank wechseln</a><br>
-    <a name="replicate-status" style="display:none"></a>
     <input type="text" name="url" style="display:none">
     <span name="columns">
       <input type="radio" name="select-fields" checked>alle
@@ -1195,6 +1192,9 @@ $(document).ready(function() {
     <span name="columns">
       <input type="checkbox" name="include-revision" checked>_id, _rev
       <input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</span>
+    <input type="button" value="replizieren" name="replicate" style="display:none">
+    <a name="replicant" target="_blank" style="display:none">zur Datenbank wechseln</a><br>
+    <a name="replicate-status" style="display:none"></a>
   </form>
   </body>
 </html>
