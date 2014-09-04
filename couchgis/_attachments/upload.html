@@ -170,7 +170,11 @@ $(document).ready(function() {
           }
           var columns=normalize(rows.shift().xml);
           while (rows.length) {
-            var row=normalize(rows.shift().xml);
+            var row=rows.shift().xml;
+            // LibreOffice sometimes adds a lot of empty rows to
+            // the end of the file. We can safely ignore those.
+            if (row.length===1 && !row[0].xml.length) continue;
+            row=normalize(row);
             var properties={};
             for (var c=0;c<row.length;c++) {
               if (!columns[c].xml.length) continue;
