@@ -314,17 +314,21 @@ $(document).ready(function() {
   // ii) inserted in the middle and merged with filters following it
   // iii) nothing of the above if an identical filter is already used.
   function filter_documents(new_filter) {
-    // Use this to filter_documents with the rest of the commands.
     var commands=filter_documents.commands;
     if (!commands) {
+      // Set up a new command stack if none is in place yet.
       commands=Array.prototype.slice.apply(arguments, [1]);
       filter_documents.commands=commands;
     } else if (arguments[0]!==commands) {
+      // If filters are already processed parallel to
+      // this, push new filters to the command stack.
       Array.prototype.push.apply(commands, arguments);
       return;
+      // filter_documents(filter_documents.commands) is
+      // employed below to recurse to the next filter.
     } else new_filter=commands.shift();
-    // Generate geometry id list from latest document list and
-    // reset viewports because they are most likely invalidated.
+    // If the command stack is depleted, reset
+    // viewports, update geometries and etc.
     if (!new_filter) {
       var documents=filters[filters.length-1].documents;
       keys.splice(0);
