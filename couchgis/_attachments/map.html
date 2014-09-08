@@ -1039,8 +1039,7 @@ $(document).ready(function() {
       if (keys.indexOf(documents[d][0])!==-1)
         data.doc_ids.push(documents[d][1]);
     $.ajax("/_replicate", {
-      type:"POST",
-      dataType:"json",
+      type:"POST", dataType:"json",
       contentType:"application/json",
       data:JSON.stringify(data),
       complete:function(jqXHR, textStatus) {
