@@ -5,7 +5,6 @@
     <title>Datenbank-Replikation</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <script src="script/jquery-1.11.1.min.js"></script>
-    <script src="script/jquery.couch.js"></script>
 
 <script>
 $(document).ready(function() {
@@ -34,31 +33,27 @@ $(document).ready(function() {
       var source=($("#replicate [name=mode]:checked").val()==="push");
       // insert username:password@ into centralhost
       var addr={false:centralhost.replace("://","://"+login)+'/'+db, true:db};
-      $.couch.replicate(addr[source], addr[!source], {
-        success:function(data) {
-          $("#replicate :submit").prop('disabled', false);
-          // display some replication results
-          r=$("#response");
-          r.html("")
-          // write key and value in bold real quick
-          function append(obj, keys) {
-            for (var k=0;k<keys.length;k++)
-              if (obj[keys[k]]!=null)
-                r.append(keys[k]+": <b>"+obj[keys[k]], "</b><br>");
+      $.ajax("/_replicate", {
+        type:"POST", dataType:"json",
+        contentType:"application/json",
+        data:JSON.stringify({
+          source:addr[source], target:addr[!source],
+          continuous: $("#replicate :checkbox").prop('checked'),
+          create_target:true
+        }),
+        complete:function(jqXHR, textStatus) {
+          JQXHR=jqXHR;
+          var resp=jqXHR.responseJSON || {status:textStatus};
+          console.log(resp);
+          var lines=[];
+          for (var prop in resp) {
+            if (typeof resp[prop] === "object") continue;
+            if (typeof resp[prop] === "function") continue;
+            lines.push(prop+': <b>'+resp[prop]+'</b>');
           }
-          append(data, ["ok", "no_changes"]);
-          if (!data.history || data.no_changes) return;
-          // show latest replication history
-          append(data.history[0], ["start_time", "end_time",
-            "missing_checked", "missing_found", "docs_read",
-            "docs_written", "doc_write_failures"]);
-        },
-        error:function(jqXHR, error) {
+          $("#response").html(lines.join(',<br>'));
           $("#replicate :submit").prop('disabled', false);
-          $("#response").html("Fehler: <b>"+error+"</b>");
         }
-      }, {
-        continuous: $("#replicate :checkbox").prop('checked')
       });
       $("#replicate :submit").prop('disabled', true);
       e.preventDefault();
