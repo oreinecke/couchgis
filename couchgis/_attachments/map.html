@@ -988,9 +988,9 @@ $(document).ready(function() {
       var offset=list[0];
       while (offset && rows[offset].key===rows[offset-1].key)
         offset--;
-      var start_key='["'+rows[offset].key+'",0]';
-      var end_key='["'+rows[list[list.length-1]].key+'","'+rows[list[list.length-1]].id+'"]';
-      url+="&start_key="+start_key+"&end_key="+end_key;
+      url+="&start_key="+JSON.stringify([rows[offset].key, 0]);
+      var end_row=rows[list[list.length-1]];
+      url+="&end_key="+JSON.stringify([end_row.key, end_row.id]);
       for (var i=0;i<list.length;i++) list[i]-=offset;
       translate_url(url+"&compressed_keys="+indexes.compress(list));
     });
