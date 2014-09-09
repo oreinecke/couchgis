@@ -976,20 +976,20 @@ $(document).ready(function() {
     // Otherwise employ index compression.
     $.getJSON("_view/geojson-doc", function(data) {
       // get document order identical to _view/geojson
-      keys=data.rows;
-      for (var k=0;k<keys.length;k++)
-        keys[ [keys[k].key,keys[k].id] ] = k;
+      var rows=data.rows;
+      for (var k=0;k<rows.length;k++)
+        rows[ [rows[k].key,rows[k].id] ] = k;
       var list=[];
       for (var d=0;d<documents.length;d++)
-        list.push(keys[documents[d]]);
+        list.push(rows[documents[d]]);
       // Compute start_key and end_key to reduce amount of rows that
       // are JSON.parse'ed and then just skipped by _list/export.
       indexes.sort(list);
       var offset=list[0];
-      while (offset && keys[offset].key===keys[offset-1].key)
+      while (offset && rows[offset].key===rows[offset-1].key)
         offset--;
-      var start_key='["'+keys[offset].key+'",0]';
-      var end_key='["'+keys[list[list.length-1]].key+'","'+keys[list[list.length-1]].id+'"]';
+      var start_key='["'+rows[offset].key+'",0]';
+      var end_key='["'+rows[list[list.length-1]].key+'","'+rows[list[list.length-1]].id+'"]';
       url+="&start_key="+start_key+"&end_key="+end_key;
       for (var i=0;i<list.length;i++) list[i]-=offset;
       translate_url(url+"&compressed_keys="+indexes.compress(list));
