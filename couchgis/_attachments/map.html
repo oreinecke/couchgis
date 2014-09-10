@@ -787,14 +787,14 @@ $(document).ready(function() {
     }
     var types=$("#filter .types :checked");
     if (!types.length) types=$("#filter .types :checkbox");
-    var labels=[];
+    // Hash each label to null.
+    var labels={};
     // Set-up autocomplete to match the text input's value
     // as regular expression against a list of suggestions.
     function source(request, response) {
       var data=[];
       var matcher=new RegExp(request.term, "i");
-      for (var l=0;l<labels.length;l++) {
-        var label=labels[l];
+      for (var label in labels) {
         if (matcher.test(label))
           data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") });
         if (data.length===50) break;
@@ -814,8 +814,7 @@ $(document).ready(function() {
           var row=data.rows.pop();
           // Do not suggest numbers or objects right now.
           if (row.value.type!=="string") continue;
-          var label=row.key[2];
-          if (labels.indexOf(label)===-1) labels.push(label);
+          labels[row.key[2]]=null;
         }
       });
     });
