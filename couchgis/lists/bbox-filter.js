@@ -100,12 +100,12 @@ function(head, req) {
     var related_Polygons=function(type, relation) {
       if ( !/contains|intersects/.test(relation) ) return;
       relates=fail;
-      var inspect_types=["Polygon", "MultiPolygon"];
-      if (inspect_types.indexOf(type)!==-1) return related_GeoJSON;
+      var inspect_types=/^(Multi)?Polygon$/;
+      if (inspect_types.test(type)) return related_GeoJSON;
       if (type!=="GeometryCollection") return;
       var geometries=[];
       for (var g=0;g<related_GeoJSON.geometries.length;g++)
-        if (inspect_types.indexOf(related_GeoJSON.geometries[g].type)!==-1)
+        if (inspect_types.test(related_GeoJSON.geometries[g].type))
           geometries.push(related_GeoJSON.geometries[g]);
       if (geometries.length) return {
         type:"GeometryCollection",
