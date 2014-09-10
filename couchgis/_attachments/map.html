@@ -416,10 +416,15 @@ $(document).ready(function() {
     filters.push(new_filter);
     // Divert spatial filters to the request chain below.
     if (new_filter.spatial) {
-      var data='{"keys":[["'+new_filter.keys.join('",0],["')+'",0]]}';
-      var passed=new_filter.passed || new_filter.keys.slice();
-      var failed=new_filter.failed || [];
-      $.post("_view/geojson", data, function(data) {
+      var passed=new_filter.passed || function(keys) {
+        var result={};
+        for (var k=0;k<keys.length;k++)
+          result[keys[k]]=true;
+        new_filter.data='{"keys":[["'+keys.join('",0],["')+'",0]]}';
+        delete new_filter.keys;
+        return result;
+      }(new_filter.keys);
+      $.post("_view/geojson", new_filter.data, function(data) {
         var GeometryCollection={ type:"GeometryCollection", geometries:[] };
         var bbox=[Infinity,Infinity,-Infinity,-Infinity];
         while (data.rows.length) {
@@ -438,9 +443,7 @@ $(document).ready(function() {
         for (var d=0, id=null; d<documents.length; d++) {
           if (id===documents[d][0]) continue;
           id=documents[d][0];
-          if (passed.indexOf(id)!==-1) continue;
-          if (failed.indexOf(id)!==-1) continue;
-          keys.push(id);
+          if (passed[id]===undefined) keys.push(id);
         }
         var options={keys:keys, bbox:bbox, relation:new_filter.spatial};
         list("bbox-filter/bbox", options, function(data) {
@@ -452,14 +455,13 @@ $(document).ready(function() {
             var new_documents=[];
             while (keys.length) {
               var id=keys.pop();
-              (id in data?passed:failed).push(id);
+              passed[id]=id in data;
             }
             for (var d=0, doc; d<documents.length; d++)
-              if (passed.indexOf((doc=documents[d])[0])!==-1)
+              if (passed[(doc=documents[d])[0]])
                 new_documents.push(doc);
             new_filter.documents=new_documents;
             new_filter.passed=passed;
-            new_filter.failed=failed;
             filter_documents(commands);
           });
         });
