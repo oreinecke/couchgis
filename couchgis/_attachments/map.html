@@ -797,10 +797,11 @@ $(document).ready(function() {
         var label=labels[l];
         if (matcher.test(label))
           data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") });
+        if (data.length===50) break;
       }
       response(data);
     }
-    input.autocomplete({ minLength:0, maxItems:50, source:source });
+    input.autocomplete({ minLength:0, source:source });
     types.each(function() {
       var type=$(this).prop('name');
       var options={
