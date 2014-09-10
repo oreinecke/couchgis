@@ -795,6 +795,7 @@ $(document).ready(function() {
       var data=[];
       var matcher=new RegExp(request.term, "i");
       for (var label in labels) {
+        label=label.substr(1);
         if (matcher.test(label))
           data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") });
         if (data.length===50) break;
@@ -814,7 +815,7 @@ $(document).ready(function() {
           var row=data.rows.pop();
           // Do not suggest numbers or objects right now.
           if (row.value.type!=="string") continue;
-          labels[row.key[2]]=null;
+          labels['_'+row.key[2]]=null;
         }
       });
     });
