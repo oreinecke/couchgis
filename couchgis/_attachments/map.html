@@ -589,9 +589,10 @@ $(document).ready(function() {
       var optgroup=$("[name=fields]");
       for (var field in fields)
         optgroup.append($("<option>").text(field));
-      var span=$("#filter .types");
       for (var type in types) {
-        span.append($('<input>').attr({type:"checkbox",name:type}), type);
+        var label=$('<label>').text(type)
+                              .prepend( $('<input>').attr({type:"checkbox",name:type}) );
+        $("#filter .types").append(label, ' ');
         filters[0].types.push(type);
         // This is one rare advantage of javascripts 'phony' arrays:
         // I can use fillColors first as a set and then assign keys
@@ -1082,8 +1083,6 @@ $(document).ready(function() {
 
 <style>
   #settings .geometry-level {width:6em}
-  #settings span, #filter span, #export span {white-space:nowrap}
-  #filter span.types, #cuts span {white-space:normal}
   label, span.nowrap {white-space:nowrap}
   #cuts li {display:inline}
   table, th, tr, td {
