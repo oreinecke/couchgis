@@ -70,19 +70,25 @@ $(document).ready(function() {
 
   <h1> Datenbank-Replikation </h1>
   <form style="display:none" id="replicate">
-    <input type="radio" value="pull" name="mode" checked> <b>zentrale Daten auf diesen Rechner laden</b> <br>
-    <input type="radio" value="push" name="mode"> <b>Daten von hier auf zentrale Datenbank laden</b> <br>
-    Benutzername: <input type="text" size="7">
-    Kennwort: <input type="password" size="7"><br>
-    <input type="checkbox"> Fortlaufend <input type="submit" value="Los!"><br>
+    <label style="font-weight:bold">
+      <input type="radio" value="pull" name="mode" checked>
+      zentrale Daten auf diesen Rechner laden</label><br>
+    <label style="font-weight:bold">
+      <input type="radio" value="push" name="mode">
+      Daten von hier auf zentrale Datenbank laden</label><br>
+    <label>Benutzername: <input type="text" size="7"></label>
+    <label>Kennwort: <input type="password" size="7"></label><br>
+    <label><input type="checkbox">Fortlaufend</label>
+    <input type="submit" value="Los!"><br>
     <div id="response"></div>
     <a href="#" id="centralapp">Zur zentralen Datenbank wechseln</a>
   </form>
   <div style="display:none">
     <b>Datenbank-Replikation funktioniert nur vom localhost.</b>
-    <ul><li><a href="#" id="localapp">Zur lokalen Datenbank</a>
-        <li><a href="http://localhost:5984/_utils/replicator.html">Zum Replikator (Futon)</a>
-        <li><a href="http://couchdb.apache.org/">CouchDB installeren</a> </ul>
+    <ul>
+      <li><a href="#" id="localapp">Zur lokalen Datenbank</a>
+      <li><a href="http://localhost:5984/_utils/replicator.html">Zum Replikator (Futon)</a>
+      <li><a href="http://couchdb.apache.org/">CouchDB installeren</a></ul>
   </div>
   </body>
 </html>
