@@ -1084,6 +1084,7 @@ $(document).ready(function() {
   #settings .geometry-level {width:6em}
   #settings span, #filter span, #export span {white-space:nowrap}
   #filter span.types, #cuts span {white-space:normal}
+  label, span.nowrap {white-space:nowrap}
   #cuts li {display:inline}
   table, th, tr, td {
     padding:0; padding-right:3px;
@@ -1109,21 +1110,22 @@ $(document).ready(function() {
     <input type="button" name="refine" class="geometry-level" value="verfeinern">
     <input type="button" name="precise" class="geometry-level" value="exakt" style="display:none">
     <input type="button" name="simplified" class="geometry-level" value="vereinfacht" style="display:none">
-    <span><input type="checkbox" name="delayed">verzögert</span>
-    <span><input type="text" name="limit" size=2 value="50"> Polygone</span>
-    <span><input type="button" value="weniger" name="less">
+    <label><input type="checkbox" name="delayed">verzögert</label>
+    <label><input type="text" name="limit" size=2 value="50">Polygone</label>
+    <span class="nowrap">
+      <input type="button" value="weniger" name="less">
       <input type="button" value="mehr" name="more"></span>
   </form>
   <div id="map" style="height:65%"></div>
   <form id="filter"> Filter:
     <span class="types"></span><br>
-    <span>von: <input type="text" size=8 name="time" title="Zeit"></span>
-    <span>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></span>
-    <span>als: <select name="field">
+    <label>von: <input type="text" size=8 name="time" title="Zeit"></label>
+    <label>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></label>
+    <label>als: <select name="field">
       <option value="_keyword">Text</option>
       <option value="_expression">Funktion</option>
       <optgroup name="fields" label="Felder"></optgroup>
-    </select></span>
+    </select></label>
     <ol id="cuts">
       <!-- default filter list items -->
       <li style="display:none" id="type-is" class="filter-item">
@@ -1180,20 +1182,20 @@ $(document).ready(function() {
   </table>
   <form id="export">
     Auswahl
-    <span>als <input type="text" value="export" name="filename"></span>
-    <span>
-      <input type="radio" name="filetype" value="geojson" checked>.geojson
-      <input type="radio" name="filetype" value="xml">.xml-Tabelle
-      <input type="radio" name="filetype" value="couchdb">CouchDB</span>
-    <input type="button" value="speichern" name="download">
-    <input type="button" value="URL erzeugen" name="get-url">
+    <label>als <input type="text" value="export" name="filename"></label>
+    <label><input type="radio" name="filetype" value="geojson" checked>.geojson</label>
+    <label><input type="radio" name="filetype" value="xml">.xml-Tabelle</label>
+    <label><input type="radio" name="filetype" value="couchdb">CouchDB</label>
+    <span class="nowrap">
+      <input type="button" value="speichern" name="download">
+      <input type="button" value="URL erzeugen" name="get-url"></span>
     <input type="text" name="url" style="display:none">
-    <span name="columns">
-      <input type="radio" name="select-fields" checked>alle
-      <input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</span>
-    <span name="columns">
-      <input type="checkbox" name="include-revision" checked>_id, _rev
-      <input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</span>
+    <span name="columns" class="nowrap">
+      <label><input type="radio" name="select-fields" checked>alle</label>
+      <label><input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</label></span>
+    <span name="columns" class="nowrap">
+      <label><input type="checkbox" name="include-revision" checked>_id, _rev</label>
+      <label><input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</label></span>
     <input type="button" value="replizieren" name="replicate" style="display:none">
     <a name="replicant" target="_blank" style="display:none">zur Datenbank wechseln</a><br>
     <a name="replicate-status" style="display:none"></a>
