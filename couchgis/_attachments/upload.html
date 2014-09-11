@@ -76,7 +76,7 @@ $(document).ready(function() {
       if (fields[prop]) continue;
       // Special fields have non-editable field names.
       var special = /^(GeoJSON_cl(one)?|_id|_rev|_deleted)$/.test(prop);
-      var row=$("<span>");
+      var row=$("<label>");
       // render field: value input pair
       var checkbox=$('<input type="checkbox" name="include" checked>').prop('disabled',special);
       var field=$('<input type="text" name="field">').val(prop);
@@ -604,15 +604,17 @@ $(document).ready(function() {
   <form id="modify" style="display:none">
     <span>Datensatz-Typ: <input type="text" name="type" size="10" value=""></span>
     <span>Zeitraum: <input type="text" name="time" size="15"></span><br>
-    <span><input type="checkbox" name="all" checked> Alle Felder auswählen</span>
+    <label><input type="checkbox" name="all" checked>Alle Felder auswählen</label>
     <span><input type="button" name="prev" value="<">
       Datensatz <a>1</a>
       <input type="button" name="next" value=">"></span><br>
-    <input id="description-include" type="checkbox" checked>
-    <b id="description-field">&lt;Datensatz-Typ&gt;</b><b>:</b>
-    <input id="description-value" type="text">
+    <label>
+      <input id="description-include" type="checkbox" checked>
+      <b id="description-field">&lt;Datensatz-Typ&gt;</b><b>:</b>
+      <input id="description-value" type="text">
+    </label>
     <div></div>
-    <span><input type="checkbox" name="all" checked> Alle Felder auswählen</span>
+    <label><input type="checkbox" name="all" checked>Alle Felder auswählen</label>
     <span><input type="button" name="prev" value="<">
       Datensatz <a>1</a>
       <input type="button" name="next" value=">"></span>
