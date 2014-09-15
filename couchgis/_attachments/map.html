@@ -199,7 +199,7 @@ $(document).ready(function() {
       // once before. It works just fine if we delay it by 1ms.
       window.setTimeout(function() {
         $("#table tbody").prepend(item.tr);
-        item.tr.find('a').first().focus();
+        item.tr.find('a:first').focus();
       }, 1);
       return;
     }
@@ -846,7 +846,7 @@ $(document).ready(function() {
       // move option back to the fields optgroup
       select.find("[name=fields]").prepend(option);
     } else {
-      var last=$("#table thead th").last();
+      var last=$("#table thead th:last");
       var th=$('<th>').text(option.val())
                       .val(option.val())
                       .addClass("field")
