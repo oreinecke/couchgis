@@ -216,7 +216,7 @@ $(document).ready(function() {
   };
 
   update_geometry.create_filter=function(e) {
-    $("#filter select[name=field]").val(e.data.field);
+    $("#filter [name=field]").val(e.data.field);
     $("#filter [name=content]").val(e.data.value).keypress();
   };
 
@@ -654,13 +654,13 @@ $(document).ready(function() {
         fields[key[1]]=null;
       }
       var optgroup=$("#filter [name=fields]");
-      var val=$("#filter select[name=field]").val();
+      var val=$("#filter [name=field]").val();
       $("[name=fields]").html('');
       for (var field in fields)
         optgroup.append($("<option>").text(field));
       // The selected option was destroyed three
       // lines above, so I just re-select it here.
-      $("#filter select[name=field]").val(val);
+      $("#filter [name=field]").val(val);
       // Remove fields that are in the 'columns' <optgroup> already.
       $("#table [name=columns] option").each( function() {
         delete fields[$(this).val()];
@@ -693,7 +693,7 @@ $(document).ready(function() {
   $("#filter [name=content]").keypress( function(e) {
     if (e.originalEvent && e.which!==13) return;
     var cut={
-      field:$("#filter select[name=field]").val(),
+      field:$("#filter [name=field]").val(),
       value:$(this).val().replace(/^\s+|\s+$/g,'') || undefined
     };
     // I've made template filter items at the bottom of the
@@ -707,14 +707,14 @@ $(document).ready(function() {
     if (!id) return;
     filter_documents({ cuts:[cut] });
     var li=$(id).clone();
-    li.css('display','inline').prop('id',"");
-    li.append(cut.value).find('[name=field]').text(cut.field);
+    li.filter("#field-is, #has-defined").find('b').text(cut.field);
+    li.append(cut.value).css('display','inline').prop('id',"");
     $("#cuts").append(li);
     li.find(':button').click(function() {
       // Tell filter_documents() to remove cut from the queue and set form
       // fields to its parameters; it is likely that the filter had a
       // spelling error, so I should provide an easy way to correct it.
-      $("#filter select[name=field]").val( cut.field ).change();
+      $("#filter [name=field]").val( cut.field ).change();
       $("#filter [name=content]").val( cut.value || "" );
       cut.remove_me=true;
       filter_documents({ cuts:[cut] });
@@ -785,7 +785,7 @@ $(document).ready(function() {
   });
 
   // Update autocomplete source array.
-  $("#filter select[name=field]").change( function() {
+  $("#filter [name=field]").change( function() {
     // clear text input on field change.
     var input=$("#filter [name=content]");
     input.val('');
@@ -831,7 +831,7 @@ $(document).ready(function() {
   });
 
   // Add or remove column to #table.
-  $("#table select[name=field]").change( function() {
+  $("#table [name=field]").change( function() {
     var select=$(this);
     // Get selected option and find out in wich <optgroup> it belongs.
     var option=select.find(":selected");
@@ -1151,9 +1151,9 @@ $(document).ready(function() {
       <li style="display:none" class="filter-item" id="contains">
         <input type="button" value="x" title="löschen"> <b>enthält</b> </li>
       <li style="display:none" class="filter-item" id="has-defined">
-        <input type="button" value="x" title="löschen"> <b name="field"></b> zugewiesen</li>
+        <input type="button" value="x" title="löschen"> <b></b> zugewiesen</li>
       <li style="display:none" class="filter-item" id="field-is">
-        <input type="button" value="x" title="löschen"> <b name="field"></b> </li>
+        <input type="button" value="x" title="löschen"> <b></b> </li>
       <li style="display:none" class="filter-item" id="expression">
         <input type="button" value="x" title="löschen"> <b>erfüllt</b> </li>
       <!-- always show selected docs -->
