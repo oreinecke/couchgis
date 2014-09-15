@@ -308,15 +308,6 @@ $(document).ready(function() {
     });
   }
 
-  (function() {
-    var li=$("#filtering-documents");
-    var t=['/', '-', '\\', '|'];
-    var i=0;
-    window.setInterval(function() {
-      li.text('['+t[i++]+']');
-      i%=t.length;
-    }, 250);
-  }());
 
   // Applies new filter to document list; new_filter must be an object
   // denoting the filter type by its first member. It is then either
@@ -330,8 +321,14 @@ $(document).ready(function() {
       commands=Array.prototype.slice.apply(arguments, [1]);
       filter_documents.commands=commands;
       window.setTimeout(function() {
-        if (filter_documents.commands)
-          $("#cuts").append($("#filtering-documents").show());
+        if (!filter_documents.commands) return;
+        var interval=window.setInterval(function() {
+          var li=$("#cuts li.in-progress");
+          li.last().hide();
+          if (filter_documents.commands)
+            $("#cuts").append(li.first().show());
+          else window.clearInterval(interval);
+        }, 250);
       }, 500);
     } else if (arguments[0]!==commands) {
       // If filters are already processed parallel to
@@ -344,7 +341,6 @@ $(document).ready(function() {
     // If the command stack is depleted, reset
     // viewports, update geometries and etc.
     if (!new_filter) {
-      $("#filtering-documents").hide();
       var documents=filters[filters.length-1].documents;
       keys.splice(0);
       viewports.splice(1);
@@ -1100,6 +1096,10 @@ $(document).ready(function() {
   #settings .geometry-level {width:6em}
   label, span.nowrap {white-space:nowrap}
   #cuts li {display:inline}
+  #cuts li.in-progress {
+    font-weight:bold;
+    font-family:monospace
+  }
   table, th, tr, td {
     padding:0; padding-right:3px;
     border-collapse:collapse;
@@ -1141,8 +1141,11 @@ $(document).ready(function() {
       <optgroup name="fields" label="Felder"></optgroup>
     </select></label>
     <ol id="cuts">
-      <!-- indicate filter commands in progress -->
-      <li id="filtering-documents" style="display:none;font-weight:bold;font-family:monospace"></li>
+      <!-- cycle through these if filter is busy -->
+      <li style="display:none" class="in-progress">[-]</li>
+      <li style="display:none" class="in-progress">[\]</li>
+      <li style="display:none" class="in-progress">[|]</li>
+      <li style="display:none" class="in-progress">[/]</li>
       <!-- default filter list items -->
       <li style="display:none" id="type-is" class="filter-item">
         <input type="button" value="x" title="löschen"> <a></a></li>
