@@ -945,8 +945,7 @@ $(document).ready(function() {
 
   $("form").submit( function(e) {e.preventDefault();} );
 
-  $("#export [name=download]").add("#export [name=get-url]")
-                              .click( function() {
+  $("#export").find("[name=download], [name=get-url]").click( function() {
     var url="_list/export/geojson";
     url+="?filename="+$("#export [name=filename]").val();
     url+="&filetype="+$("#export [name=filetype]:checked").val();
@@ -1015,9 +1014,7 @@ $(document).ready(function() {
   });
 
   $("#export [name=filetype]").change( function() {
-    var elements=$("#export [name=columns]")
-                 .add("#export [name=download]")
-                 .add("#export [name=get-url]");
+    var elements=$("#export").find("[name=columns], [name=download], [name=get-url]");
     if ($(this).val()==="couchdb") {
       elements.hide();
       $("#export [name^=replicate]").show();
