@@ -1044,7 +1044,7 @@ $(document).ready(function() {
     var documents=filters[0].documents;
     for (var k=0, d=0; k<keys.length; k++) {
       while (documents[d][0]!==keys[k]) d++;
-      while (documents[d][0]===keys[k])
+      while ((documents[d]||{})[0]===keys[k])
         data.doc_ids.push(documents[d++][1]);
     }
     $.ajax("/_replicate", {
