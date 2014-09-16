@@ -1052,7 +1052,6 @@ $(document).ready(function() {
       contentType:"application/json",
       data:JSON.stringify(data),
       complete:function(jqXHR, textStatus) {
-        JQXHR=jqXHR;
         var resp=jqXHR.responseJSON || {status:textStatus};
         var lines=[];
         for (var prop in resp) {
