@@ -1052,6 +1052,12 @@ $(document).ready(function() {
       contentType:"application/json",
       data:JSON.stringify(data),
       complete:function(jqXHR, textStatus) {
+        if ( textStatus!=="success" && data.target.indexOf('/')!==-1 && !/^https?:/.test(data.target) ) {
+          $("#export [name=filename]").val(data.target="http://"+data.target);
+          this.data=JSON.stringify(data);
+          $.ajax("/_replicate", this);
+          return;
+        }
         var resp=jqXHR.responseJSON || {status:textStatus};
         var lines=[];
         for (var prop in resp) {
