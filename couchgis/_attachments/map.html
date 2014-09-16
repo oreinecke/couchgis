@@ -1064,9 +1064,9 @@ $(document).ready(function() {
         $("#export [name=replicate]").prop('disabled', false);
         if (textStatus!=="success") return;
         $("#export [name=replicate]").hide();
-        $("#export [name=replicant]").attr({
-          href:"../../../"+data.target+'/'+list.app+"/index.html"
-        }).show().focus();
+        var href=data.target+'/'+list.app+"/index.html";
+        if (!/^https?:/.test(data.target)) href="../../../"+href;
+        $("#export [name=replicant]").attr({ href:href }).show().focus();
       }
     });
   });
