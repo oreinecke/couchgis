@@ -102,7 +102,7 @@ function(head, req) {
     }));
   case "xml":
     if (fields==null) {
-      fields=[];
+      fields=["type", "time"];
       // move _id, _rev, GeoJSON_clone to the left
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
       if (include_revision) fields=["_id", "_rev"].concat(fields);
