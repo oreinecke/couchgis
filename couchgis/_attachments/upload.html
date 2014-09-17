@@ -25,7 +25,7 @@ $(document).ready(function() {
   var values={};
   // doc ids and revisions from _bulk_docs response
   var uploaded_docs;
-  $.getJSON("_view/fields-values?group_level=1", function(data) {
+  $.getJSON("_view/type-year?group_level=1", function(data) {
     var source=[];
     while (data.rows.length)
       source.push(data.rows.shift().key[0]);
