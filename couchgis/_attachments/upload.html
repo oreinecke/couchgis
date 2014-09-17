@@ -28,7 +28,7 @@ $(document).ready(function() {
   $.getJSON("_view/type-year?group_level=1", function(data) {
     var source=[];
     while (data.rows.length)
-      source.push(data.rows.shift().key[0]);
+      source.push( data.rows.shift().key.pop() );
     $("#modify [name=type]").autocomplete({
       source:source, minLength:0,
       change:function() {$(this).change();}
@@ -36,16 +36,18 @@ $(document).ready(function() {
   });
 
   $("#modify [name=type]").change( function() {
-    var key="start_key="+encodeURIComponent(JSON.stringify([$(this).val()])) +
-             "&end_key="+encodeURIComponent(JSON.stringify([$(this).val()+' ']));
     // Suggest these common field names:
     var source=[
       { label:"Datensatz-Typ", value:"type", mixed:true },
       { label:"Zeitraum", value:"time" }
     ];
-    $.getJSON("_view/fields-values?group_level=2&"+key, function(data) {
+    $.getJSON("_view/fields-values", {
+      group_level:2, descending:true,
+      start_key:JSON.stringify([ $(this).val()+' ' ]),
+      end_key:JSON.stringify([ $(this).val() ])
+    }, function(data) {
       while (data.rows.length)
-        source.push(data.rows.shift().key[1]);
+        source.push( data.rows.pop().key.pop() );
       $("#modify [name=field]").autocomplete({
         minLength:0, source:source,
         change:function() {$(this).change();}
