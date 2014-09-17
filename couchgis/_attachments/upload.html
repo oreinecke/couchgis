@@ -76,7 +76,7 @@ $(document).ready(function() {
       if (fields[prop]) continue;
       // Special fields have non-editable field names.
       var special = /^(GeoJSON_cl(one)?|_id|_rev|_deleted)$/.test(prop);
-      var row=$("<label>");
+      var row=$("<span>");
       // render field: value input pair
       var checkbox=$('<input type="checkbox" name="include" checked>').prop('disabled',special);
       var field=$('<input type="text" name="field">').val(prop);
