@@ -1,6 +1,7 @@
 // Sample [type, year] at "reasonable granularity".
 
 function(doc) {
+  if (!doc.type) return;
   var ranges=require('views/lib/ranges');
   var range=function(ranges) {
     return {
