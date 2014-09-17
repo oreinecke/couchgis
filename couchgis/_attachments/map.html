@@ -587,18 +587,9 @@ $(document).ready(function() {
       }, "json");
     });
     // get doc types and set colors
-    $.getJSON("_view/fields-values?group_level=2", function(data) {
-      var fields={_id:null};
-      var types={};
+    $.getJSON("_view/type-year?group_level=1&descending=true", function(data) {
       while (data.rows.length) {
-        var key=data.rows.shift().key;
-        fields[key[1]]=null;
-        types[key[0]]=null;
-      }
-      var optgroup=$("[name=fields]");
-      for (var field in fields)
-        optgroup.append($("<option>").text(field));
-      for (var type in types) {
+        var type=data.rows.pop().key.pop();
         var label=$('<label>').text(type)
                               .prepend( $('<input>').attr({type:"checkbox",name:type}) );
         $("#filter .types").append(label, ' ');
@@ -608,6 +599,15 @@ $(document).ready(function() {
         // to each element!! How nice!!!
         fillColors[type] = fillColors[type] || fillColors.shift();
       }
+    });
+    // get doc fields
+    $.getJSON("_view/fields-values?group_level=2&descending=true", function(data) {
+      var fields={_id:null};
+      while (data.rows.length)
+        fields[data.rows.pop().key.pop()]=null;
+      var optgroup=$("[name=fields]");
+      for (var field in fields)
+        optgroup.append($("<option>").text(field));
     });
   });
 
