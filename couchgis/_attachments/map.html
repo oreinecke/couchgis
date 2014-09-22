@@ -123,7 +123,7 @@ $(document).ready(function() {
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name=delayed]").prop('checked');
       var headers=$("#table th");
-      var interval=window.setInterval(function update_one_geometry() {
+      var interval=window.setInterval( function() {
         while (data.rows.length) {
           var row=data.rows.pop();
           var item=items[row.key[0]];
