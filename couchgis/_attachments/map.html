@@ -138,7 +138,6 @@ $(document).ready(function() {
             for (var d=1;d<item.keys.length;d++) {
               // Group docs with identical GIS into one li.
               var doc=data.rows.pop().value.doc;
-              delete doc.ranges;
               if (!fillColor) fillColor=fillColors[doc.type];
               headers.each(function(i) {
                 var th=$(this);
@@ -148,18 +147,11 @@ $(document).ready(function() {
                   // Link to Futon for the lack of a better interface
                   // and set link text to a useful item explanation.
                   var a=$("<a>").attr({
-                    href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank",
-                    title:(function stringify(obj, spaces, lines) {
-                      for (var prop in obj)
-                        if (obj[prop] && typeof obj[prop]==="object") {
-                          lines.push(spaces+prop+':');
-                          stringify(obj[prop], spaces+'\t', lines);
-                        } else lines.push(spaces+prop+': '+obj[prop]);
-                      return lines;
-                    }(doc, "", [])).join('\n')
+                    href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
                   }).text( doc[doc.type]||doc.type );
                   if (cl==="title-time" && doc.time)
                     a.append(' ('+doc.time+')');
+                  a.one("mouseenter", update_geometry.show_document);
                   td.append(a, '<br>');
                 // evaluate columns
                 } else if (cl==="field") {
@@ -197,6 +189,21 @@ $(document).ready(function() {
       }, timeout);
     }
   }
+
+  update_geometry.show_document=function() {
+    var a=$(this);
+    $.getJSON('/'+list.db+a.attr('href').match(/\/[^/]+$/), function(doc) {
+      delete doc.GeoJSON;
+      a.attr('title', function stringify(obj, spaces, lines) {
+        for (var prop in obj)
+          if (obj[prop] && typeof obj[prop]==="object") {
+            lines.push(spaces+prop+':');
+            stringify(obj[prop], spaces+'  ', lines);
+          } else lines.push(spaces+prop+': '+obj[prop]);
+        return lines;
+      }(doc, "", []).join('\n') );
+    });
+  };
 
   update_geometry.highlight_row=function() {
     this.setOptions({zIndex:-new Date().getTime()});
