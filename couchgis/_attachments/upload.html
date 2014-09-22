@@ -229,8 +229,8 @@ $(document).ready(function() {
 
   // Check if feature.geometry is about to be dropped in the next upload, and
   // relay documents pointing to its geometry to the one that will replace it.
-  function relay_geometry(feature) {
-    var properties=feature.properties;
+  function relay_geometry(relayed) {
+    var properties=relayed.properties;
     var doc=uploaded_docs[properties._id];
     // Nothing to be done if the document wasn't in the
     // database before or doesn't have its own geometry.
@@ -242,40 +242,62 @@ $(document).ready(function() {
       if (properties.GeoJSON_clone===doc._id) return;
     }
     $.getJSON('_view/geojson-doc?key="'+doc._id+'"', function(data) {
-      while (data.rows.length) {
-        var row=data.rows.pop();
-        // skip own document
-        if (row.key===row.id) continue;
-        // look up existing document in the feature list, or
-        if (uploaded_docs[row.id])
-          for (var f=0; (feature=features[f]).properties._id!==row.id; f++);
-        else {
-          // add document to uploaded_docs and the feature list
-          features.push(feature={properties:{_id:row.id}});
-          $.getJSON('/'+db+'/'+row.id, function(properties) {
-            return function(doc) {
-              uploaded_docs[doc._id]=doc;
-              properties._rev=doc._rev;
-            };
-          }(feature.properties));
+      var doc_ids=[], rows=data.rows, row;
+      // Fetch missing documents other than relayed.
+      for (var r=0; row=rows[r]; r++)
+        if (row.key===row.id) rows.splice(r--, 1);
+        else if (!uploaded_docs[row.id])
+          doc_ids.push(row.id);
+      // Nothing to be done of no other documents are involved.
+      if (!rows.length) return;
+      $.getJSON('/'+db+"/_all_docs", {
+        include_docs:true, keys:JSON.stringify(doc_ids)
+      }, function(data) {
+        while ( row=data.rows.pop() ) {
+          uploaded_docs[row.id]=row.doc;
+          features.push({
+            properties:{
+              _id:row.doc._id, _rev:row.doc._rev,
+              GeoJSON_clone:row.doc.GeoJSON_clone
+            }
+          });
         }
-        // Do nothing if this one is also staged for deletion.
-        if (feature.properties._deleted===true) continue;
+        var single=undefined, relays=[];
+        for (var r=0, f=0, relay; row=rows[r]; r++) {
+          while ( (relay=features[f]).properties._id!==row.id )
+            f = (f+1) % features.length;
+          if (!single && relay.properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1)
+            single=relay;
+          else relays.push(relay);
+        }
         // If the document will be removed, then
-        if (properties._deleted===true) {
-          // store its geometry in the feature that we have right now
-          feature.geometry=uploaded_docs[properties._id].GeoJSON;
-          // tell the submit handler that the feature's geometry has changed,
-          feature.properties.GeoJSON_clone=null;
-          // and point all other features to this feature's geometry.
-          properties={GeoJSON_clone:row.id};
-        } else {
-          feature.properties.GeoJSON_clone=properties.GeoJSON_clone;
-          if (fields.GeoJSON_clone) continue;
-          fields.GeoJSON_clone=false;
-          show_fields();
+        if (relayed.properties._deleted===true) {
+          if (single) {
+            // store its geometry in the feature that we have right now
+            single.geometry=uploaded_docs[relayed.properties._id].GeoJSON;
+            // tell the submit handler that the feature's geometry has changed,
+            single.properties.GeoJSON_clone=null;
+            // and point all other features to this feature's geometry.
+            relayed.properties.GeoJSON_clone=single.properties._id;
+          } else {
+            delete relayed.properties._deleted;
+            delete relayed.properties.type;
+            return;
+          }
+        } else if (single) relays.push(single);
+        while (relays.length) {
+          var relay=relays.pop();
+          relay.properties.GeoJSON_clone=
+            uploaded_docs[relay.properties._id].GeoJSON_clone.replace(
+              RegExp('\\b'+relayed.properties._id+'\\b'),
+              relayed.properties.GeoJSON_clone
+            );
         }
-      }
+        // Add special field GeoJSON_clone and update #modify div
+        if (fields.GeoJSON_clone) return;
+        fields.GeoJSON_clone=false;
+        show_fields();
+      });
     });
   }
 
