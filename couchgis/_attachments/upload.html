@@ -229,8 +229,8 @@ $(document).ready(function() {
 
   // Check if feature.geometry is about to be dropped in the next upload, and
   // relay documents pointing to its geometry to the one that will replace it.
-  function relay_geometry(relayed) {
-    var properties=relayed.properties;
+  function relay_geometry(feature) {
+    var relayed=feature.properties;
     var doc=uploaded_docs[properties._id];
     // Nothing to be done if the document wasn't in the
     // database before or doesn't have its own geometry.
@@ -271,16 +271,16 @@ $(document).ready(function() {
           // We must skip this step in case we've already found a singular
           // link. It is also not needed if the feature isn't staged for
           // deletion in the first place.
-          if (single || relayed.properties._deleted!==true) continue;
+          if (single || relayed._deleted!==true) continue;
           if (relay.properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1)
             single=relays.pop();
         }
-        if (!single && relayed.properties._deleted===true) {
+        if (!single && relayed._deleted===true) {
           // If the deleted document is not pointed at exclusively, we just
           // unset its type, thus hiding it from most of the indexed views.
           // Its geometry is still seen in _view/bbox and _view/geojson.
-          delete relayed.properties._deleted;
-          relayed.properties.type=null;
+          delete relayed._deleted;
+          relayed.type=null;
           // Since no GeoJSON clones are changed, neither will any of the
           // previously downloaded documents; We might as well unstage them
           // and this way avoid confusion about 'unchanged documents'.
@@ -290,21 +290,21 @@ $(document).ready(function() {
           }
           return;
         }
-        if (single && relayed.properties._deleted===true) {
+        if (single && relayed._deleted===true) {
           // If we have an exclusive pointer to the deleted document,
           // then move its geometry into the pointing document,
-          single.geometry=uploaded_docs[relayed.properties._id].GeoJSON;
+          single.geometry=uploaded_docs[relayed._id].GeoJSON;
           // tell the submit handler that the geometry must be updated,
           single.properties.GeoJSON_clone=null;
           // and point all other features to the new doc id.
-          relayed.properties.GeoJSON_clone=single.properties._id;
+          relayed.GeoJSON_clone=single.properties._id;
         }
         while (relays.length) {
           var relay=relays.pop();
           relay.properties.GeoJSON_clone=
             relay.properties.GeoJSON_clone.replace(
-              RegExp('\\b'+relayed.properties._id+'\\b'),
-              relayed.properties.GeoJSON_clone
+              RegExp('\\b'+relayed._id+'\\b'),
+              relayed.GeoJSON_clone
             );
         }
         // Add special field GeoJSON_clone and update #modify div
