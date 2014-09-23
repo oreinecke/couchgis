@@ -264,16 +264,14 @@ $(document).ready(function() {
         }
         var single=undefined, relays=[];
         for (var r=0, f=0, relay; row=rows[r]; r++) {
-          while ( (relay=features[f]).properties._id!==row.id )
+          while ( (relay=features[f].properties)._id!==row.id )
             f = (f+1) % features.length;
-          relays.push(relay);
-          // Test if relay links to only one geometry and remember that one.
-          // We must skip this step in case we've already found a singular
-          // link. It is also not needed if the feature isn't staged for
-          // deletion in the first place.
-          if (single || relayed._deleted!==true) continue;
-          if (relay.properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1)
-            single=relays.pop();
+          // Pocket current feature if it links to
+          // nothing else than the deleted geometry.
+          if ( !single && relayed._deleted===true &&
+               relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
+            single=features[f];
+          else relays.push(relay)
         }
         if (!single && relayed._deleted===true) {
           // If the deleted document is not pointed at exclusively, we just
@@ -301,11 +299,10 @@ $(document).ready(function() {
         }
         while (relays.length) {
           var relay=relays.pop();
-          relay.properties.GeoJSON_clone=
-            relay.properties.GeoJSON_clone.replace(
-              RegExp('\\b'+relayed._id+'\\b'),
-              relayed.GeoJSON_clone
-            );
+          relay.GeoJSON_clone = relay.GeoJSON_clone.replace(
+            RegExp('\\b'+relayed._id+'\\b'),
+            relayed.GeoJSON_clone
+          );
         }
         // Add special field GeoJSON_clone and update #modify div
         if (fields.GeoJSON_clone) return;
