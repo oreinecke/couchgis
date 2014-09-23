@@ -231,15 +231,15 @@ $(document).ready(function() {
   // relay documents pointing to its geometry to the one that will replace it.
   function relay_geometry(feature) {
     var relayed=feature.properties;
-    var doc=uploaded_docs[properties._id];
+    var doc=uploaded_docs[relayed._id];
     // Nothing to be done if the document wasn't in the
     // database before or doesn't have its own geometry.
     if (!doc || doc.GeoJSON_clone) return;
     // Something should be done if the document will be removed.
-    if (properties._deleted!==true) {
+    if (relayed._deleted!==true) {
       // Nothing to be done if the document will keep its geometry.
-      if (!properties.GeoJSON_clone) return;
-      if (properties.GeoJSON_clone===doc._id) return;
+      if (!relayed.GeoJSON_clone) return;
+      if (relayed.GeoJSON_clone===doc._id) return;
     }
     $.getJSON('_view/geojson-doc?key="'+doc._id+'"', function(data) {
       var doc_ids=[], rows=data.rows, row;
