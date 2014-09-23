@@ -251,7 +251,7 @@ $(document).ready(function() {
       // Nothing to be done of no other documents are involved.
       if (!rows.length) return;
       $.getJSON('/'+db+"/_all_docs", {
-        include_docs:true, keys:JSON.stringify(doc_ids)
+        include_docs:true, keys:JSON.stringify(doc_ids.reverse())
       }, function(data) {
         while ( row=data.rows.pop() ) {
           uploaded_docs[row.id]=row.doc;
