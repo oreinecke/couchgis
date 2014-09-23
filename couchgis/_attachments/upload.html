@@ -266,35 +266,39 @@ $(document).ready(function() {
         for (var r=0, f=0, relay; row=rows[r]; r++) {
           while ( (relay=features[f]).properties._id!==row.id )
             f = (f+1) % features.length;
-          if (!single && relay.properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1)
-            single=relay;
-          else relays.push(relay);
+          relays.push(relay);
+          // Test if relay links to only one geometry and remember that one.
+          // We must skip this step in case we've already found a singular
+          // link. It is also not needed if the feature isn't staged for
+          // deletion in the first place.
+          if (single || relayed.properties._deleted!==true) continue;
+          if (relay.properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1)
+            single=relays.pop();
         }
-        if (relayed.properties._deleted===true) {
-          // If we have an exclusive pointer to the deleted document,
-          if (single) {
-            // then move its geometry into the pointing document,
-            single.geometry=uploaded_docs[relayed.properties._id].GeoJSON;
-            // tell the submit handler that the geometry must be updated,
-            single.properties.GeoJSON_clone=null;
-            // and point all other features to the new doc id.
-            relayed.properties.GeoJSON_clone=single.properties._id;
-          } else {
-            // If the deleted document is not pointed at exclusively, we just
-            // unset its type, thus hiding it from most of the indexed views.
-            // Its geometry is still seen in _view/bbox and _view/geojson.
-            delete relayed.properties._deleted;
-            relayed.properties.type=null;
-            // Since no GeoJSON clones are changed, neither will any of the
-            // previously downloaded documents; We might as well unstage them
-            // and this way avoid confusion about 'unchanged documents'.
-            while (doc_ids.length) {
-              delete uploaded_docs[doc_ids.pop()];
-              features.pop();
-            }
-            return;
+        if (!single && relayed.properties._deleted===true) {
+          // If the deleted document is not pointed at exclusively, we just
+          // unset its type, thus hiding it from most of the indexed views.
+          // Its geometry is still seen in _view/bbox and _view/geojson.
+          delete relayed.properties._deleted;
+          relayed.properties.type=null;
+          // Since no GeoJSON clones are changed, neither will any of the
+          // previously downloaded documents; We might as well unstage them
+          // and this way avoid confusion about 'unchanged documents'.
+          while (doc_ids.length) {
+            delete uploaded_docs[doc_ids.pop()];
+            features.pop();
           }
-        } else if (single) relays.push(single);
+          return;
+        }
+        if (single && relayed.properties._deleted===true) {
+          // If we have an exclusive pointer to the deleted document,
+          // then move its geometry into the pointing document,
+          single.geometry=uploaded_docs[relayed.properties._id].GeoJSON;
+          // tell the submit handler that the geometry must be updated,
+          single.properties.GeoJSON_clone=null;
+          // and point all other features to the new doc id.
+          relayed.properties.GeoJSON_clone=single.properties._id;
+        }
         while (relays.length) {
           var relay=relays.pop();
           relay.properties.GeoJSON_clone=
