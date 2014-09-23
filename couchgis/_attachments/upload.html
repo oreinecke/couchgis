@@ -281,7 +281,7 @@ $(document).ready(function() {
             relayed.properties.GeoJSON_clone=single.properties._id;
           } else {
             delete relayed.properties._deleted;
-            delete relayed.properties.type;
+            relayed.properties.type=null;
             return;
           }
         } else if (single) relays.push(single);
