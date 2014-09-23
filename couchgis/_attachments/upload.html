@@ -262,18 +262,18 @@ $(document).ready(function() {
             }
           });
         }
-        var single=undefined, relays=[];
+        var acceptor=undefined, relays=[];
         for (var r=0, f=0, relay; row=rows[r]; r++) {
           while ( (relay=features[f].properties)._id!==row.id )
             f = (f+1) % features.length;
           // Pocket current feature if it links to
           // nothing else than the deleted geometry.
-          if ( !single && relayed._deleted===true &&
+          if ( !acceptor && relayed._deleted===true &&
                relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
-            single=features[f];
+            acceptor=features[f];
           else relays.push(relay)
         }
-        if (!single && relayed._deleted===true) {
+        if (!acceptor && relayed._deleted===true) {
           // If the deleted document is not pointed at exclusively, we just
           // unset its type, thus hiding it from most of the indexed views.
           // Its geometry is still seen in _view/bbox and _view/geojson.
@@ -288,14 +288,14 @@ $(document).ready(function() {
           }
           return;
         }
-        if (single && relayed._deleted===true) {
+        if (acceptor && relayed._deleted===true) {
           // If we have an exclusive pointer to the deleted document,
           // then move its geometry into the pointing document,
-          single.geometry=uploaded_docs[relayed._id].GeoJSON;
+          acceptor.geometry=uploaded_docs[relayed._id].GeoJSON;
           // tell the submit handler that the geometry must be updated,
-          single.properties.GeoJSON_clone=null;
+          acceptor.properties.GeoJSON_clone=null;
           // and point all other features to the new doc id.
-          relayed.GeoJSON_clone=single.properties._id;
+          relayed.GeoJSON_clone=acceptor.properties._id;
         }
         while (relays.length) {
           var relay=relays.pop();
