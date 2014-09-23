@@ -266,6 +266,8 @@ $(document).ready(function() {
         for (var r=0, f=0, relay; row=rows[r]; r++) {
           while ( (relay=features[f].properties)._id!==row.id )
             f = (f+1) % features.length;
+          // Ignore features that are staged for deletion anyway.
+          if (relay._deleted===true) continue;
           // Pocket current feature if it links to
           // nothing else than the deleted geometry.
           if ( !acceptor && relayed._deleted===true &&
