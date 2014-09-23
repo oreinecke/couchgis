@@ -288,7 +288,7 @@ $(document).ready(function() {
         while (relays.length) {
           var relay=relays.pop();
           relay.properties.GeoJSON_clone=
-            uploaded_docs[relay.properties._id].GeoJSON_clone.replace(
+            relay.properties.GeoJSON_clone.replace(
               RegExp('\\b'+relayed.properties._id+'\\b'),
               relayed.properties.GeoJSON_clone
             );
