@@ -777,7 +777,7 @@ $(document).ready(function() {
   });
 
   // Filter geometry by spatial relation.
-  $("#union > :button").click( function() {
+  $("#union  [name]").click( function() {
     var relation=$(this).prop('name');
     var keys=[], documents=filters[0].union;
     for (var d=0, id=null; d<documents.length; d++)
