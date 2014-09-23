@@ -282,6 +282,10 @@ $(document).ready(function() {
           } else {
             delete relayed.properties._deleted;
             relayed.properties.type=null;
+            while (doc_ids.length) {
+              delete uploaded_docs[doc_ids.pop()];
+              features.pop();
+            }
             return;
           }
         } else if (single) relays.push(single);
