@@ -250,11 +250,13 @@ $(document).ready(function() {
       var doc_ids=[], rows=data.rows, row;
       // Fetch missing documents.
       for (var r=0; row=rows[r]; r++)
-        if (!uploaded_docs[row.id]) {
+        if (row.key===row.id) rows.splice(r--, 1);
+        else if (!uploaded_docs[row.id]) {
           uploaded_docs[row.id]=true;
           doc_ids.push(row.id);
         }
-      $.getJSON('/'+db+"/_all_docs", {
+      // Nothing to be done of no other documents are involved.
+      if (rows.length) $.getJSON('/'+db+"/_all_docs", {
         keys:JSON.stringify(doc_ids), include_docs:true
       }, function(data) {
         while ( row=data.rows.pop() ) {
