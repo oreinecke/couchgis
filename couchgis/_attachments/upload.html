@@ -268,7 +268,7 @@ $(document).ready(function() {
             }
           });
         }
-        for ( var r=rows.length-1; row=rows[r]; rows.splice(r+1) ) {
+        for ( var r=rows.length; row=rows[--r]; rows.splice(r) ) {
           var key=rows.key, acceptor=undefined;
           var relayed=relays[key].properties;
           do {
@@ -280,7 +280,9 @@ $(document).ready(function() {
             if ( !acceptor && relayed._deleted===true &&
                  relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
               acceptor=relays[row.id];
-          } while ( key===(row=rows[--r]||{}).key );
+            row=rows[r-1] || {};
+            if (row.key===key) r--;
+          } while (row.key===key)
           if (!acceptor && relayed._deleted===true) {
             // If the deleted document is not pointed at exclusively, we just
             // unset its type, thus hiding it from most of the indexed views.
@@ -298,7 +300,7 @@ $(document).ready(function() {
             // and point all other features to the new doc id.
             relayed.GeoJSON_clone=acceptor.properties._id;
           }
-          while ( r+1!==rows.length ) {
+          while ( r!==rows.length ) {
             row=rows.pop();
             var relay=relays[row.id].properties;
             if (relay===acceptor.properties) continue;
