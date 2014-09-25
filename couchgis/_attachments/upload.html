@@ -222,96 +222,13 @@ $(document).ready(function() {
         var row=data.rows.pop();
         uploaded_docs[row.id]=row.doc;
       }
-      for (var f=0;f<features.length;f++)
-        relay_geometry(features[f]);
+      relay_geometries();
     });
   }
 
-  // Check if feature.geometry is about to be dropped in the next upload, and
-  // relay documents pointing to its geometry to the one that will replace it.
-  function relay_geometry(feature) {
-    var relayed=feature.properties;
-    var doc=uploaded_docs[relayed._id];
-    // Nothing to be done if the document wasn't in the
-    // database before or doesn't have its own geometry.
-    if (!doc || doc.GeoJSON_clone) return;
-    // Something should be done if the document will be removed.
-    if (relayed._deleted!==true) {
-      // Nothing to be done if the document will keep its geometry.
-      if (!relayed.GeoJSON_clone) return;
-      if (relayed.GeoJSON_clone===doc._id) return;
-    }
-    $.getJSON('_view/geojson-doc?key="'+doc._id+'"', function(data) {
-      var doc_ids=[], rows=data.rows, row;
-      // Fetch missing documents other than relayed.
-      for (var r=0; row=rows[r]; r++)
-        if (row.key===row.id) rows.splice(r--, 1);
-        else if (!uploaded_docs[row.id])
-          doc_ids.push(row.id);
-      // Nothing to be done of no other documents are involved.
-      if (!rows.length) return;
-      $.getJSON('/'+db+"/_all_docs", {
-        include_docs:true, keys:JSON.stringify(doc_ids.reverse())
-      }, function(data) {
-        while ( row=data.rows.pop() ) {
-          uploaded_docs[row.id]=row.doc;
-          features.push({
-            properties:{
-              _id:row.doc._id, _rev:row.doc._rev,
-              GeoJSON_clone:row.doc.GeoJSON_clone
-            }
-          });
-        }
-        var acceptor=undefined, relays=[];
-        for (var r=0, f=0, relay; row=rows[r]; r++) {
-          while ( (relay=features[f].properties)._id!==row.id )
-            f = (f+1) % features.length;
-          // Ignore features that are staged for deletion anyway.
-          if (relay._deleted===true) continue;
-          // Pocket current feature if it links to
-          // nothing else than the deleted geometry.
-          if ( !acceptor && relayed._deleted===true &&
-               relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
-            acceptor=features[f];
-          else relays.push(relay)
-        }
-        if (!acceptor && relayed._deleted===true) {
-          // If the deleted document is not pointed at exclusively, we just
-          // unset its type, thus hiding it from most of the indexed views.
-          // Its geometry is still seen in _view/bbox and _view/geojson.
-          delete relayed._deleted;
-          relayed.type=null;
-          // Since no GeoJSON clones are changed, neither will any of the
-          // previously downloaded documents; We might as well unstage them
-          // and this way avoid confusion about 'unchanged documents'.
-          while (doc_ids.length) {
-            delete uploaded_docs[doc_ids.pop()];
-            features.pop();
-          }
-          return;
-        }
-        if (acceptor && relayed._deleted===true) {
-          // If we have an exclusive pointer to the deleted document,
-          // then move its geometry into the pointing document,
-          acceptor.geometry=uploaded_docs[relayed._id].GeoJSON;
-          // tell the submit handler that the geometry must be updated,
-          acceptor.properties.GeoJSON_clone=null;
-          // and point all other features to the new doc id.
-          relayed.GeoJSON_clone=acceptor.properties._id;
-        }
-        while (relays.length) {
-          var relay=relays.pop();
-          relay.GeoJSON_clone = relay.GeoJSON_clone.replace(
-            RegExp('\\b'+relayed._id+'\\b'),
-            relayed.GeoJSON_clone
-          );
-        }
-        // Add special field GeoJSON_clone and update #modify div
-        if (fields.GeoJSON_clone) return;
-        fields.GeoJSON_clone=false;
-        show_fields();
-      });
-    });
+  // Check if geometry is about to be dropped in the
+  // next upload, and fix related documents accordingly.
+  function relay_geometries() {
   }
 
   $("#upload :file").change(function(e) {
@@ -472,8 +389,8 @@ $(document).ready(function() {
         _id:feature.id,
         _rev:feature.rev
       });
-      relay_geometry(feature);
     }
+    relay_geometries();
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       submit.show();
       revert.hide();
