@@ -229,10 +229,12 @@ $(document).ready(function() {
   // Check if geometry is about to be dropped in the
   // next upload, and fix related documents accordingly.
   function relay_geometries() {
-    var doc_ids=[];
+    var doc_ids=[], relays={};
     for (var f=0;f<features.length;f++) {
       var relayed=features[f].properties;
       var doc=uploaded_docs[relayed._id];
+      // Map document id to its feature.
+      if (doc) relays[relayed._id]=relayed;
       // Nothing to be done if the document wasn't in the
       // database before or doesn't have its own geometry.
       if (!doc || doc.GeoJSON_clone) continue;
@@ -257,7 +259,7 @@ $(document).ready(function() {
       }, function(data) {
         while ( row=data.rows.pop() ) {
           uploaded_docs[row.id]=row.doc;
-          features.push({
+          features.push( relays[row.id]={
             properties:{
               _id:row.doc._id, _rev:row.doc._rev,
               GeoJSON_clone:row.doc.GeoJSON_clone
