@@ -290,6 +290,9 @@ $(document).ready(function() {
             // Its geometry is still seen in _view/bbox and _view/geojson.
             delete relayed._deleted;
             relayed.type=null;
+            if (fields.type) continue;
+            fields.type=false;
+            show_fields();
             continue;
           }
           if (acceptor && relayed._deleted===true) {
