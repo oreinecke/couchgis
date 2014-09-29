@@ -300,6 +300,7 @@ $(document).ready(function() {
             acceptor.properties.GeoJSON_clone=null;
             // and point all other features to the new doc id.
             relayed.GeoJSON_clone=acceptor.properties._id;
+            delete acceptor.unchanged;
           }
           while ( r!==rows.length ) {
             row=rows.pop();
