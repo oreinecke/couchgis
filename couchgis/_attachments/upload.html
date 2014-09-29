@@ -283,8 +283,7 @@ $(document).ready(function() {
                       relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
               acceptor=relays[rows.splice(r,1)[0].id];
             row=rows[r-1] || {};
-            if (row.key===key) r--;
-          } while (row.key===key)
+          } while (row.key===key && r--)
           if (!acceptor && relayed._deleted===true) {
             // If the deleted document is not pointed at exclusively, we just
             // unset its type, thus hiding it from most of the indexed views.
