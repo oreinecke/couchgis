@@ -280,7 +280,7 @@ $(document).ready(function() {
             // nothing else than the deleted geometry.
             else if ( !acceptor && relayed._deleted===true &&
                       relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
-              acceptor=relays[row.id];
+              acceptor=relays[rows.splice(r,1)[0].id];
             row=rows[r-1] || {};
             if (row.key===key) r--;
           } while (row.key===key)
@@ -305,7 +305,6 @@ $(document).ready(function() {
           while ( r!==rows.length ) {
             row=rows.pop();
             var relay=relays[row.id].properties;
-            if (relay===acceptor.properties) continue;
             relay.GeoJSON_clone = relay.GeoJSON_clone.replace(
               RegExp('\\b'+relayed._id+'\\b'),
               relayed.GeoJSON_clone
