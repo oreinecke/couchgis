@@ -234,7 +234,7 @@ $(document).ready(function() {
       var relayed=features[f].properties;
       var doc=uploaded_docs[relayed._id];
       // Map document id to its feature.
-      if (doc) relays[relayed._id]=relayed;
+      if (doc) relays[relayed._id]=features[f];
       // Nothing to be done if the document wasn't in the
       // database before or doesn't have its own geometry.
       if (!doc || doc.GeoJSON_clone) continue;
@@ -246,7 +246,7 @@ $(document).ready(function() {
       }
       doc_ids.push(relayed._id);
     }
-    $.getJSON('_view/geojson-doc?keys='+JSON.stringify({keys:doc_ids}), function(data) {
+    $.getJSON('_view/geojson-doc?keys='+JSON.stringify(doc_ids), function(data) {
       var doc_ids=[], rows=data.rows, row;
       // Fetch missing documents.
       for (var r=0; row=rows[r]; r++)
@@ -270,7 +270,7 @@ $(document).ready(function() {
           });
         }
         for ( var r=rows.length; row=rows[--r]; rows.splice(r) ) {
-          var key=rows.key, acceptor=undefined;
+          var key=row.key, acceptor=undefined;
           var relayed=relays[key].properties;
           do {
             var relay=relays[row.id].properties;
