@@ -204,10 +204,10 @@ $(document).ready(function() {
     }
     fields={};
     values={};
-    var keys=[];
+    var doc_ids=[];
     for (var f=0;f<features.length;f++) {
       var properties=features[f].properties;
-      if (properties._id) keys.push(properties._id);
+      if (properties._id) doc_ids.push(properties._id);
       for (var prop in properties)
         fields[prop]=false;
     }
@@ -216,7 +216,7 @@ $(document).ready(function() {
     show_fields();
     uploaded_docs={};
     // store existing documents
-    $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:keys}), function(data) {
+    $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:doc_ids}), function(data) {
       data=JSON.parse(data);
       while (data.rows.length) {
         var row=data.rows.pop();
