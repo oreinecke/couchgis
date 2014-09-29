@@ -248,9 +248,10 @@ $(document).ready(function() {
     }
     $.getJSON('_view/geojson-doc?keys='+JSON.stringify(doc_ids), function(data) {
       var doc_ids=[], rows=data.rows, row;
-      // Fetch missing documents.
       for (var r=0; row=rows[r]; r++)
+        // Splice rows that reference the document itself.
         if (row.key===row.id) rows.splice(r--, 1);
+        // Fetch missing documents.
         else if (!uploaded_docs[row.id]) {
           uploaded_docs[row.id]=true;
           doc_ids.push(row.id);
