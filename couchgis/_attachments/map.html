@@ -147,7 +147,8 @@ $(document).ready(function() {
                   // Link to Futon for the lack of a better interface
                   // and set link text to a useful item explanation.
                   var a=$("<a>").attr({
-                    href:"/_utils/document.html?"+list.db+'/'+doc._id, target:"_blank"
+                    href:"/_utils/document.html?"+list.db+'/'+doc._id,
+                    target:"_blank", title:"..."
                   }).text( doc[doc.type]||doc.type );
                   if (cl==="title-time" && doc.time)
                     a.append(' ('+doc.time+')');
