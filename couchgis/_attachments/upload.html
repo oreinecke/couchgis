@@ -262,6 +262,7 @@ $(document).ready(function() {
         while ( row=data.rows.pop() ) {
           uploaded_docs[row.id]=row.doc;
           features.push( relays[row.id]={
+            unchanged:true,
             properties:{
               _id:row.doc._id, _rev:row.doc._rev,
               GeoJSON_clone:row.doc.GeoJSON_clone
@@ -308,11 +309,18 @@ $(document).ready(function() {
               RegExp('\\b'+relayed._id+'\\b'),
               relayed.GeoJSON_clone
             );
+            delete relays[row.id].unchanged;
           }
           // Add special field GeoJSON_clone and update #modify div
           if (fields.GeoJSON_clone) continue;
           fields.GeoJSON_clone=false;
           show_fields();
+        }
+        // Unstage unchanged documents from upload.
+        for (var f=0;f<features.length;f++) {
+          if (!features[f].unchanged) continue;
+          delete uploaded_docs[features[f].properties._id];
+          features.splice(f--, 1);
         }
       });
     });
