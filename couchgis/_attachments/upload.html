@@ -309,6 +309,10 @@ $(document).ready(function() {
               relayed.GeoJSON_clone
             );
           }
+          // Add special field GeoJSON_clone and update #modify div
+          if (fields.GeoJSON_clone) continue;
+          fields.GeoJSON_clone=false;
+          show_fields();
         }
       });
     });
