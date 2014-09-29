@@ -274,12 +274,10 @@ $(document).ready(function() {
           var relayed=relays[key].properties;
           do {
             var relay=relays[row.id].properties;
-            // Ignore features that are staged for deletion anyway.
-            if (relay._deleted) continue;
             // Pocket current feature if it links to
             // nothing else than the deleted geometry.
-            if ( !acceptor && relayed._deleted===true &&
-                 relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
+            if ( !acceptor && relayed._deleted===true && !relay._deleted &&
+                  relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
               acceptor=relays[row.id];
             row=rows[r-1] || {};
             if (row.key===key) r--;
