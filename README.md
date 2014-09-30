@@ -114,15 +114,18 @@ long as it is from QGIS, but for ArcGIS I cannot guarantee anything.
 
 Documents have to give at least a tiny bit of explanation on what we can expect
 to find in them. Or vice versa, if we look for certain information, it should
-be obvious which document type covers it. Hence the above document is a very
-very bad examble, since "Use by Area" should surely go to some different
-document type.
+be obvious which document type covers it. The above document is a very very bad
+example, since "Use by Area" should surely go to some different document type.
+
+By removing `doc.type` or setting it to false-ish, the document is hidden from
+the map page, but its `GeoJSON` will still be referenceable by other documents.
 
 ###`doc[doc.type]`
 
 It is nice to have that property set, because it yields a meaningful title
-almost all the time. And I can not think of any case where it wouldn't make
-sense to have it set.
+almost all the time. And I cannot think of any case where it wouldn't make
+sense to use it. For all these reasons, the map page uses `doc[doc.type]`
+as an item title, or `doc.type` if the former is missing.
 
 ###`doc.time`
 
@@ -134,11 +137,10 @@ date was given as `MONTH_BEG` `YEAR_BEG` `DAY_END` or whatever.
 [Dates or ranges of dates](couchgis/views/lib/ranges.js) are expressed as a
 string as such:
 - Dates can be given in DD.MM.YYYY, YYYY.MM.DD, YYYY/MM/DD, DD/MM/YYYY i.e. I
-  only expect the year to be four digits, the digits to be consecutive, and I
-  don't care about the order as long as it follows hierarchy.
-- Date intervals are written as `"<date> - <date>"` ("to" or something would
-  hinder internationalization even more). Hence **the dash must not be used
-  as a separator!**
+  only expect the year to be four digits, digits to be consecutive, and I don't
+  care about the order as long as it follows hierarchy.
+- Date intervals are written as `"<date> - <date>"` ("to" or something hinders
+  internationalization). Hence, **the dash must not be used as a separator!**
 - If the day is left out, `"03/2004"` equals `"01/03/2004 - 31/03/2004"`, ditto
   for months.
 - If the entire date is left out, it is treated as +/- infinity. `"- 03/2004"`
@@ -198,10 +200,10 @@ itself for each relation. I have the following to say to this:
 - Each geometry relates to itself by default.
 - You might encounter glitches due to my sloppy implementation: For instance, I
   do not check for intersecting line segments, points identical to other
-  points or points on line segments etc.
+  points, points on line segments, etc.
 - I've built in a tolerance (or snap if you will) of 6-10cm depending on
   latitude. This is a good thing, because coordinates usually aren't that
-  precise, hence that kind of a distance shouldn't decide if geometries are
+  precise; that magnitude of a distance shouldn't decide if geometries are
   related.
 - Let the interface encourage you to select the documents as tightly as
   possible, before they are filtered geometrically. I've tried to make the
