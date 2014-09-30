@@ -324,6 +324,11 @@ $(document).ready(function() {
     });
   }
 
+  // Use GeoCouch if supported.
+  $.getJSON("_spatial/_info", function() {
+    update_items.GeoCouch=true;
+  });
+
   // Applies new filter to document list; new_filter must be an object
   // denoting the filter type by its first member. It is then either
   // i) attached at the end of the filter queue
