@@ -44,7 +44,7 @@ $(document).ready(function() {
         complete:function(jqXHR, textStatus) {
           JQXHR=jqXHR;
           var resp=jqXHR.responseJSON || {status:textStatus};
-          console.log(resp);
+          $.extend(resp, (resp.history||[]).shift());
           var lines=[];
           for (var prop in resp) {
             if (typeof resp[prop] === "object") continue;
