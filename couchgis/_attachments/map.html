@@ -254,16 +254,21 @@ $(document).ready(function() {
     viewports.push(vp);
     // abort if we already see less items than requested
     if (vp.populated) return call.that_last_one();
+    // query GeoCouch spatial handler if available
     if (update_items.GeoCouch) $.getJSON("_spatial/bbox", {
       bbox:options.bbox.toString()
     }, function(data) {
       var row, rows=data.rows, ids={};
+      // hash each geometry id to true for faster look-up
       while ( row=rows.pop() ) ids[row.id]=true;
       var KEYS=[];
+      // list at most options.limit keys within bbox
       for (var k=0, key; key=keys[k]; k++)
         if ( ids[key] && KEYS.push(key)===options.limit )
           break;
+      // pop all viewports but one, since the aren't really needed
       viewports.splice(1);
+      // use _list/bbox-filter/bbox to return a proper geometry error
       list("bbox-filter/bbox", {error:options.error, keys:KEYS}, success);
     }); else {
       // ignore items that were already dropped by previous viewport
