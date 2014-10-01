@@ -259,11 +259,12 @@ $(document).ready(function() {
     }, function(data) {
       var row, rows=data.rows, ids={};
       while ( row=rows.pop() ) ids[row.id]=true;
-      options.keys=[];
-      for (var k=0; k<keys.length && options.keys.length<options.limit; k++)
-        if (ids[keys[k]]) options.keys.push(keys[k]);
+      var KEYS=[];
+      for (var k=0, key; key=keys[k]; k++)
+        if ( ids[key] && KEYS.push(key)===options.limit )
+          break;
       viewports.splice(1);
-      list("bbox-filter/bbox", {error:options.error, keys:options.keys}, success);
+      list("bbox-filter/bbox", {error:options.error, keys:KEYS}, success);
     }); else {
       // ignore items that were already dropped by previous viewport
       options.keys=vp.prefix.concat(keys.slice(vp.position));
