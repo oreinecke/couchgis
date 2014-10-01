@@ -259,8 +259,9 @@ $(document).ready(function() {
     }
     // ignore items that were already dropped by previous viewport
     options.keys=vp.prefix.concat(keys.slice(vp.position));
-    var table = $("#table tbody");
-    list("bbox-filter/bbox", options, function(data) {
+    list("bbox-filter/bbox", options, success);
+    function success(data) {
+      var table = $("#table tbody");
       var position=0;
       // lists items to be removed as {id:null}
       var old_items={};
@@ -321,7 +322,7 @@ $(document).ready(function() {
       }
       // Fetch changed geometries in 50 ms.
       window.setTimeout(update_geometry, 50);
-    });
+    };
   }
 
   // Use GeoCouch if supported.
