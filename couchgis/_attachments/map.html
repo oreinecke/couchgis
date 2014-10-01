@@ -241,7 +241,7 @@ $(document).ready(function() {
     var NE=map.getBounds().getNorthEast();
     var SW=map.getBounds().getSouthWest();
     var options={
-      limit:parseFloat($("#settings [name=limit]").val()),
+      limit:+$("#settings [name=limit]").val() || 1,
       error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
       bbox:[ SW.lng(), SW.lat(), NE.lng(), NE.lat() ],
     };
@@ -253,10 +253,7 @@ $(document).ready(function() {
     // the last viewport is valid, so it needs to be re-stacked
     viewports.push(vp);
     // abort if we already see less items than requested
-    if (vp.populated) {
-      call.that_last_one();
-      return;
-    }
+    if (vp.populated) return call.that_last_one();
     if (update_items.GeoCouch) $.getJSON("_spatial/bbox", {
       bbox:options.bbox.toString()
     }, function(data) {
@@ -293,9 +290,7 @@ $(document).ready(function() {
           continue;
         }
         items[id]=data[id];
-        var tr=$("<tr>");
-        table.append(tr);
-        items[id].tr=tr;
+        table.append( items[id].tr=$("<tr>") );
         // fetch GeoJSON of specified detail level
         var KEYS=[[id, data[id].GeoJSON.error]];
         // skip to matching document id
@@ -948,7 +943,7 @@ $(document).ready(function() {
 
   // increase limit to next higher [1,2,5,10,20,50,etc]
   $("#settings [name=more]").click( function() {
-    var limit=parseFloat($("#settings [name=limit]").val());
+    var limit=$("#settings [name=limit]").val();
     var new_limit=10;
     while (new_limit<=limit) new_limit*=10;
     if (new_limit>5*limit) new_limit/=5;
@@ -959,7 +954,7 @@ $(document).ready(function() {
 
   // decrease limit to next lower [1,2,5,10,20,50,etc]
   $("#settings [name=less]").click( function() {
-    var limit=parseFloat($("#settings [name=limit]").val());
+    var limit=$("#settings [name=limit]").val();
     var new_limit=1;
     while (new_limit*10<limit) new_limit*=10;
     if (new_limit*5<limit) new_limit*=5;
