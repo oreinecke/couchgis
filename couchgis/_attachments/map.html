@@ -491,7 +491,8 @@ $(document).ready(function() {
           if (passed[id]===undefined) keys.push(id);
         }
         var options={keys:keys, bbox:bbox, relation:new_filter.spatial};
-        list("bbox-filter/bbox", options, function(data) {
+        list("bbox-filter/bbox", options, success);
+        function success(data) {
           options.keys=[];
           for (var id in data) options.keys.push([id,0]);
           options.GeoJSON=GeometryCollection;
@@ -509,7 +510,7 @@ $(document).ready(function() {
             new_filter.passed=passed;
             filter_documents(commands);
           });
-        });
+        };
       }, "json");
       return;
     }
