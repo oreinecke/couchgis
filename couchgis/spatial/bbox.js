@@ -1,3 +1,5 @@
+// Emits minimal geometry for spatial index.
+
 function(doc) {
   var utils=require('views/lib/utils');
   if (!doc.GeoJSON) return;

@@ -1,5 +1,5 @@
 // Emit GeoJSON, simplified GeoJSON for
-// faster drawing and associated documents.
+// faster drawing, and associated properties.
 
 function(doc) {
   var utils=require('views/lib/utils');

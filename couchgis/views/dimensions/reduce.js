@@ -1,5 +1,5 @@
-// Unifies bboxes for viewport initialization.
-// Also unifies time ranges as general info.
+// Unify bboxes for viewport initialization.
+// Also unify time ranges as general info.
 
 function(keys, values) {
   ;function lesser(a, b) {

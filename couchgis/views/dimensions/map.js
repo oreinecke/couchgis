@@ -1,4 +1,4 @@
-// Emits size as key and bbox for reduce.
+// Emit size as key and bbox for reduce.
 
 function(doc) {
   var utils=require('views/lib/utils');

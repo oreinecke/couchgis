@@ -1,4 +1,5 @@
-// Emits bbox, size and associated document ids.
+// Emit bounding box and geometry
+// errors indexed by document id.
 
 function(doc) {
   var utils=require('views/lib/utils');
