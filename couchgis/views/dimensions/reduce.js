@@ -26,14 +26,15 @@ function(keys, values) {
     }
     return a;
   }
-  var bbox=values[0].bbox;
-  var range=values[0].ranges;
+  var value=values.pop();
+  var bbox=value.bbox;
+  var range=value.ranges;
   range={begin:range[0].begin, end:range[range.length-1].end};
-  for (var v=1;v<values.length;v++) {
-    var ranges=values[v].ranges;
+  while ( value=values.pop() ) {
+    var ranges=value.ranges;
     range.begin=lesser(range.begin,ranges[0].begin);
     range.end=greater(range.end,ranges[ranges.length-1].end);
-    var bbox2=values[v].bbox;
+    var bbox2=value.bbox;
     if (!bbox) bbox=bbox2;
     if (!bbox || !bbox2) continue;
     bbox[0]=(bbox[0]<bbox2[0]?bbox:bbox2)[0];
