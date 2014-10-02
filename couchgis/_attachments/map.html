@@ -484,13 +484,10 @@ $(document).ready(function() {
           delete GeoJSON.error;
           GeometryCollection.geometries.push(GeoJSON);
         }
-        var keys=[];
-        for (var d=0, id=null; d<documents.length; d++) {
-          if (id===documents[d][0]) continue;
-          id=documents[d][0];
-          if (passed[id]===undefined) keys.push(id);
-        }
-        var options={keys:keys, bbox:bbox, relation:new_filter.spatial};
+        var ids=keys.slice();
+        for (var k=0, id; id=keys[k]; k++)
+          if (passed[id]===undefined) ids.push(id);
+        var options={keys:ids, bbox:bbox, relation:new_filter.spatial};
         list("bbox-filter/bbox", options, success);
         function success(data) {
           options.keys=[];
@@ -499,8 +496,8 @@ $(document).ready(function() {
           delete options.bbox;
           list("bbox-filter/geojson", options, function(data) {
             var new_documents=[];
-            while (keys.length) {
-              var id=keys.pop();
+            while (ids.length) {
+              var id=ids.pop();
               passed[id]=id in data;
             }
             for (var d=0, doc; d<documents.length; d++)
