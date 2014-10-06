@@ -463,9 +463,8 @@ $(document).ready(function() {
     if (new_filter.spatial) {
       var passed=new_filter.passed || function(keys) {
         var result={};
-        for (var k=0;k<keys.length;k++)
-          result[keys[k]]=true;
         new_filter.data='{"keys":[["'+keys.join('",0],["')+'",0]]}';
+        while (keys.length) result[keys.pop()]=true;
         delete new_filter.keys;
         return result;
       }(new_filter.keys);
