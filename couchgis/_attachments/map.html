@@ -483,9 +483,11 @@ $(document).ready(function() {
           delete GeoJSON.error;
           GeometryCollection.geometries.push(GeoJSON);
         }
-        var ids=keys.slice();
-        for (var k=0, id; id=keys[k]; k++)
-          if (passed[id]===undefined) ids.push(id);
+        var ids=[];
+        for (var d=0, doc, id=null; doc=documents[d]; d++) {
+          if (id===doc[0]) continue;
+          if (passed[id=doc[0]]===undefined) ids.push(id);
+        }
         var options={keys:ids, bbox:bbox, relation:new_filter.spatial};
         list("bbox-filter/bbox", options, success);
         function success(data) {
