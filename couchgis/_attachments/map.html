@@ -489,7 +489,21 @@ $(document).ready(function() {
           if (passed[id=doc[0]]===undefined) ids.push(id);
         }
         var options={keys:ids, bbox:bbox, relation:new_filter.spatial};
-        list("bbox-filter/bbox", options, success);
+        // Query GeoCouch spatial handler if available.
+        if (update_items.GeoCouch) $.getJSON("_spatial/bbox", {
+          bbox:options.bbox.toString()
+        }, function(data) {
+          // Hash geometry ids to true.
+          var row, rows=data.rows, ids={};
+          while ( row=rows.pop() )
+            ids[row.id]=true;
+          // Intersect options.keys with hashed geometry ids.
+          var key, keys=options.keys;
+          options.keys=[];
+          while ( key=keys.pop() )
+            if (ids[key]) options.keys.push(key);
+          list("bbox-filter/bbox", options, success);
+        }); else list("bbox-filter/bbox", options, success);
         function success(data) {
           options.keys=[];
           for (var id in data) options.keys.push([id,0]);
