@@ -33,6 +33,10 @@ release from http://lsh1908.selfhost.eu:5984/release (Mo-Th 12-6p.m.) or
 https://reinecke.iriscouch.com/release (as long as I am below my monthly
 quota).
 
+If you happen to have the [GeoCouch](https://github.com/couchbase/geocouch)
+extension installed into your CouchDB, Couch-GIS will automatically use its
+faster bounding box filter.
+
 Document Structure
 ------------------
 
