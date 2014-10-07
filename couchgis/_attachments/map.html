@@ -500,7 +500,7 @@ $(document).ready(function() {
           // Intersect options.keys with hashed geometry ids.
           var key, keys=options.keys;
           options.keys=[];
-          while ( key=keys.pop() )
+          for (var k=0, key; key=keys[k]; k++)
             if (ids[key]) options.keys.push(key);
           list("bbox-filter/bbox", options, success);
         }); else list("bbox-filter/bbox", options, success);
