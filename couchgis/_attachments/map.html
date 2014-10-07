@@ -21,6 +21,11 @@ $(document).ready(function() {
     center: new LatLng(50.83730534254573, 13.938310197234163)
   });
 
+  if (Maps.offline) {
+    $("#map").hide();
+    $("#offline-map").show();
+  }
+
   var path=require('views/lib/path');
   var ranges=require('views/lib/ranges');
   var indexes=require('views/lib/indexes');
@@ -1177,6 +1182,10 @@ $(document).ready(function() {
       <input type="button" value="mehr" name="more"></span>
   </form>
   <div id="map" style="height:65%"></div>
+  <div id="offline-map" style="text-align:center;display:none">
+    Offline-Karte: Google Maps API konnte nicht geladen werden.
+    Diese wird zur Anzeige der Kartendaten benötigt.
+  </div>
   <form id="filter"> Filter:
     <span class="types"></span><br>
     <label>von: <input type="text" size=8 name="time" title="Zeit"></label>
