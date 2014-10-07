@@ -24,6 +24,7 @@ $(document).ready(function() {
   if (Maps.offline) {
     $("#map").hide();
     $("#offline-map").show();
+    $("#settings").find(".geometry-level, [name=delayed]").prop('disabled', true);
   }
 
   var path=require('views/lib/path');
