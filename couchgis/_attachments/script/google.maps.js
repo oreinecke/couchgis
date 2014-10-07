@@ -2,6 +2,9 @@
 var Maps=google.maps;
 var LatLng=Maps.LatLng;
 var LatLngBounds=Maps.LatLngBounds;
+var Point=Maps.Marker;
+var Polygon=Maps.Polygon;
+var LineString=Maps.Polyline;
 
 // add GeoJSON MultiLineString support
 function MultiLineString(options) {
@@ -84,9 +87,9 @@ function expand_options(options) {
 }
 
 function create_shape(type, options) {
-  if (type==="Point") return new Maps.Marker(options);
-  if (type==="Polygon") return new Maps.Polygon(options);
-  if (type==="LineString") return new Maps.Polyline(options);
+  if (type==="Point") return new Point(options);
+  if (type==="Polygon") return new Polygon(options);
+  if (type==="LineString") return new LineString(options);
   if (type==="MultiPolygon") return new MultiPolygon(options);
   if (type==="MultiLineString") return new MultiLineString(options);
   // remind myself that this needs work!!!
