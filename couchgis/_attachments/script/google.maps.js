@@ -1,10 +1,9 @@
 // stash frequently used objects here
-var Maps=google.maps;
-var LatLng=Maps.LatLng;
-var LatLngBounds=Maps.LatLngBounds;
-var Point=Maps.Marker;
-var Polygon=Maps.Polygon;
-var LineString=Maps.Polyline;
+var Maps = window.google && google.maps;
+var LatLng     = Maps && Maps.LatLng;
+var Point      = Maps && Maps.Marker;
+var Polygon    = Maps && Maps.Polygon;
+var LineString = Maps && Maps.Polyline;
 
 // add GeoJSON MultiLineString support
 function MultiLineString(options) {
@@ -94,4 +93,62 @@ function create_shape(type, options) {
   if (type==="MultiLineString") return new MultiLineString(options);
   // remind myself that this needs work!!!
   alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+}
+
+// Provide offline Google Maps API look-and-feel.
+Maps=Maps || { offline:true };
+
+if (Maps.offline) {
+
+  function nothing(){};
+
+  Maps.Map=function() {
+    this.setCenter=nothing;
+    this.getBounds=function() {
+      return {
+        getNorthEast:function() {
+          return {
+            lat:function() {return 90;},
+            lng:function() {return 360;}
+          };
+        },
+        getSouthWest:function() {
+          return {
+            lat:function() {return 0;},
+            lng:function() {return 0;}
+          };
+        }
+      };
+    }
+  };
+
+  Maps.MapTypeId={};
+
+  LatLng=nothing;
+
+  Point=nothing;
+  Polygon=nothing;
+  LineString=nothing;
+  MultiPolygon=nothing;
+  MultiLineString=nothing;
+
+  Maps.event={
+    addListenerOnce:function(instance, eventName, handler) { handler(); },
+    addListener:function(instance, eventName, handler) {
+      this.handler=handler;
+    },
+    trigger:function() {
+      if (this.handler) this.handler();
+    },
+    clearListeners:nothing
+  };
+
+  create_shape=function() {
+    return {
+      setOptions:nothing,
+      addListener:nothing,
+      setMap:nothing
+    };
+  };
+
 }
