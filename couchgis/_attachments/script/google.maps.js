@@ -99,9 +99,10 @@ function create_shape(type, options) {
 
 // Provide offline Google Maps API look-and-feel.
 if (Maps.offline) {
-
+  // Offline Maps API does nothing all the time.
   function nothing(){};
-
+  // The Offline map canvas extends over the
+  // entire planet and does nothing else.
   Maps.Map=function() {
     this.setCenter=nothing;
     this.getBounds=function() {
@@ -119,18 +120,20 @@ if (Maps.offline) {
           };
         }
       };
-    }
+    };
   };
-
+  // Offline maps supports undefined map types.
   Maps.MapTypeId={};
-
+  // Use nothing() as an empty constructor.
   LatLng          = nothing;
- 
   Point           = nothing;
   Polygon         = nothing;
   LineString      = nothing;
   MultiPolygon    = nothing;
   MultiLineString = nothing;
+  // The map page attaches a single handler to 'bounds_changed'.
+  // It uses no other event types or maps. This allows me to
+  // ignore instance, eventName, and multiple handlers.
   Maps.event={
     handler:nothing,
     addListener:function(instance, eventName, handler) {
@@ -142,7 +145,7 @@ if (Maps.offline) {
     trigger:function() { this.handler(); },
     clearListeners:function() { this.handler=nothing; }
   };
-
+  // Offline maps supports invisible shapes.
   create_shape=function() {
     return {
       setOptions:nothing,
@@ -150,5 +153,4 @@ if (Maps.offline) {
       setMap:nothing
     };
   };
-
 }
