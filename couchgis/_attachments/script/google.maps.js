@@ -133,14 +133,15 @@ if (Maps.offline) {
   MultiLineString=nothing;
 
   Maps.event={
-    addListenerOnce:function(instance, eventName, handler) { handler(); },
+    handler:nothing,
     addListener:function(instance, eventName, handler) {
       this.handler=handler;
     },
-    trigger:function() {
-      if (this.handler) this.handler();
+    addListenerOnce:function(instance, eventName, handler) {
+      handler();
     },
-    clearListeners:nothing
+    trigger:function() { this.handler(); },
+    clearListeners:function() { this.handler=nothing; }
   };
 
   create_shape=function() {
