@@ -124,14 +124,13 @@ if (Maps.offline) {
 
   Maps.MapTypeId={};
 
-  LatLng=nothing;
-
-  Point=nothing;
-  Polygon=nothing;
-  LineString=nothing;
-  MultiPolygon=nothing;
-  MultiLineString=nothing;
-
+  LatLng          = nothing;
+ 
+  Point           = nothing;
+  Polygon         = nothing;
+  LineString      = nothing;
+  MultiPolygon    = nothing;
+  MultiLineString = nothing;
   Maps.event={
     handler:nothing,
     addListener:function(instance, eventName, handler) {
