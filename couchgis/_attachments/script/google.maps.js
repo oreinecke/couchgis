@@ -1,9 +1,11 @@
-// stash frequently used objects here
-var Maps = window.google && google.maps;
-var LatLng     = Maps && Maps.LatLng;
-var Point      = Maps && Maps.Marker;
-var Polygon    = Maps && Maps.Polygon;
-var LineString = Maps && Maps.Polyline;
+// If the Google Maps API has been loaded successfully, shorthand
+// google.maps to Maps. Otherwise revert Maps to 'offline-mode' API.
+var Maps = window.google && google.maps || {offline:true};
+// Stash frequently used objects and use GeoJSON type names.
+var LatLng     = Maps.LatLng;
+var Point      = Maps.Marker;
+var Polygon    = Maps.Polygon;
+var LineString = Maps.Polyline;
 
 // add GeoJSON MultiLineString support
 function MultiLineString(options) {
@@ -96,8 +98,6 @@ function create_shape(type, options) {
 }
 
 // Provide offline Google Maps API look-and-feel.
-Maps=Maps || { offline:true };
-
 if (Maps.offline) {
 
   function nothing(){};
