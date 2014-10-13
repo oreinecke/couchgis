@@ -16,6 +16,7 @@ function(head, req) {
   var include_geojson_id='include_geojson_id' in req.query;
   var EPSG=req.query.EPSG;
   var include_WKT='include_WKT' in req.query;
+  var include_JSON='include_JSON' in req.query;
   var index=0, next_index=indexes.pop();
   start({'headers':{
     'Content-Type':{
@@ -55,6 +56,14 @@ function(head, req) {
         delete doc.GeoJSON_clone;
       else if (!doc.GeoJSON_clone)
         doc.GeoJSON_clone=row.key[0];
+      if (include_JSON) {
+        var _JSON={};
+        for (var field in doc) _JSON[field]=doc[field];
+        delete _JSON._id;
+        delete _JSON._rev;
+        delete _JSON.GeoJSON_clone;
+        doc._JSON=JSON.stringify(_JSON);
+      }
       // create flat column names from nested objects
       (function flatten(obj, fields) {
         if (!obj || typeof obj!=="object")
