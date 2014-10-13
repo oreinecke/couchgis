@@ -67,8 +67,7 @@ function(head, req) {
       })(doc, []);
       for (var field in doc) {
         if (fields==null) break;
-        if (!/^[A-ZÄÖÜ]/.test(field)) continue;
-        if (/^GeoJSON/.test(field)) continue;
+        if ( /^(GeoJSON|_id|_rev)$/.test(field) ) continue;
         if (fields.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
           delete doc[field];
       }
