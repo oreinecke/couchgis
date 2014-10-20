@@ -500,14 +500,13 @@ $(document).ready(function() {
           bbox:options.bbox.toString()
         }, function(data) {
           // Hash geometry ids to true.
-          var row, rows=data.rows, ids={};
+          var row, rows=data.rows, intersects={};
           while ( row=rows.pop() )
-            ids[row.id]=true;
+            intersects[row.id]=true;
           // Intersect options.keys with hashed geometry ids.
-          var key, keys=options.keys;
           options.keys=[];
-          for (var k=0, key; key=keys[k]; k++)
-            if (ids[key]) options.keys.push(key);
+          for (var i=0, id; id=ids[i]; i++)
+            if (intersects[id]) options.keys.push(id);
           list("bbox-filter/bbox", options, success);
         }); else list("bbox-filter/bbox", options, success);
         function success(data) {
