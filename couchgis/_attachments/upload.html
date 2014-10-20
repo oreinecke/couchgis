@@ -409,6 +409,11 @@ $(document).ready(function() {
       // save document description as doc[doc.type]
       if ($("#description-include").prop('checked') && doc.type)
         doc[doc.type]=$("#description-value").val() || doc[doc.type] || undefined;
+      // parse feature.properties._JSON
+      try {
+        $.extend(true, doc, JSON.parse(feature.properties._JSON));
+        delete feature.properties._JSON;
+      } catch(err) {}
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
