@@ -121,6 +121,7 @@ function(head, req) {
       fields=["type", "time"].concat(fields?fields.split(':'):[]);
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
       if (include_revision) fields=["_id", "_rev"].concat(fields);
+      if (include_JSON) fields.unshift("_JSON");
     }
     if (include_WKT) fields.unshift("_WKT");
     send('<?xml version="1.0"?>');
