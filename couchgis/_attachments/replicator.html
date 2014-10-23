@@ -42,7 +42,6 @@ $(document).ready(function() {
           create_target:true
         }),
         complete:function(jqXHR, textStatus) {
-          JQXHR=jqXHR;
           var resp=jqXHR.responseJSON || {status:textStatus};
           $.extend(resp, (resp.history||[]).shift());
           var lines=[];
