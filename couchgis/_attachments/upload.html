@@ -270,17 +270,18 @@ $(document).ready(function() {
             }
           });
         }
+        // Ignore features that are staged for deletion anyway.
+        for (var r=0; row=rows[r]; r++)
+          if (relays[row.id].properties._deleted===true)
+            rows.splice(r--,1);
         for ( var r=rows.length; row=rows[--r]; rows.splice(r) ) {
           var key=row.key, acceptor=undefined;
           var relayed=relays[key].properties;
           do {
-            var relay=relays[row.id].properties;
-            // Ignore features that are staged for deletion anyway.
-            if (relay._deleted) rows.splice(r,1);
             // Pocket current feature if it links to
             // nothing else than the deleted geometry.
-            else if ( !acceptor && relayed._deleted===true &&
-                      relay.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
+            if ( !acceptor && relayed._deleted===true &&
+                 relays[row.id].properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
               acceptor=relays[rows.splice(r,1)[0].id];
             row=rows[r-1] || {};
           } while (row.key===key && r--)
