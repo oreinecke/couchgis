@@ -630,8 +630,11 @@ $(document).ready(function() {
       // update GeoJSON according to viewport
       // get associated document ids
       $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
+        // Re-build keys to purge orphaned geometries.
+        keys.splice();
         while (data.rows.length) {
           var row=data.rows.shift();
+          keys.push(row.key);
           filters[0].documents.push([row.key, row.id]);
         }
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
