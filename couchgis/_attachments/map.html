@@ -627,7 +627,6 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
       while (data.rows.length)
         keys.push(data.rows.shift().id);
-      // update GeoJSON according to viewport
       // get associated document ids
       $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
         // Re-build keys to purge orphaned geometries.
