@@ -43,6 +43,7 @@ function(doc) {
     if (/^GeoJSON/.test(field)) continue;
     val.doc[field]=doc[field];
   }
+  ids=ids.replace(/[#%].*($)/gm, '$1');
   ids=ids.match(/[^\s,;&]+/g);
   while (ids.length) emit([ids.shift(),doc._id], val);
 }
