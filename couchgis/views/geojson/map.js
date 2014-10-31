@@ -3,10 +3,7 @@
 
 function(doc) {
   var utils=require('views/lib/utils');
-  var id=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
-  // abort if no GeoJSON is set at all
-  if (id==null) return;
-  if (id===doc._id) {
+  if (doc.GeoJSON) {
     // I need a copy that can be modified.
     var GeoJSON=utils.clone(doc.GeoJSON);
     // Keep CRS name of source geometry.
@@ -24,12 +21,14 @@ function(doc) {
       var simplified_GeoJSON=utils.stripLastCoord(utils.simplify(utils.clone(GeoJSON),error));
       // Store EPSG used to transform coordinates from source geometry.
       if (simplified_GeoJSON.error===0) simplified_GeoJSON.EPSG=utils.EPSG({crs:crs});
-      emit([id,+simplified_GeoJSON.error.toExponential(1)], {GeoJSON:simplified_GeoJSON});
+      emit([doc._id,+simplified_GeoJSON.error.toExponential(1)], {GeoJSON:simplified_GeoJSON});
       error=simplified_GeoJSON.error;
     }
   }
   var ranges=require('views/lib/ranges');
   if (!doc.type) return;
+  var ids=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
+  if (!ids) return;
   var val={doc:{
     _id:doc._id,
     _rev:doc._rev,
@@ -44,6 +43,6 @@ function(doc) {
     if (/^GeoJSON/.test(field)) continue;
     val.doc[field]=doc[field];
   }
-  var ids=id.match(/[^\s,;&]+/g);
+  ids=ids.match(/[^\s,;&]+/g);
   while (ids.length) emit([ids.shift(),doc._id], val);
 }
