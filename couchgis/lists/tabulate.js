@@ -49,7 +49,7 @@ function(head, req) {
         var g=join( /"(\\"|[^"])*"/, f+join(/\s*\.\s*/.source+f)+'*', /\W/ );
         var parts=cut.value.match(g,'g');
         var expression="";
-        for (var part; (part=parts.shift())!=null; expression+=part ) {
+        for (var part; part=parts.shift(); expression+=part ) {
           // This is equivalent to 'anything else'.
           if (/^\W$/.test(part)) continue;
           // Do not process keywords and accumulator functions.
