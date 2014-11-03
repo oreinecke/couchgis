@@ -204,6 +204,11 @@ $(document).ready(function() {
     }
   }
 
+  // Use couch-ogr2ogr if installed.
+  $.getJSON("/_ogr2ogr", function() {
+    load_features.ogr2ogr=true;
+  });
+
   // Check if geometry is about to be dropped in the
   // next upload, and fix related documents accordingly.
   function relay_geometries() {
