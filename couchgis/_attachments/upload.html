@@ -371,7 +371,7 @@ $(document).ready(function() {
       var files=[].slice.apply(e.target.files), file;
       (function load_next() {
         if ( file=files.pop() ) {
-          // get file type and be flexible about extensions
+          // Get file type and be flexible about extensions.
           var filetype=file.name.match(/[^.]*$/);
           if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
           if (/^xml$/i.test(filetype)) filetype="xml";
