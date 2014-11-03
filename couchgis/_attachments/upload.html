@@ -373,9 +373,13 @@ $(document).ready(function() {
       (function load_next() {
         if ( file=files.pop() ) {
           // Get file type and be flexible about extensions.
-          var filetype=file.name.match(/[^.]*$/);
-          if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
-          if (/^xml$/i.test(filetype)) filetype="xml";
+          var filetype=file.name.match(/[^.]*$/)[0].toLowerCase();
+          if (/^(geo)?json$/.test(filetype)) filetype="geojson";
+          // Add files of unknown extension to the upload blob.
+          else if (filetype!=="xml" && load_features.ogr2ogr) {
+            load_next();
+            return;
+          }
           reader.onload=function(evt) {
             load_features(evt.target.result, filetype);
             load_next();
