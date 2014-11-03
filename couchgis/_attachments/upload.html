@@ -112,7 +112,6 @@ $(document).ready(function() {
   }
 
   function load_features(data, filetype) {
-    show_geometry(-1);
     try {
       if (filetype==="geojson") {
         var GeoJSON;
@@ -340,6 +339,7 @@ $(document).ready(function() {
     $("#results").html();
     submit.prop('disabled', true).show();
     revert.hide();
+    show_geometry(-1);
     features=[];
     var type=$(e.target).attr('type');
     if (type==="text") $.ajax({
