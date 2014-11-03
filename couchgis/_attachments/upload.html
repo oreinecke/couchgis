@@ -348,8 +348,8 @@ $(document).ready(function() {
       },
       success:function(data, text, jqXHR) {
         var filetype=jqXHR.getResponseHeader('Content-type');
-        if (filetype==="text/xml") filetype="xml";
-        else filetype="geojson";
+        if (filetype.match("text/xml")) filetype="xml";
+        if (filetype.match("application/json")) filetype="geojson";
         load_features(data, filetype);
       }
     });
