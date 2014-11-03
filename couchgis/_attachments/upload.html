@@ -363,15 +363,20 @@ $(document).ready(function() {
     });
     if (type==="file") {
       var reader=new FileReader();
-      // get file type and be flexible about extensions
-      var filetype=e.target.files[0].name.match(/[^.]*$/)[0];
-      if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
-      if (/^xml$/i.test(filetype)) filetype="xml";
-      reader.onload=function(evt) {
-        load_features(evt.target.result, filetype);
-        finalize();
-      };
-      reader.readAsText(e.target.files[0]);
+      var files=[].slice.apply(e.target.files), file;
+      (function load_next() {
+        if ( file=files.pop() ) {
+          // get file type and be flexible about extensions
+          var filetype=file.name.match(/[^.]*$/);
+          if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
+          if (/^xml$/i.test(filetype)) filetype="xml";
+          reader.onload=function(evt) {
+            load_features(evt.target.result, filetype);
+            load_next();
+          };
+          reader.readAsText(file);
+        } else finalize();
+      }());
     }
   });
 
