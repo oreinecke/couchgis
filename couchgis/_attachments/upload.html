@@ -119,8 +119,10 @@ $(document).ready(function() {
         // reformat JSON.parse error merrages
         try { GeoJSON=JSON.parse(data); }
         catch (err) { throw{message:"JSON.parse: "+err.message}; }
-        if (GeoJSON.type==="FeatureCollection") features=GeoJSON.features;
-        else if (GeoJSON.type==="Feature") features=[GeoJSON];
+        if (GeoJSON.type==="FeatureCollection")
+          features=features.concat(GeoJSON.features);
+        else if (GeoJSON.type==="Feature")
+          features.push(GeoJSON);
         else throw{message:"Unknown or useless GeoJSON type: "+GeoJSON.type};
         if (!GeoJSON.crs) throw{message:"No top-level CRS defined"};
         for (var f=0;f<features.length;f++)
@@ -164,7 +166,6 @@ $(document).ready(function() {
           } while (m);
           return elements;
         }(data, ["Table","Row","Cell","Data"]);
-        features=[];
         while (tables.length) {
           var rows=tables.shift().xml;
           // insert empty xml if ss:Index is set
@@ -339,6 +340,7 @@ $(document).ready(function() {
     $("#results").html();
     submit.prop('disabled', true).show();
     revert.hide();
+    features=[];
     var type=$(e.target).attr('type');
     if (type==="text") $.ajax({
       dataType:"text",
