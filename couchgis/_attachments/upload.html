@@ -330,7 +330,7 @@ $(document).ready(function() {
     });
   }
 
-  $("#upload :file").change(function(e) {
+  $("#upload").change(function(e) {
     $("#modify").hide();
     $("#reduce [name=show]").show();
     $("#reduce span").hide();
@@ -339,27 +339,8 @@ $(document).ready(function() {
     $("#results").html();
     submit.prop('disabled', true).show();
     revert.hide();
-    var reader=new FileReader();
-    // get file type and be flexible about extensions
-    var filetype=e.target.files[0].name.match(/[^.]*$/)[0];
-    if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
-    if (/^xml$/i.test(filetype)) filetype="xml";
-    reader.onload=function(evt) {
-      load_features(evt.target.result, filetype);
-    };
-    reader.readAsText(e.target.files[0]);
-  });
-
-  $("#upload :text").change(function() {
-    $("#modify").hide();
-    $("#reduce [name=show]").show();
-    $("#reduce span").hide();
-    $("#reduce").hide();
-    $("#upload b").html("");
-    $("#results").html();
-    submit.prop('disabled', true).show();
-    revert.hide();
-    $.ajax({
+    var type=$(e.target).attr('type');
+    if (type==="text") $.ajax({
       dataType:"text",
       url:$("#upload :text").val(),
       error:function(jqXHR, text, error) {
@@ -372,6 +353,17 @@ $(document).ready(function() {
         load_features(data, filetype);
       }
     });
+    if (type==="file") {
+      var reader=new FileReader();
+      // get file type and be flexible about extensions
+      var filetype=e.target.files[0].name.match(/[^.]*$/)[0];
+      if (/^(geojson|json)$/i.test(filetype)) filetype="geojson";
+      if (/^xml$/i.test(filetype)) filetype="xml";
+      reader.onload=function(evt) {
+        load_features(evt.target.result, filetype);
+      };
+      reader.readAsText(e.target.files[0]);
+    }
   });
 
   $("#modify").submit(function(e) {e.preventDefault();});
