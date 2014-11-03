@@ -202,28 +202,6 @@ $(document).ready(function() {
       $("#upload b").html(err.message+"<br>");
       return;
     }
-    fields={};
-    values={};
-    var doc_ids=[];
-    for (var f=0;f<features.length;f++) {
-      var properties=features[f].properties;
-      if (properties._id) doc_ids.push(properties._id);
-      for (var prop in properties)
-        fields[prop]=false;
-    }
-    submit.prop('disabled', false);
-    $("#modify div").html('');
-    show_fields();
-    uploaded_docs={};
-    // store existing documents
-    $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:doc_ids}), function(data) {
-      data=JSON.parse(data);
-      while (data.rows.length) {
-        var row=data.rows.pop();
-        uploaded_docs[row.id]=row.doc;
-      }
-      relay_geometries();
-    });
   }
 
   // Check if geometry is about to be dropped in the
@@ -341,6 +319,33 @@ $(document).ready(function() {
     revert.hide();
     show_geometry(-1);
     features=[];
+    // When the url or all files have finished loading, we
+    // need to fetch existing documents, set-up #modify div
+    // and incorporate changed geometry links.
+    function finalize() {
+      fields={};
+      values={};
+      var doc_ids=[];
+      for (var f=0;f<features.length;f++) {
+        var properties=features[f].properties;
+        if (properties._id) doc_ids.push(properties._id);
+        for (var prop in properties)
+          fields[prop]=false;
+      }
+      submit.prop('disabled', false);
+      $("#modify div").html('');
+      show_fields();
+      uploaded_docs={};
+      // store existing documents
+      $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:doc_ids}), function(data) {
+        data=JSON.parse(data);
+        while (data.rows.length) {
+          var row=data.rows.pop();
+          uploaded_docs[row.id]=row.doc;
+        }
+        relay_geometries();
+      });
+    }
     var type=$(e.target).attr('type');
     if (type==="text") $.ajax({
       dataType:"text",
@@ -353,6 +358,7 @@ $(document).ready(function() {
         if (filetype.match("text/xml")) filetype="xml";
         if (filetype.match("application/json")) filetype="geojson";
         load_features(data, filetype);
+        finalize();
       }
     });
     if (type==="file") {
@@ -363,6 +369,7 @@ $(document).ready(function() {
       if (/^xml$/i.test(filetype)) filetype="xml";
       reader.onload=function(evt) {
         load_features(evt.target.result, filetype);
+        finalize();
       };
       reader.readAsText(e.target.files[0]);
     }
