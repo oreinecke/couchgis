@@ -166,6 +166,7 @@ $(document).ready(function() {
           } while (m);
           return elements;
         }(data, ["Table","Row","Cell","Data"]);
+        if (!tables.length) throw SyntaxError("XML.parse: Missing <Table>");
         while (tables.length) {
           var rows=tables.shift().xml;
           // insert empty xml if ss:Index is set
