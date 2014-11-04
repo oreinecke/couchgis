@@ -435,7 +435,7 @@ $(document).ready(function() {
           for (var basename in ogr2ogr_uploads) {
             // construct request body or something.
             $.ajax("/_ogr2ogr", {
-              type:"POST", dataType:"json",
+              type:"POST", dataType:"text",
               contentType:"application/json",
               data:JSON.stringify(ogr2ogr_uploads[basename]),
               error:compose_error_message,
