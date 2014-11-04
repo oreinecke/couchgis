@@ -426,7 +426,23 @@ $(document).ready(function() {
             load_next();
           };
           reader.readAsText(file);
-        } else finalize();
+        } else {
+          for (var basename in ogr2ogr_uploads) {
+            // construct request body or something.
+            $.ajax("/_ogr2ogr", {
+              type:"POST", dataType:"json",
+              contentType:"application/json",
+              data:JSON.stringify(ogr2ogr_uploads[basename]),
+              success:function(data) {
+                load_features(data, "geojson");
+                load_next();
+              }
+            });
+            delete ogr2ogr_uploads[basename];
+            return;
+          }
+          finalize();
+        }
       }());
     }
   });
