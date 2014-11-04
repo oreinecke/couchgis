@@ -201,7 +201,7 @@ $(document).ready(function() {
         }
       } else throw Error("Unknown extension: ."+filetype);
     } catch(err) {
-      $("#upload b").html(err.message+"<br>");
+      $("#upload b").text(err.message).append("<br>");
       throw err;
     }
   }
