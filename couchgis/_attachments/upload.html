@@ -401,6 +401,7 @@ $(document).ready(function() {
     if (type==="file") {
       var reader=new FileReader();
       var files=[].slice.apply(e.target.files), file;
+      var ogr2ogr_uploads={};
       (function load_next() {
         if ( file=files.pop() ) {
           // Get file type and be flexible about extensions.
@@ -408,7 +409,16 @@ $(document).ready(function() {
           if (/^(geo)?json$/.test(filetype)) filetype="geojson";
           // Add files of unknown extension to the upload blob.
           else if (filetype!=="xml" && load_features.ogr2ogr) {
-            load_next();
+            reader.onload=function(evt) {
+              var basename=file.name.slice(0, file.name.length-filetype.length-1);
+              // Store content into ogr2ogr_uploads using this hierarchy:
+              // { <basename>: { <extension>: <content>, etc.}, etc. }
+              if (!ogr2ogr_uploads[basename])
+                ogr2ogr_uploads[basename] = {};
+              ogr2ogr_uploads[basename][filetype] = Base64.encode(new Uint8Array(evt.target.result));
+              load_next();
+            }
+            reader.readAsArrayBuffer(file);
             return;
           }
           reader.onload=function(evt) {
