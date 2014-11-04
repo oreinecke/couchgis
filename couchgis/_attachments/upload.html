@@ -346,12 +346,9 @@ $(document).ready(function() {
   };
 
   $("#upload").change(function(e) {
-    $("#modify").hide();
+    $("#modify, #reduce, #reduce span").hide();
     $("#reduce [name=show]").show();
-    $("#reduce span").hide();
-    $("#reduce").hide();
-    $("#upload b").html("");
-    $("#results").html();
+    $("#upload b, #results").html("");
     submit.prop('disabled', true).show();
     revert.hide();
     show_geometry(-1);
