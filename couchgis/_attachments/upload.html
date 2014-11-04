@@ -202,7 +202,7 @@ $(document).ready(function() {
       } else throw Error("Unknown extension: ."+filetype);
     } catch(err) {
       $("#upload b").html(err.message+"<br>");
-      return;
+      throw err;
     }
   }
 
