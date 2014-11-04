@@ -115,10 +115,7 @@ $(document).ready(function() {
   function load_features(data, filetype) {
     try {
       if (filetype==="geojson") {
-        var GeoJSON;
-        // reformat JSON.parse error merrages
-        try { GeoJSON=JSON.parse(data); }
-        catch (err) { SyntaxError("JSON.parse: "+err.message); }
+        var GeoJSON=JSON.parse(data);
         if (GeoJSON.type==="FeatureCollection")
           features=features.concat(GeoJSON.features);
         else if (GeoJSON.type==="Feature")
