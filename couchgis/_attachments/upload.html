@@ -118,13 +118,13 @@ $(document).ready(function() {
         var GeoJSON;
         // reformat JSON.parse error merrages
         try { GeoJSON=JSON.parse(data); }
-        catch (err) { throw{message:"JSON.parse: "+err.message}; }
+        catch (err) { SyntaxError("JSON.parse: "+err.message); }
         if (GeoJSON.type==="FeatureCollection")
           features=features.concat(GeoJSON.features);
         else if (GeoJSON.type==="Feature")
           features.push(GeoJSON);
-        else throw{message:"Unknown or useless GeoJSON type: "+GeoJSON.type};
-        if (!GeoJSON.crs) throw{message:"No top-level CRS defined"};
+        else throw Error("Unknown or useless GeoJSON type: "+GeoJSON.type);
+        if (!GeoJSON.crs) throw Error("No top-level CRS defined");
         for (var f=0;f<features.length;f++)
           features[f].geometry.crs=GeoJSON.crs;
       } else if (filetype==="xml") {
@@ -155,7 +155,7 @@ $(document).ready(function() {
               xml=xml.substring(m.index+m[0].length);
               // match closing </Tag>
               if (!(m=xml.match('</\\s*'+tag+'\\s*>')))
-                throw{message:"XML.parse: Missing </"+tag+">"};
+                throw SyntaxError("XML.parse: Missing </"+tag+">");
               // add xml between <Tag>..</Tag>
               element.xml=xml.substring(0,m.index);
             // add empty xml if <Tag/> is singular
@@ -198,7 +198,7 @@ $(document).ready(function() {
             features.push({properties:properties});
           }
         }
-      } else throw{message:"Unknown extension: ."+filetype};
+      } else throw Error("Unknown extension: ."+filetype);
     } catch(err) {
       $("#upload b").html(err.message+"<br>");
       return;
