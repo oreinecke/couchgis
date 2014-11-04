@@ -383,13 +383,18 @@ $(document).ready(function() {
         relay_geometries();
       });
     }
+    // Compose a meaningful error message out of a jqXHR.
+    function compose_error_message(jqXHR) {
+      var resp = jqXHR.responseJSON
+              || jqXHR.responseText && JSON.parse(jqXHR.responseText)
+              || {}
+      $("#upload b").append(jqXHR.statusText+": "+resp.reason);
+    }
     var type=$(e.target).attr('type');
     if (type==="text") $.ajax({
       dataType:"text",
       url:$("#upload :text").val(),
-      error:function(jqXHR, text, error) {
-        $("#upload b").append(text+' '+error, "<br>");
-      },
+      error:compose_error_message,
       success:function(data, text, jqXHR) {
         var filetype=jqXHR.getResponseHeader('Content-type');
         if (filetype.match("text/xml")) filetype="xml";
@@ -433,6 +438,7 @@ $(document).ready(function() {
               type:"POST", dataType:"json",
               contentType:"application/json",
               data:JSON.stringify(ogr2ogr_uploads[basename]),
+              error:compose_error_message,
               success:function(data) {
                 load_features(data, "geojson");
                 load_next();
