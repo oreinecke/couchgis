@@ -703,8 +703,8 @@ $(document).ready(function() {
         fields[types[t]]=null;
       while (data.rows.length) {
         var key=data.rows.shift().key;
-        if (types.indexOf(key[0])===-1) continue;
-        fields[key[1]]=null;
+        if (types.indexOf(key[0])!==-1)
+          fields[key[1]]=null;
       }
       var optgroup=$("#filter [name=fields]");
       var val=$("#filter [name=field]").val();
