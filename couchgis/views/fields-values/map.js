@@ -7,16 +7,10 @@ function(doc) {
     if (!/^[A-ZÄÖÜ]/.test(field)) continue;
     if (/^GeoJSON/.test(field)) continue;
     (function flat_fields(obj, fields) {
-      if (!obj || typeof obj!=="object") {
-        var summary={count:1,type:typeof obj};
-        if (typeof obj==="number") {
-          summary.min=obj;
-          summary.max=obj;
-          obj=null;
-        }
-        emit([doc.type, path.encode(fields), obj], summary);
-      } else for (var field in obj)
+      if (!obj || typeof obj!=="object")
+        emit([doc.type, path.encode(fields), obj]);
+      else for (var field in obj)
         flat_fields(obj[field], fields.concat([field]));
-    })(doc[field], [field]);
+    }(doc[field], [field]));
   }
 }
