@@ -711,9 +711,9 @@ $(document).ready(function() {
       $("[name=fields]").html('');
       for (var field in fields)
         optgroup.append($("<option>").text(field));
-      // The selected option was destroyed three
-      // lines above, so I just re-select it here.
-      $("#filter [name=field]").val(val);
+      // The selected option was destroyed three lines above, so I just
+      // re-select it here, and update the autocomplete source array.
+      $("#filter [name=field]").val(val).change();
       // Remove fields that are in the 'columns' <optgroup> already.
       $("#table [name=columns] option").each( function() {
         delete fields[$(this).val()];
