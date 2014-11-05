@@ -1,15 +1,10 @@
-// Count occurrences of strings
-// or sample ranges of numbers.
+// For group_level=2, forward 1st of all identical keys as
+// document value that can be evaluated by _list/tabulate.
 
-function reduce(keys, values) {
-  var result=values.pop();
-  while (values.length) {
-    var value=values.pop();
-    result.count+=value.count;
-    if (result.type==="number") {
-      if (value.min<result.min) result.min=value.min;
-      if (value.max>result.max) result.max=value.max;
-    }
-  }
-  return result;
+function reduce(keys, values, rereduce) {
+  if (rereduce) return values.pop();
+  var key=keys.pop()[0];
+  var doc={type:key[0]};
+  doc[key[1]]=key[2];
+  return {doc:doc};
 }
