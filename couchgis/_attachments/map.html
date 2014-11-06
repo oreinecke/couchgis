@@ -636,6 +636,7 @@ $(document).ready(function() {
         delete params.skip;
         delete options.types;
         options.cuts.splice(options.cuts.indexOf(cut), 1);
+        if (!options.cuts.length) delete options.cuts;
         if (cut.field!=="_keyword") cut.field="'"+cut.field+"'";
         params.options=JSON.stringify({
           cuts:[cut], types: types===filters[0].types ? undefined : types,
