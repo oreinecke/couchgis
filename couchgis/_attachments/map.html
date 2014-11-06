@@ -549,7 +549,7 @@ $(document).ready(function() {
       return filter_documents(commands);
     // Pre-filter documents with indexed type and year. This improves
     // response time if it's used for the first or second filter item.
-    if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
+    if ( !new_filter.redo && (options.types || options.time) && position<=2 ) {
       var types=options.types || filters[1].types || filters[0].types;
       // Obtain simplified [type,year] pairs from
       // _view/type-year matching options' filters.
