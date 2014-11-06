@@ -550,13 +550,16 @@ $(document).ready(function() {
     // Pre-filter documents with indexed type and year. This improves
     // response time if it's used for the first or second filter item.
     if ( (options.types || options.time) && position<=2 && !new_filter.redo ) {
+      var types=options.types || filters[1].types || filters[0].types;
       // Obtain simplified [type,year] pairs from
       // _view/type-year matching options' filters.
       $.get("_list/tabulate/type-year", {
+        start_key:JSON.stringify([types[0]]),
+        end_key:JSON.stringify([types[types.length-1], {}]),
         group_level:2, options: JSON.stringify({
           // Fetch filter from options or filters[1], but not from
           // filters[0] because those would only slow the list down.
-          types: options.types || filters[1] && filters[1].types,
+          types: types===filters[0].types ? undefined : types,
           time: options.time || filters[1] && filters[1].time
         })
       }, function(keys) {
