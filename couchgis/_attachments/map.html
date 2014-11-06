@@ -634,11 +634,12 @@ $(document).ready(function() {
         }
         delete params.limit;
         delete params.skip;
-        params.options=JSON.stringify({
-          types: types===filters[0].types ? undefined : types,
-          cuts: options.cuts.splice(options.cuts.indexOf(cut), 1)
-        });
         delete options.types;
+        options.cuts.splice(options.cuts.indexOf(cut), 1);
+        if (cut.field!=="_keyword") cut.field="'"+cut.field+"'";
+        params.options=JSON.stringify({
+          cuts:[cut], types: types===filters[0].types ? undefined : types,
+        });
         $.get("_list/tabulate/fields-values", params, function(keys) {
           keys=encodeURIComponent(keys);
           $.getJSON("_view/fields-values?reduce=false&keys="+keys, function(data) {
