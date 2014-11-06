@@ -207,7 +207,8 @@ exports.simplify=function(GeoJSON, error) {
   return exports.eachCoords(GeoJSON, function(coords) {
     var first=coords[0], last=coords[coords.length-1];
     // Remember number of nested function calls for linear rings.
-    var depth = first[0]===last[0] && first[1]===last[1] ? 1 : Infinity;
+    var depth = first[0].toExponential(14) === last[0].toExponential(14) &&
+                first[1].toExponential(14) === last[1].toExponential(14) ? 1 : Infinity;
     // http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm
     function bisect_or_remove(i, k) {
       if (i+1==k) return;
