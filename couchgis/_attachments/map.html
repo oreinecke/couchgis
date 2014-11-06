@@ -612,10 +612,7 @@ $(document).ready(function() {
       // (But it might be worth trying without that criterion???)
       if (cut.field==="_keyword" && types.length>1) return false;
       // THIS LOOKS FUCKED UP YOU SHOULD SAY SOMETHING!!!
-      var params={
-        limit:1, skip:documents.length,
-        group_level: 2 + !!cut.value
-      };
+      var params={ limit:1, group:true, skip:documents.length };
       // Set first and last element of types as key
       // range (types is already orderd alphabetically.
       params.start_key=[types[0]];
