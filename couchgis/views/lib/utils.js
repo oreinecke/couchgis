@@ -91,7 +91,10 @@ exports.bbox=function(GeoJSON) {
 // and we'll see how this goes.
 
 exports.size=function(GeoJSON) {
-  GeoJSON.size=(GeoJSON.bbox[2]-GeoJSON.bbox[0])+(GeoJSON.bbox[3]-GeoJSON.bbox[1]);
+  var bbox=GeoJSON.bbox, size=bbox[2]-bbox[0];
+  if (exports.EPSG(GeoJSON)===4326)
+    size *= Math.cos(Math.PI*(bbox[1]+bbox[3])/360);
+  GeoJSON.size = size + bbox[3]-bbox[1];
   return GeoJSON;
 };
 
