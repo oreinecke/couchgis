@@ -312,11 +312,20 @@ $(document).ready(function() {
         return;
       }
       // prepare new viewport
-      var new_vp={ bbox:options.bbox, prefix:[] };
+      var new_vp={
+        bbox:options.bbox, prefix:[],
+        pad:[Infinity,Infinity,-Infinity,-Infinity],
+      };
       // I need the last prop of data after the loop again. And
       // yes, I know it looks silly and it makes no difference.
-      var id; for (id in data)
+      var id; for (id in data) {
         new_vp.prefix.push(id);
+        var bbox=data[id].GeoJSON.bbox;
+        if (bbox[2]<new_vp.pad[0]) new_vp.pad[0]=bbox[2];
+        if (bbox[3]<new_vp.pad[1]) new_vp.pad[1]=bbox[3];
+        if (bbox[0]>new_vp.pad[2]) new_vp.pad[2]=bbox[0];
+        if (bbox[1]>new_vp.pad[3]) new_vp.pad[3]=bbox[1];
+      }
       // Note that we've retrieved all items with this viewport.
       if (new_vp.prefix.length<options.limit) {
         new_vp.populated=true;
