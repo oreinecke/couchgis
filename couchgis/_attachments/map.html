@@ -258,7 +258,7 @@ $(document).ready(function() {
     while (options.bbox[0]<vp.bbox[0]||options.bbox[1]<vp.bbox[1]||
            options.bbox[2]>vp.bbox[2]||options.bbox[3]>vp.bbox[3]);
     // if only one viewport was removed, it might be extended
-    var extend_vp = v==viewports.length-2 && viewports[v];
+    var extend_vp = v==viewports.length-2 && viewports[v+1];
     // do away with the unneeded viewports
     viewports.splice(v+1);
     // abort if we already see less items than requested
