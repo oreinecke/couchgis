@@ -251,13 +251,13 @@ $(document).ready(function() {
       error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
       bbox:[ SW.lng(), SW.lat(), NE.lng(), NE.lat() ],
     };
-    var vp;
-    // pop viewports until one is found that surrounds bbox
-    do vp=viewports.pop();
+    // get viewport that surrounds bbox
+    var v=viewports.length, vp;
+    do vp=viewports[--v];
     while (options.bbox[0]<vp.bbox[0]||options.bbox[1]<vp.bbox[1]||
            options.bbox[2]>vp.bbox[2]||options.bbox[3]>vp.bbox[3]);
-    // the last viewport is valid, so it needs to be re-stacked
-    viewports.push(vp);
+    // do away with the unneeded viewports
+    viewports.splice(v+1);
     // abort if we already see less items than requested
     if (vp.populated) return call.that_last_one();
     // ignore items that were already dropped by previous viewport
