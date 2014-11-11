@@ -256,6 +256,8 @@ $(document).ready(function() {
     do vp=viewports[--v];
     while (options.bbox[0]<vp.bbox[0]||options.bbox[1]<vp.bbox[1]||
            options.bbox[2]>vp.bbox[2]||options.bbox[3]>vp.bbox[3]);
+    // if only one viewport was removed, it might be extended
+    var extend_vp = v==viewports.length-2 && viewports[v];
     // do away with the unneeded viewports
     viewports.splice(v+1);
     // abort if we already see less items than requested
@@ -278,6 +280,7 @@ $(document).ready(function() {
           KEYS[0][1]=data[id].GeoJSON.error;
           continue;
         }
+        extend_vp.dismiss=true;
         items[id]=data[id];
         table.append( items[id].tr=$("<tr>") );
         // fetch GeoJSON of specified detail level
@@ -292,12 +295,21 @@ $(document).ready(function() {
       }
       // remove out-of-viewport shapes and links
       for (var id in old_items) {
+        extend_vp.dismiss=true;
         items[id].shape.setMap();
         items[id].tr.remove();
         delete items[id];
       }
       // Fetch changed geometries in 50 ms.
       window.setTimeout(update_geometry, 50);
+      if (extend_vp && !extend_vp.dismiss) {
+        if (options.bbox[0]<extend_vp.bbox[0]) extend_vp.bbox[0]=options.bbox[0];
+        if (options.bbox[1]<extend_vp.bbox[1]) extend_vp.bbox[1]=options.bbox[1];
+        if (options.bbox[2]>extend_vp.bbox[2]) extend_vp.bbox[2]=options.bbox[2];
+        if (options.bbox[3]>extend_vp.bbox[3]) extend_vp.bbox[3]=options.bbox[3];
+        viewports.push(extend_vp);
+        return;
+      }
       // prepare new viewport
       var new_vp={ bbox:options.bbox, prefix:[] };
       // I need the last prop of data after the loop again. And
