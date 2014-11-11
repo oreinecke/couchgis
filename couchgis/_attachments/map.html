@@ -269,13 +269,8 @@ $(document).ready(function() {
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
-      // prepare new viewport
-      var new_vp={ bbox:options.bbox, prefix:[] };
       var documents=filters[filters.length-1].documents;
-      // I need the last prop of data after the loop again. And
-      // yes, I know it looks silly and it makes no difference.
-      var id; for (id in data) {
-        new_vp.prefix.push(id);
+      for (var id in data) {
         if (items[id]) {
           delete old_items[id];
           var KEYS=items[id].keys;
@@ -295,8 +290,22 @@ $(document).ready(function() {
           KEYS.push(documents[position++]);
         items[id].keys=KEYS;
       }
+      // remove out-of-viewport shapes and links
+      for (var id in old_items) {
+        items[id].shape.setMap();
+        items[id].tr.remove();
+        delete items[id];
+      }
+      // Fetch changed geometries in 50 ms.
+      window.setTimeout(update_geometry, 50);
+      // prepare new viewport
+      var new_vp={ bbox:options.bbox, prefix:[] };
+      // I need the last prop of data after the loop again. And
+      // yes, I know it looks silly and it makes no difference.
+      var id; for (id in data)
+        new_vp.prefix.push(id);
+      // Note that we've retrieved all items with this viewport.
       if (new_vp.prefix.length<options.limit) {
-        // note that we've retrieved all items with this viewport
         new_vp.populated=true;
         // set full detail level automatically in this case
         if (error!==0) for (var id in data) {
@@ -304,7 +313,6 @@ $(document).ready(function() {
           items[id].keep_shape=items[id].shape && (items[id].keys[0][1]===0);
           items[id].keys[0][1]=0;
         }
-      }
       // If the query returned less than the required items, then these must
       // be the only items within the viewport. In this case the index may be
       // set to the end of the list, and no keys are appended.
@@ -315,15 +323,7 @@ $(document).ready(function() {
       // Add new_vp to viewport stack, but only if it is indeed more restrictive.
       if (new_vp.position>vp.position || new_vp.prefix.length<vp.prefix.length)
         viewports.push(new_vp);
-      // remove out-of-viewport shapes and links
-      for (var id in old_items) {
-        items[id].shape.setMap();
-        items[id].tr.remove();
-        delete items[id];
-      }
-      // Fetch changed geometries in 50 ms.
-      window.setTimeout(update_geometry, 50);
-    };
+    }
   }
 
   // Use GeoCouch if installed.
