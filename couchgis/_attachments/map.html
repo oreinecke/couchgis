@@ -263,9 +263,13 @@ $(document).ready(function() {
     viewports.splice(v+1);
     // abort if we already see less items than requested
     if (vp.populated) return call.that_last_one();
+    // don't query for more geometries if pad lies inside bbox
+    if (options.bbox[0]<=vp.pad[0]&&options.bbox[1]<=vp.pad[1]&&
+        options.bbox[2]>=vp.pad[2]&&options.bbox[3]>=vp.pad[3]) {
+      options.keys=vp.prefix;
+      delete options.bbox;
     // ignore items that were already dropped by previous viewport
-    options.keys=vp.prefix.concat(keys.slice(vp.position));
-    list("bbox-filter/bbox", options, success);
+    } else options.keys=vp.prefix.concat(keys.slice(vp.position));
     function success(data) {
       var table = $("#table tbody");
       var position=0;
@@ -303,6 +307,7 @@ $(document).ready(function() {
       }
       // Fetch changed geometries in 50 ms.
       window.setTimeout(update_geometry, 50);
+      if (!options.bbox) return;
       if (extend_vp && !extend_vp.dismiss) {
         if (options.bbox[0]<extend_vp.bbox[0]) extend_vp.bbox[0]=options.bbox[0];
         if (options.bbox[1]<extend_vp.bbox[1]) extend_vp.bbox[1]=options.bbox[1];
