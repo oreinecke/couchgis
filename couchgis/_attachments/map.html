@@ -261,8 +261,6 @@ $(document).ready(function() {
     var extend_vp = v==viewports.length-2 && viewports[v+1];
     // do away with the unneeded viewports
     viewports.splice(v+1);
-    // abort if we already see less items than requested
-    if (vp.populated) return call.that_last_one();
     // don't query for more geometries if pad lies inside bbox
     if (options.bbox[0]<=vp.pad[0]&&options.bbox[1]<=vp.pad[1]&&
         options.bbox[2]>=vp.pad[2]&&options.bbox[3]>=vp.pad[3]) {
@@ -354,18 +352,9 @@ $(document).ready(function() {
         if (bbox[0]>new_vp.pad[2]) new_vp.pad[2]=bbox[0];
         if (bbox[1]>new_vp.pad[3]) new_vp.pad[3]=bbox[1];
       }
-      // Note that we've retrieved all items with this viewport.
-      if (new_vp.prefix.length<options.limit) {
-        new_vp.populated=true;
-        // set full detail level automatically in this case
-        if (error!==0) for (var id in data) {
-          // keep items that are already displayed
-          items[id].keep_shape=items[id].shape && (items[id].keys[0][1]===0);
-          items[id].keys[0][1]=0;
-        }
-      // Otherwise it is safe to assume that any key before the last
-      // one is either outside the viewport or already in prefix.
-      } else new_vp.position=keys.indexOf(id)+1;
+      // It is safe to assume that any key before the last one
+      // is either outside the viewport or already in prefix.
+      new_vp.position=keys.indexOf(id)+1;
       viewports.push(new_vp);
     }
   }
@@ -1079,8 +1068,6 @@ $(document).ready(function() {
     if (new_limit*5<limit) new_limit*=5;
     if (new_limit*2<limit) new_limit*=2;
     $("#settings [name=limit]").val(new_limit);
-    // remove populated-viewport-notification
-    viewports[viewports.length-1].populated=false;
     Maps.event.trigger(map, 'bounds_changed');
   });
 
