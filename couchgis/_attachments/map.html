@@ -268,8 +268,10 @@ $(document).ready(function() {
         options.bbox[2]>=vp.pad[2]&&options.bbox[3]>=vp.pad[3]) {
       options.keys=vp.prefix;
       delete options.bbox;
-    // ignore items that were already dropped by previous viewport
-    } else options.keys=vp.prefix.concat(keys.slice(vp.position));
+    }
+    else if (!update_items.GeoCouch)
+      // ignore items that were already dropped by previous viewport
+      options.keys=vp.prefix.concat(keys.slice(vp.position));
     // Query GeoCouch spatial handler if installed,
     // but limit output to 250 items (~50kb).
     if (update_items.GeoCouch && options.bbox) $.getJSON("_spatial/bbox", {
@@ -288,7 +290,7 @@ $(document).ready(function() {
             break;
         options.keys=prefix;
         delete options.bbox;
-      }
+      } else options.keys=vp.prefix.concat(keys.slice(vp.position));
       list("bbox-filter/bbox", options, success);
     }); else list("bbox-filter/bbox", options, success);
     function success(data) {
