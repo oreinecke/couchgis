@@ -623,6 +623,26 @@ $(document).ready(function() {
         for (var p=position-1; p>=0; p--)
           if (filters[p].types) return filters[p].types;
       }();
+      // Update filter queue with the view result.
+      function success(data) {
+        var doc_ids={};
+        while (data.rows.length)
+          doc_ids[data.rows.pop().id]=true;
+        var new_documents=[];
+        for (var d=0, doc; doc=documents[d]; d++)
+          if (doc.keep_me || doc[1] in doc_ids)
+            new_documents.push(doc);
+        filters.push({
+          documents:new_documents,
+          types:types, cuts:[cut]
+        });
+        options.cuts.splice(options.cuts.indexOf(cut), 1);
+        if (!options.cuts.length) delete options.cuts;
+        delete options.types;
+        if (function() { for (var prop in options) return true; }())
+          commands.unshift(options);
+        filter_documents(commands);
+      };
       return false;
     }()) return;
     options.keys=[];
