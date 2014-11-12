@@ -276,7 +276,6 @@ $(document).ready(function() {
       limit:250, bbox:options.bbox.toString()
     }, function(data) {
       var rows=data.rows;
-      console.log({length:data.rows.length});
       if (rows.length!==250) {
         var ids={}, row;
         // hash each geometry id to true for faster look-up
