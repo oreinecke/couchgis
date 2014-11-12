@@ -643,6 +643,18 @@ $(document).ready(function() {
           commands.unshift(options);
         filter_documents(commands);
       };
+      // Vaguely test if cut.value could only match one string.
+      if (/\^(\\[()[\]|^$.*+?]|[^\\()[\]|^$.*+?])*\$/.test(cut.value)) {
+        var keys=[], value=cut.value.slice(1,-1).replace(/\\/g, '');
+        // i.e. if +value !== NaN
+        if (+value===+value) value=+value;
+        for (var t=0;t<types.length;t++)
+          keys.push([cut.field, types[t], value]);
+        $.getJSON("_view/field-type-value", {
+          reduce:false, keys:JSON.stringify(keys)
+        }, success);
+        return true;
+      }
       return false;
     }()) return;
     options.keys=[];
