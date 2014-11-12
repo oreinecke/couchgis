@@ -168,7 +168,7 @@ $(document).ready(function() {
                   var span=$('<span>').text(value);
                   // Copy cell content and field name to #filter.
                   span.addClass('field').click({
-                    field:th.text(), value:span.text().replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&")
+                    field:th.text(), value:span.text().replace(/[.*+?^=!:${}()|\[\]\\]/g, "\\$&")
                   }, update_geometry.create_filter);
                   td.append(span, '<br>');
                 }
@@ -893,7 +893,7 @@ $(document).ready(function() {
       for (var label in labels) {
         label=label.substr(1);
         if (matcher.test(label))
-          data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") });
+          data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\\]/g, "\\$&") });
         if (data.length===50) break;
       }
       response(data);
