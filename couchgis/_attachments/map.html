@@ -613,7 +613,7 @@ $(document).ready(function() {
       // Find a cut that neither an _expression nor a _keyword.
       var cut=function(cuts) {
         for (var c=0, cut; cut=cuts[c]; c++)
-          if (cut.field!=="_expression" && cut.field!=="_keyword")
+          if (!/^_(id|expression|keyword)$/.test(cut.field))
             return cut;
       }(options.cuts);
       if (!cut) return false;
