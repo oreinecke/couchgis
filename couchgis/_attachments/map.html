@@ -611,12 +611,12 @@ $(document).ready(function() {
     }
     // Pre-filter documents with indexed document field and value.
     if ( !new_filter.redo && documents.length>100 && options.cuts && function() {
-      // Find a cut that isn't an _expression.
+      // Find a cut that neither an _expression nor a _keyword.
       var cut=function(cuts) {
         for (var c=0, cut; cut=cuts[c]; c++)
-          if (cut.field!=="_expression") return cut;
+          if (cut.field!=="_expression" && cut.field!=="_keyword")
+            return cut;
       }(options.cuts);
-      // Abort pre-filter if only _expressions are requested.
       if (!cut) return false;
       // Find latest type list in [ options | filters ].
       var types=options.types || function() {
