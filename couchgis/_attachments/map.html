@@ -250,7 +250,7 @@ $(document).ready(function() {
     var options={
       limit:+$("#settings [name=limit]").val() || 1,
       error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
-      bbox:[ SW.lng(), SW.lat(), NE.lng(), NE.lat() ],
+      bbox:[ SW.lng(), SW.lat(), NE.lng(), NE.lat() ]
     };
     // get viewport that surrounds bbox
     var v=viewports.length, vp;
