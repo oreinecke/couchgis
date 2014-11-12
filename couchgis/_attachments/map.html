@@ -560,7 +560,7 @@ $(document).ready(function() {
     // Remove filter from options if an identical one has already been applied.
     if (equal_filter) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
-    if (function() { for (var prop in options) return; return true; }())
+    if (!function() { for (var prop in options) return true; }())
       return filter_documents(commands);
     // Pre-filter documents with indexed type and year. This improves
     // response time if it's used for the first or second filter item.
