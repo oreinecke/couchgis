@@ -623,60 +623,7 @@ $(document).ready(function() {
         for (var p=position-1; p>=0; p--)
           if (filters[p].types) return filters[p].types;
       }();
-      // Don't pre-filter a single field content over multiple types.
-      // (But it might be worth trying without that criterion???)
-      if (cut.field==="_keyword" && types.length>1) return false;
-      // THIS LOOKS FUCKED UP YOU SHOULD SAY SOMETHING!!!
-      var params={ limit:1, group:true, skip:documents.length };
-      // Set first and last element of types as key
-      // range (types is already orderd alphabetically.
-      params.start_key=[types[0]];
-      params.end_key=[types[types.length-1]];
-      // Refine key range if only one field is requested.
-      if (cut.field!=="_keyword") {
-        params.start_key.push(cut.field);
-        params.end_key.push(cut.field);
-      } else params.end_key.push({});
-      params.end_key.push({});
-      params.start_key=JSON.stringify(params.start_key);
-      params.end_key=JSON.stringify(params.end_key);
-      $.getJSON("_view/fields-values", params, function(data) {
-        if (data.rows.length) {
-          commands.unshift({redo:options});
-          filters.push(options);
-          filter_documents(commands);
-          return;
-        }
-        delete params.limit;
-        delete params.skip;
-        delete options.types;
-        options.cuts.splice(options.cuts.indexOf(cut), 1);
-        if (!options.cuts.length) delete options.cuts;
-        if (cut.field!=="_keyword") cut.field="'"+cut.field+"'";
-        params.options=JSON.stringify({
-          cuts:[cut], types: types===filters[0].types ? undefined : types,
-        });
-        $.get("_list/tabulate/fields-values", params, function(keys) {
-          keys=encodeURIComponent(keys);
-          $.getJSON("_view/fields-values?reduce=false&keys="+keys, function(data) {
-            // Hash matching document ids into doc_ids.
-            var doc_ids={};
-            while (data.rows.length)
-              doc_ids[data.rows.pop().id]=true;
-            var new_documents=[];
-            for (var d=0, doc; doc=documents[d]; d++)
-              if (doc.keep_me || doc[1] in doc_ids)
-                new_documents.push(doc);
-            filters.push({
-              documents:new_documents,
-              types:types, cuts:[cut]
-            });
-            commands.unshift(options);
-            filter_documents(commands);
-          });
-        }, "text");
-      });
-      return true;
+      return false;
     }()) return;
     options.keys=[];
     for (var d=0;d<documents.length;d++) {
