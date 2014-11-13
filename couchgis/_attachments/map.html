@@ -758,13 +758,13 @@ $(document).ready(function() {
       }
     });
     // get doc fields
-    $.getJSON("_view/fields-values?group_level=2&descending=true", function(data) {
-      var fields={_id:null};
-      while (data.rows.length)
-        fields[data.rows.pop().key.pop()]=null;
+    $.getJSON("_view/field-type-value", {
+      group_level:1, descending:true
+    }, function(data) {
       var optgroup=$("[name=fields]");
-      for (var field in fields)
-        optgroup.append($("<option>").text(field));
+      optgroup.append($("<option>").text("_id"));
+      while (data.rows.length)
+        optgroup.append($("<option>").text(data.rows.pop().key[0]));
     });
   });
 
@@ -800,15 +800,15 @@ $(document).ready(function() {
     if (!types.length) types=filters[0].types;
     // Update the list of fields to show only those
     // that are available by the given type selection.
-    $.getJSON("_view/fields-values?group_level=2", function(data) {
+    $.getJSON("_list/tabulate/field-type-value", {
+      group_level:2, descending:true,
+      options:JSON.stringify({types:types})
+    }, function(keys) {
       var fields={_id:null};
       for (var t=0;t<types.length;t++)
         fields[types[t]]=null;
-      while (data.rows.length) {
-        var key=data.rows.shift().key;
-        if (types.indexOf(key[0])!==-1)
-          fields[key[1]]=null;
-      }
+      while (keys.length)
+        fields[keys.pop()[0]]=null;
       var optgroup=$("#filter [name=fields]");
       var val=$("#filter [name=field]").val();
       $("[name=fields]").html('');
@@ -977,12 +977,11 @@ $(document).ready(function() {
     input.autocomplete({ minLength:0, source:source });
     types.each(function() {
       var type=$(this).prop('name');
-      var options={
+      $.getJSON("_view/field-type-value", {
         group:true, inclusive_end:false, descending:true,
-        start_key:JSON.stringify([type, field, []]),
-        end_key:JSON.stringify([type, field, ""])
-      }
-      $.getJSON("_view/fields-values", options, function(data) {
+        start_key:JSON.stringify([field, type, []]),
+        end_key:JSON.stringify([field, type, ""])
+      }, function(data) {
         while (data.rows.length)
           labels[ '_'+data.rows.pop().key[2] ]=null;
       });
