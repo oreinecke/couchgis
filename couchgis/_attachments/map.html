@@ -642,9 +642,9 @@ $(document).ready(function() {
         if (function() { for (var prop in options) return true; }())
           commands.unshift(options);
         filter_documents(commands);
-      };
+      }
       // Vaguely test if cut.value could only match one string.
-      if (/\^(\\[()[\]|^$.*+?]|[^\\()[\]|^$.*+?])*\$/.test(cut.value)) {
+      if (/\^(\\[()[\]|^$.*+?nt]|[^\\()[\]|^$.*+?])*\$/.test(cut.value)) {
         var keys=[], value=cut.value.slice(1,-1).replace(/\\/g, '');
         // i.e. if +value !== NaN
         if (+value===+value) value=+value;
