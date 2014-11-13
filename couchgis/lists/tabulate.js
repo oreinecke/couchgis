@@ -65,7 +65,7 @@ function(head, req) {
         }
         expressions.push(expression);
       } else {
-        cut.value=cut.value && new RegExp(cut.value, 'im');
+        cut.value=cut.value && new RegExp(cut.value, 'i');
         cut.field=path.decode(cut.field);
         // value should be somewhere in the document
         if (cut.field[0]==="_keyword") keywords.push(cut.value);
