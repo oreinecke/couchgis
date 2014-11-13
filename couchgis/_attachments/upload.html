@@ -404,12 +404,13 @@ $(document).ready(function() {
       (function load_next() {
         if ( file=files.pop() ) {
           // Get file type and be flexible about extensions.
-          var filetype=file.name.match(/[^.]*$/)[0].toLowerCase();
+          var basename=file.name.split('.');
+          var filetype=basename.pop().toLowerCase();
+          basename=basename.join('.');
           if (/^(geo)?json$/.test(filetype)) filetype="geojson";
           // Add files of unknown extension to the upload blob.
           else if (filetype!=="xml" && load_features.ogr2ogr) {
             reader.onload=function(evt) {
-              var basename=file.name.slice(0, file.name.length-filetype.length-1);
               // Store content into ogr2ogr_uploads using this hierarchy:
               // { <basename>: { <extension>: <content>, etc.}, etc. }
               if (!ogr2ogr_uploads[basename])
