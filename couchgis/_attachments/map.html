@@ -612,7 +612,7 @@ $(document).ready(function() {
       return;
     }
     // Pre-filter documents with indexed document field and value.
-    if ( !new_filter.redo && documents.length>100 && options.cuts && function() {
+    if ( options.cuts && documents.length > 500 && function() {
       // Find a cut that neither an _expression nor a _keyword.
       var cut=function(cuts) {
         for (var c=0, cut; cut=cuts[c]; c++)
