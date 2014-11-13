@@ -168,7 +168,7 @@ $(document).ready(function() {
                   var span=$('<span>').text(value);
                   // Copy cell content and field name to #filter.
                   span.addClass('field').click({
-                    field:th.text(), value:span.text().replace(/[.*+?^=!:${}()|\[\]\\]/g, "\\$&")
+                    field:th.text(), value:value
                   }, update_geometry.create_filter);
                   td.append(span, '<br>');
                 }
@@ -240,7 +240,10 @@ $(document).ready(function() {
 
   update_geometry.create_filter=function(e) {
     $("#filter [name=field]").val(e.data.field);
-    $("#filter [name=content]").val(e.data.value).keypress();
+    var value=e.data.value.toString();
+    value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
+    value=value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&");
+    $("#filter [name=content]").val(value).keypress();
   };
 
   // diff-updates items inside viewport
@@ -645,7 +648,8 @@ $(document).ready(function() {
       }
       // Vaguely test if cut.value could only match one string.
       if (/\^(\\[^sSwWdD]|[^\\(){}\[\]|^$.*+?])*\$/.test(cut.value)) {
-        var keys=[], value=cut.value.slice(1,-1).replace(/\\/g, '');
+        var keys=[], value=cut.value.slice(1,-1);
+        value=JSON.parse('"'+value.replace(/\\([^tnrfbu])/g, '$1')+'"');
         // i.e. if +value !== NaN
         if (+value===+value) value=+value;
         for (var t=0;t<types.length;t++)
@@ -957,8 +961,11 @@ $(document).ready(function() {
       var matcher=new RegExp(request.term, "i");
       for (var label in labels) {
         label=label.substr(1);
-        if (matcher.test(label))
-          data.push({ label:label, value:label.replace(/[.*+?^=!:${}()|\[\]\\]/g, "\\$&") });
+        if (!matcher.test(label)) continue;
+        var value=label;
+        value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
+        value=value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&");
+        data.push({ label:label, value:value });
         if (data.length===50) break;
       }
       response(data);
