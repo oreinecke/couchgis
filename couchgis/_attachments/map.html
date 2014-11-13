@@ -940,11 +940,15 @@ $(document).ready(function() {
     $("#cuts > [id^=spatial-]").hide();
   });
 
+  // Clear text input on field change.
+  $("#filter [name=field]").change( function(e) {
+    if (e.originalEvent)
+      $("#filter [name=content]").val('');
+  });
+
   // Update autocomplete source array.
   $("#filter [name=field]").change( function() {
-    // clear text input on field change.
     var input=$("#filter [name=content]");
-    input.val('');
     var field=$(this).val();
     if (!$(this).find("[name=fields] :selected").length) {
       input.autocomplete({source:[]});
