@@ -648,12 +648,17 @@ $(document).ready(function() {
       }
       // Vaguely test if cut.value could only match one string.
       if (/\^(\\[^sSwWdD]|[^\\(){}\[\]|^$.*+?])*\$/.test(cut.value)) {
-        var keys=[], value=cut.value.slice(1,-1);
+        var keys=[], value=cut.value.slice(1,-1), other;
         value=JSON.parse('"'+value.replace(/\\([^tnrfbu])/g, '$1')+'"');
-        // i.e. if +value !== NaN
-        if (+value===+value) value=+value;
-        for (var t=0;t<types.length;t++)
-          keys.push([cut.field, types[t], value]);
+        // If value happens to be "true", "12,3" or something, it might
+        // be indexed as JSON true or 12.3, because the type info gets
+        // pretty much lost in all the HTML forms and whatnot.
+        try { other=JSON.parse(value); } catch(err) {};
+        for (var t=0, type; type=types[t]; t++) {
+          keys.push([cut.field, type, value]);
+          if (other!==undefined)
+            keys.push([cut.field, type, other]);
+        }
         $.getJSON("_view/field-type-value", {
           reduce:false, keys:JSON.stringify(keys)
         }, success);
