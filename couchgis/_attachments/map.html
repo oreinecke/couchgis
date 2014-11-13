@@ -242,7 +242,7 @@ $(document).ready(function() {
     $("#filter [name=field]").val(e.data.field);
     var value=e.data.value.toString();
     value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
-    value=value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&");
+    value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
     $("#filter [name=content]").val(value).keypress();
   };
 
@@ -973,7 +973,7 @@ $(document).ready(function() {
         if (!matcher.test(label)) continue;
         var value=label;
         value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
-        value=value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&");
+        value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
         data.push({ label:label, value:value });
         if (data.length===50) break;
       }
