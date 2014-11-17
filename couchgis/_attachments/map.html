@@ -276,10 +276,10 @@ $(document).ready(function() {
     // Query GeoCouch spatial handler if installed,
     // but limit output to 1000 items (~200kb).
     if (update_items.GeoCouch && options.bbox) $.getJSON("_spatial/bbox", {
-      limit:1000, bbox:options.bbox.toString()
+      count:true, bbox:options.bbox.toString()
     }, function(data) {
       var rows=data.rows;
-      if (rows.length!==1000) {
+      if (rows) {
         var ids={}, row;
         // hash each geometry id to true for faster look-up
         while ( row=rows.pop() ) ids[row.id]=true;
@@ -291,8 +291,13 @@ $(document).ready(function() {
         options.keys=prefix;
         delete options.bbox;
         delete options.limit;
-      } else options.keys=vp.prefix.concat(keys.slice(vp.position));
-      list("bbox-filter/bbox", options, success);
+        list("bbox-filter/bbox", options, success);
+      } else if (data.count>1000) {
+        options.keys=vp.prefix.concat(keys.slice(vp.position));
+        list("bbox-filter/bbox", options, success);
+      } else $.getJSON("_spatial/bbox", {
+        bbox:options.bbox.toString()
+      }, this.success);
     }); else list("bbox-filter/bbox", options, success);
     function success(data) {
       var table = $("#table tbody");
