@@ -269,6 +269,7 @@ $(document).ready(function() {
         options.bbox[2]>=vp.pad[2]&&options.bbox[3]>=vp.pad[3]) {
       options.keys=vp.prefix;
       delete options.bbox;
+      delete options.limit;
     } else if (!update_items.GeoCouch)
       // ignore items that were already dropped by previous viewport
       options.keys=vp.prefix.concat(keys.slice(vp.position));
@@ -289,6 +290,7 @@ $(document).ready(function() {
             break;
         options.keys=prefix;
         delete options.bbox;
+        delete options.limit;
       } else options.keys=vp.prefix.concat(keys.slice(vp.position));
       list("bbox-filter/bbox", options, success);
     }); else list("bbox-filter/bbox", options, success);
