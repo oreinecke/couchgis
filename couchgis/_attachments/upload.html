@@ -38,14 +38,14 @@ $(document).ready(function() {
 
   $("#modify [name=type]").change( function() {
     // Suggest these common field names:
-    var source=[
-      { label:"Datensatz-Typ", value:"type", mixed:true },
-      { label:"Zeitraum", value:"time" }
-    ];
     $.getJSON("_list/tabulate/field-type-value", {
       group_level:2, descending:true,
       options:JSON.stringify({ types:[$(this).val()] })
     }, function(keys) {
+      var source=[
+        { label:"Datensatz-Typ", value:"type", mixed:true },
+        { label:"Zeitraum", value:"time" }
+      ];
       while (keys.length)
         source.push( keys.pop()[0] );
       $("#modify [name=field]").autocomplete({
