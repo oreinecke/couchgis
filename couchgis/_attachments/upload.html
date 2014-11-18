@@ -42,10 +42,9 @@ $(document).ready(function() {
       group_level:2, descending:true,
       options:JSON.stringify({ types:[$(this).val()] })
     }, function(keys) {
-      var source=[
-        { label:"Datensatz-Typ", value:"type", mixed:true },
-        { label:"Zeitraum", value:"time" }
-      ];
+      var source=$("#modify div").data('autocomplete-source');
+      source.splice(2);
+      source[0].mixed=true;
       while (keys.length)
         source.push( keys.pop()[0] );
       $("#modify [name=field]").autocomplete({
@@ -742,7 +741,10 @@ $(document).ready(function() {
       <input id="description-include" type="checkbox" checked>
       <b id="description-field">&lt;Datensatz-Typ&gt;</b><b>:</b></label>
     <input id="description-value" type="text">
-    <div></div>
+    <div data-autocomplete-source='[
+      { "value":"type", "label":"Datensatz-Typ"},
+      { "value":"time", "label":"Zeitraum" }
+    ]'></div>
     <label><input type="checkbox" name="all" checked>Alle Felder auswählen</label>
     <span class="nowrap">
       <input type="button" name="prev" value="<"> Datensatz <a>1</a>
