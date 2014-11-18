@@ -1018,6 +1018,8 @@ $(document).ready(function() {
         }
         for (var r=0;r<rows.length;r++)
           labels[ '_'+data.rows[r].key[2] ]=null;
+        if (input.is(":focus"))
+          input.autocomplete("search", input.val());
       });
     });
   });
