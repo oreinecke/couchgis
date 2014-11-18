@@ -992,6 +992,14 @@ $(document).ready(function() {
         data.push({ label:label, value:value });
         if (data.length===50) break;
       }
+      if (request.term && data.length>1 && data.length<50) {
+        var item={ label:"^(<KEY1>|...|<KEYN>)$" };
+        item.value=[];
+        for (var i=0;i<data.length;i++)
+          item.value.push(data[i].value.slice(1,-1));
+        item.value='^('+item.value.join('|')+')$';
+        data.unshift(item);
+      }
       response(data);
     }
     input.autocomplete({ minLength:0, source:source });
