@@ -570,10 +570,13 @@ $(document).ready(function() {
     // Avoid query if all filters have been removed from options.
     if (!function() { for (var prop in options) return true; }())
       return filter_documents(commands);
-    // Pre-filter documents with indexed type and year. This improves
-    // response time if it's used for the first or second filter item.
-    if ( !new_filter.redo && (options.types || options.time) && position<=2 ) {
-      var types=options.types || filters[1].types || filters[0].types;
+    // Pre-filter documents with indexed type and year.
+    if ( (options.types || options.time) && documents.length>500 && !new_filter.redo ) {
+      // Find latest type list in [ options | filters ].
+      var types=options.types || function() {
+        for (var p=position-1; p>=0; p--)
+          if (filters[p].types) return filters[p].types;
+      }();
       // Obtain simplified [type,year] pairs from
       // _view/type-year matching options' filters.
       $.get("_list/tabulate/type-year", {
