@@ -995,6 +995,8 @@ $(document).ready(function() {
         data.push({ label:label, value:value });
         if (data.length===50) break;
       }
+      // Provide a compiled key set as an autocomplete item. It
+      // list all the other suggestions as /$(<VALUE1>|...)^/.
       if (request.term && data.length>1 && data.length<50) {
         var item={ label:input.data('use-suggestions') };
         item.value=[];
@@ -1015,6 +1017,8 @@ $(document).ready(function() {
       };
       $.getJSON("_view/field-type-value", params, function(data) {
         var rows=data.rows;
+        // If 100 rows or more are encountered, it is usually faster to proceed
+        // with ungrouped rows and let the browser reduce to unique values.
         if (rows.length===params.limit) {
           params.start_key=JSON.stringify(rows.pop().key);
           delete params.group;
@@ -1024,6 +1028,7 @@ $(document).ready(function() {
         }
         for (var r=0;r<rows.length;r++)
           labels[ '_'+data.rows[r].key[2] ]=null;
+        // Update suggestions on each new chunk.
         if (input.is(":focus"))
           input.autocomplete("search", input.val());
       });
