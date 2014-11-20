@@ -642,8 +642,8 @@ $(document).ready(function() {
         shape.addListener('click', select_me);
         (feature.items[row.key[0]] || feature).shape=shape;
       }
-      map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0+offset[1],
-                               (feature.bbox[2]+feature.bbox[0])/2.0+offset[0]));
+      map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0,
+                               (feature.bbox[2]+feature.bbox[0])/2.0));
       shape = (feature.items[feature.properties.GeoJSON_clone] || feature).shape
       select_me.apply(shape);
     });
