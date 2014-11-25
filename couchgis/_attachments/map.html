@@ -572,52 +572,58 @@ $(document).ready(function() {
       return filter_documents(commands);
     // Pre-filter documents with indexed type and year.
     if ( (options.types || options.time) && documents.length>500 && !new_filter.redo ) {
-      // Find latest type list in [ options | filters ].
       var types=options.types || function() {
         for (var p=position-1; p>=0; p--)
           if (filters[p].types) return filters[p].types;
       }();
-      // Obtain simplified [type,year] pairs from
-      // _view/type-year matching options' filters.
-      $.get("_list/tabulate/type-year", {
+      var time=options.time || function() {
+        for (var p=position-1; p>=0; p--)
+          if (filters[p].time) return filters[p].time;
+      }();
+      $.getJSON("_view/type-year", {
+        group:true,
         start_key:JSON.stringify([types[0]]),
-        end_key:JSON.stringify([types[types.length-1], {}]),
-        group_level:2, options: JSON.stringify({
-          // Fetch filter from options or filters[1], but not from
-          // filters[0] because those would only slow the list down.
-          types: types===filters[0].types ? undefined : types,
-          time: options.time || filters[1] && filters[1].time
+        end_key:JSON.stringify([types[types.length-1], {}])
+      }, function(data) {
+        var rows=data.rows, row, keys=[], more_keys=[];
+        while ( row=rows.pop() ) {
+          if (types.indexOf(row.key[0])===-1) continue;
+          if (!ranges.intersects(time, row.value.one)) continue;
+          if ( ranges.contains(row.value.one, time) ||
+               ranges.intersects(time, row.value.all) )
+            more_keys.push(row.key);
+          else keys.push(row.key);
+        }
+        $.getJSON("_list/tabulate/type-year", {
+          reduce:false, keys:JSON.stringify(keys),
+          options:JSON.stringify({ time:time })
+        }, function(keys) {
+          $.getJSON("_view/type-year", {
+            reduce:false, keys:JSON.stringify(more_keys)
+          }, function(data) {
+            var doc_ids={};
+            while (data.rows.length)
+              doc_ids[data.rows.pop().id]=true;
+            while (keys.length)
+              doc_ids[keys.pop()]=true;
+            var new_documents=[];
+            for (var d=0, doc; doc=documents[d]; d++)
+              if (doc.keep_me || doc[1] in doc_ids)
+                new_documents.push(doc);
+            filters.push(new_filter={
+              documents:new_documents,
+              types:types, time:time
+            });
+            if (types===filters[0].types) delete new_filter.types;
+            if (time===filters[0].time) delete new_filter.time;
+            delete options.types;
+            delete options.time;
+            if (function() { for (var prop in options) return true; }())
+              commands.unshift(options);
+            filter_documents(commands);
+          });
         })
-      }, function(keys) {
-        // _list/tabulate already returns a valid JSON array of keys, so
-        // it just needs to be URIencoded and run by the unreduced view.
-        keys=encodeURIComponent(keys);
-        $.getJSON("_view/type-year?reduce=false&keys="+keys, function(data) {
-          // Hash matching document ids into doc_ids.
-          var doc_ids={};
-          while (data.rows.length)
-            doc_ids[data.rows.pop().id]=true;
-          // If only the type and nothing else has been pre-
-          // filtered, there is no need to reissue the filter.
-          var redo=false;
-          for (var prop in options)
-             redo |= prop!=="types";
-          var new_documents=[];
-          for (var d=0;d<documents.length;d++) {
-            var doc=documents[d];
-            if (doc.keep_me || doc[1] in doc_ids)
-              new_documents.push(doc);
-            // Tag document to be skipped once next time.
-            else doc.skip_me=redo;
-          }
-          // Issue filter again if other filters were involved,
-          if (redo) commands.unshift({redo:options});
-          // otherwise set up the new filter and we're done.
-          else options.documents=new_documents;
-          filters.push(options);
-          filter_documents(commands);
-        });
-      }, "text");
+      });
       return;
     }
     // Pre-filter documents with indexed document field and value.
