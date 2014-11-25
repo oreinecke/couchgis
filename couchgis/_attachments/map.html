@@ -584,9 +584,7 @@ $(document).ready(function() {
         start_key:JSON.stringify([types[0]]),
         end_key:JSON.stringify([types[types.length-1], {}])
       }, function(data) {
-        // Divert keys to _list/tabulate/type-year and
-        // more_keys directly to _view/type-year directly.
-        var rows=data.rows, row, keys=[], more_keys=[];
+        var rows=data.rows, row, list_keys=[], view_keys=[];
         while ( row=rows.pop() ) {
           if (types.indexOf(row.key[0])===-1) continue;
           // Ignore isolated time intervals.
@@ -597,23 +595,23 @@ $(document).ready(function() {
           // 'one' covers every doc.time, so if time
           // contains it, it intersects every doc.time.
                ranges.contains(time, row.value.one) )
-            more_keys.push(row.key);
-          else keys.push(row.key);
+            view_keys.push(row.key);
+          else list_keys.push(row.key);
         }
         $.getJSON("_list/tabulate/type-year", {
-          reduce:false, keys:JSON.stringify(keys),
+          reduce:false, keys:JSON.stringify(list_keys),
           options:JSON.stringify({ time:time })
-        }, function(keys) {
+        }, function(list_ids) {
           $.getJSON("_view/type-year", {
-            reduce:false, keys:JSON.stringify(more_keys)
-          }, function(data) {
+            reduce:false, keys:JSON.stringify(view_keys)
+          }, function(view_data) {
             var doc_ids={};
             // Hash doc ids from _view/type-year.
-            while (data.rows.length)
-              doc_ids[data.rows.pop().id]=true;
+            while (view_data.rows.length)
+              doc_ids[view_data.rows.pop().id]=true;
             // Hash doc ids from _list/tabulate/type-year.
-            while (keys.length)
-              doc_ids[keys.pop()]=true;
+            while (list_ids.length)
+              doc_ids[list_ids.pop()]=true;
             var new_documents=[];
             for (var d=0, doc; doc=documents[d]; d++)
               if (doc.keep_me || doc[1] in doc_ids)
