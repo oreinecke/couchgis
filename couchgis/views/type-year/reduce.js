@@ -5,6 +5,7 @@ function(keys, values, rereduce) {
   for (var v=0; !rereduce && v<values.length; v++) {
     var ranges=values[v].doc.ranges;
     values[v]={
+      all: ranges.slice(),
       one: [{ begin:ranges[0].begin, end:ranges.pop().end }]
     };
   }
@@ -34,5 +35,5 @@ function(keys, values, rereduce) {
     one.begin=lesser(one.begin, one2.begin) || one.begin;
     one.end=greater(one.end, one2.end) || one.end;
   }
-  return { one:[one] };
+  return { one:[one], all:[] };
 }
