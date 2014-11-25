@@ -85,9 +85,12 @@ table (Seriously! The same geometry was drawn twice!!!), or are working around
 that problem by using more and more columns for the same property at a
 different time.
 
-Multiple geometry clones may be separated by comma/space/ampersand/semicolon.
-These documents may be listed twice or more in the map page, but are only
-exported once into a spreadsheet.
+A document can even be attached to more than one geometry, as long as ids are
+separated by comma/space/ampersand/semicolon. Such a document will be listed
+twice or more in the map page, but is exported once into a spreadsheet.
+
+Line comments are supported to help with long id lists ([#%] that is). This way
+you can leave a description next to each rather meaningless document id.
 
 `doc.GeoJSON.type` is restricted to Point, LineString, Polygon,
 MultiLineString, MultiPolygon. It could make sense, and it would be easy, to
