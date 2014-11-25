@@ -588,8 +588,8 @@ $(document).ready(function() {
         while ( row=rows.pop() ) {
           if (types.indexOf(row.key[0])===-1) continue;
           if (!ranges.intersects(time, row.value.one)) continue;
-          if ( ranges.contains(row.value.one, time) ||
-               ranges.intersects(time, row.value.all) )
+          if ( ranges.intersects(time, row.value.all) ||
+               ranges.contains(time, row.value.one) )
             more_keys.push(row.key);
           else keys.push(row.key);
         }
