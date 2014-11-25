@@ -16,7 +16,8 @@ To install, push the couchgis directory into your couchdb using
 ```
 $ erica push couchgis http://localhost:5984/db
 ==> couchgis (push)
-==> Successfully pushed. You can browse it at: http://localhost:5984/db/_design/couchgis-v1.0/index.html
+==> Successfully pushed. You can browse it at: http://localhost:5984/db/_design/
+couchgis-v1.0/index.html
 ```
 
 If you don't have erica installed, use the compiled design document that is
