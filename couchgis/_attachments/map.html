@@ -732,11 +732,8 @@ $(document).ready(function() {
       return true;
     }()) return;
     options.keys=[];
-    for (var d=0;d<documents.length;d++) {
-      var doc=documents[d];
-      if (!doc.keep_me && !doc.skip_me) options.keys.push(doc);
-      delete doc.skip_me;
-    }
+    for (var d=0, doc; doc=documents[d]; d++)
+      if (!doc.keep_me) options.keys.push(doc);
     list("tabulate/geojson", options, function(data) {
       var new_documents=[];
       var doc_id=data.reverse().pop();
