@@ -584,11 +584,18 @@ $(document).ready(function() {
         start_key:JSON.stringify([types[0]]),
         end_key:JSON.stringify([types[types.length-1], {}])
       }, function(data) {
+        // Divert keys to _list/tabulate/type-year and
+        // more_keys directly to _view/type-year directly.
         var rows=data.rows, row, keys=[], more_keys=[];
         while ( row=rows.pop() ) {
           if (types.indexOf(row.key[0])===-1) continue;
+          // Ignore isolated time intervals.
           if (!ranges.intersects(time, row.value.one)) continue;
+          // 'all' is within every doc.time and therefore any interval
+          // that intersects with it intersects with every doc.time.
           if ( ranges.intersects(time, row.value.all) ||
+          // 'one' covers every doc.time, so if time
+          // contains it, it intersects every doc.time.
                ranges.contains(time, row.value.one) )
             more_keys.push(row.key);
           else keys.push(row.key);
@@ -601,8 +608,10 @@ $(document).ready(function() {
             reduce:false, keys:JSON.stringify(more_keys)
           }, function(data) {
             var doc_ids={};
+            // Hash doc ids from _view/type-year.
             while (data.rows.length)
               doc_ids[data.rows.pop().id]=true;
+            // Hash doc ids from _list/tabulate/type-year.
             while (keys.length)
               doc_ids[keys.pop()]=true;
             var new_documents=[];
