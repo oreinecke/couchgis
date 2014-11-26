@@ -506,10 +506,9 @@ $(document).ready(function() {
           bbox[1]=(bbox[1]<bbox2[1]?bbox:bbox2)[1];
           bbox[2]=(bbox[2]>bbox2[2]?bbox:bbox2)[2];
           bbox[3]=(bbox[3]>bbox2[3]?bbox:bbox2)[3];
-          delete GeoJSON.bbox;
-          delete GeoJSON.crs;
-          delete GeoJSON.error;
-          GeometryCollection.geometries.push(GeoJSON);
+          GeometryCollection.geometries.push({
+            type:GeoJSON.type, coordinates:GeoJSON.coordinates
+          });
         }
         var ids=[];
         for (var d=0, doc, id=null; doc=documents[d]; d++) {
