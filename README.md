@@ -181,7 +181,7 @@ these are refering to):
 - "Text" itself may be used to check if the pattern is matched by any of the
   fields. Because I for instance can hardly remember where a particular info
   had been placed.
-- Where it says "Funktion" it actually means _eerily modified javascript
+- Where it says "Funktion" it actually means _eerily modified JavaScript
   expression_. I give some examples using the document from the top:
 
 ```javascript
@@ -197,6 +197,31 @@ these are refering to):
                         // This doesn't make much sense here, but feel free
                         // to define functions if it implies less typing.
 ```
+
+###Search Performance
+
+As the number of documents exceeds 10000, response time will depend on the
+complexity of the filter. Whenever possible, CouchGIS will improve response
+time by using a secondary index, instead of the documents itself:
+- Selecting one or more document types usually responds instantly.
+- Restricting documents to a certain time range also responds instantly. I
+  recommend taking a look at [_view/type-year](couchgis/views/type-year). It
+  sorts documents neatly into time spans.
+- Asking for documents containing a certain field responds instantly as well.
+- Using a regexp pattern on a category also responds very fast. For example,
+  `doc.Vegetation` might be a category, because it has probably less than 100
+  unique values.
+- Using a fixed pattern on a field also responds very fast. If the regexp looks
+  like `/^<NO TRICKY REGEXP SYMBOLS>$/` or `/^(<VALUE1>|<ETC.>)$/`, CouchGIS
+  can look up the apparent values directly. The nice autocomplete text input
+  conveniently sticks to this syntax and features a compiled list of its own
+  suggestions.
+
+However, anything that has to run by a lot of documents may take a while:
+JavaScript expressions for example have to be evaluated for each document,
+ditto for full-text search. This doesn't matter if the amount of documents was
+already been reduced by a previous search, because CouchGIS won't filter
+excluded documents again.
 
 ###Spatial Relations
 
