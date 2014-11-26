@@ -232,11 +232,14 @@ How Document Editing Works
 --------------------------
 
 The [upload page](couchgis/_attachments/upload.html) covers editing and
-uploading new documents. Accepted formats are GeoJSON Feature/FeatureCollection
-and the ghastly Microsoft Excel 2003 XML spreadsheet. Not surprisingly, the
-form pretty much explains itself, and even if documents have been deleted or
-messed up, there's always a revert button. Also, you can review the data that
-is going to be uploaded.
+uploading new documents. By itself, it can read the ghastly Microsoft Excel
+2003 XML spreadsheet and the GeoJSON Feature/FeatureCollection. If you patch
+CouchGIS with [couch-ogr2ogr][4], it will also accept ghastly ESRI Shape Files
+as well as pretty much everything.
+
+Not surprisingly, the form pretty much explains itself, and even if documents
+have been deleted or messed up, there's always a revert button. Also, you can
+review the data that is going to be uploaded.
 
 In CouchDB creating new or changing documents is more or less the same, as soon
 as the Bulk Document API is in use. The application works with, and extends its
@@ -250,6 +253,8 @@ principle in some way.
 - If `_deleted` exists and equals `true` (in LibreOffice Calc, this amounts to
   typing `=TRUE()` in a cell), it deletes the document. It has to be this
   annoying because it is for your own safety as well!!!
+
+[4]: http://github.com/oreinecke/couch-ogr2ogr
 
 ###Search and Link to Existing Geometry
 
