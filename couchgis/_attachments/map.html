@@ -93,6 +93,8 @@ $(document).ready(function() {
   }];
   // Same as viewports for content-based filters.
   var filters=[{ types:[], time:"", documents:[], union:[] }];
+  // Document set used by update_items() below.
+  update_items.documents=filters[0].documents;
 
   // query for GeoJSON and full documents
   function update_geometry() {
@@ -305,7 +307,7 @@ $(document).ready(function() {
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
-      var documents=filters[filters.length-1].documents;
+      var documents=update_items.documents;
       for (var id in data) {
         if (items[id]) {
           delete old_items[id];
@@ -404,7 +406,7 @@ $(document).ready(function() {
     // If the command stack is depleted, reset
     // viewports, update geometries and etc.
     if (!new_filter) {
-      var documents=filters[filters.length-1].documents;
+      var documents=update_items.documents=filters[filters.length-1].documents;
       keys.splice(0);
       viewports.splice(1);
       for (var d=0, id=null; d<documents.length; d++) {
