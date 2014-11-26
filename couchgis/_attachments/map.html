@@ -576,7 +576,7 @@ $(document).ready(function() {
       }();
       var time=options.time || function() {
         for (var p=position-1; p>=0; p--)
-          if (filters[p].time) return filters[p].time;
+          if ('time' in filters[p]) return filters[p].time;
       }();
       $.getJSON("_view/type-year", {
         group:true,
