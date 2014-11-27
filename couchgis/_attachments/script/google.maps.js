@@ -64,6 +64,9 @@ Primitives.MultiPolygon=function(options) {
   };
 };
 
+// Tag two-dimensional primitives.
+Primitives.Polygon.prototype.solid=true;
+Primitives.MultiPolygon.prototype.solid=true;
 
 // Replace all 2-element arrays inside GeoJSON.coordinates with
 // LatLngs; This is written with extra-ugly comma operators and
