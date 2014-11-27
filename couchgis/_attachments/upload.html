@@ -478,17 +478,17 @@ $(document).ready(function() {
       var doc=uploaded_docs[feature.properties._id] || {};
       // detach doc from uploaded_docs
       doc=JSON.parse(JSON.stringify(doc));
+      // parse feature.properties._JSON
+      try {
+        $.extend(true, doc, JSON.parse(feature.properties._JSON));
+        delete feature.properties._JSON;
+      } catch(err) {}
       // set doc-type and time
       doc.type=type || doc.type || undefined;
       doc.time=time || doc.time || undefined;
       // save document description as doc[doc.type]
       if ($("#description-include").prop('checked') && doc.type)
         doc[doc.type]=$("#description-value").val() || doc[doc.type] || undefined;
-      // parse feature.properties._JSON
-      try {
-        $.extend(true, doc, JSON.parse(feature.properties._JSON));
-        delete feature.properties._JSON;
-      } catch(err) {}
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
