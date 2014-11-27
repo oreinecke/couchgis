@@ -115,6 +115,7 @@ function(head, req) {
       // move _id, _rev, GeoJSON_clone to the left
       if (include_geojson_id) fields.unshift("GeoJSON_clone");
       if (include_revision) fields=["_id", "_rev"].concat(fields);
+      if (include_JSON) fields.unshift("_JSON");
       for (var f=0;f<features.length;f++)
       for (var prop in features[f].properties)
         if (fields.indexOf(prop)===-1) fields.push(prop);
