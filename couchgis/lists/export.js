@@ -110,22 +110,17 @@ function(head, req) {
       features:features
     }));
   case "xml":
+    var extra_fields=["type", "time"];
+    if (include_JSON) extra_fields.unshift("_JSON");
+    if (include_WKT) extra_fields.unshift("_WKT");
+    if (include_geojson_id) extra_fields.unshift("GeoJSON_clone");
+    if (include_revision) extra_fields=["_id", "_rev"].concat(extra_fields);
     if (fields==null) {
-      fields=["type", "time"];
-      // move _id, _rev, GeoJSON_clone to the left
-      if (include_geojson_id) fields.unshift("GeoJSON_clone");
-      if (include_revision) fields=["_id", "_rev"].concat(fields);
-      if (include_JSON) fields.unshift("_JSON");
+      fields=extra_fields;
       for (var f=0;f<features.length;f++)
       for (var prop in features[f].properties)
         if (fields.indexOf(prop)===-1) fields.push(prop);
-    } else {
-      fields=["type", "time"].concat(fields?fields.split(':'):[]);
-      if (include_geojson_id) fields.unshift("GeoJSON_clone");
-      if (include_revision) fields=["_id", "_rev"].concat(fields);
-      if (include_JSON) fields.unshift("_JSON");
-    }
-    if (include_WKT) fields.unshift("_WKT");
+    } else fields=extra_fields.concat(fields?fields.split(':'):[]);
     send('<?xml version="1.0"?>');
     send('<?mso-application progid="Excel.Sheet"?>');
     send('<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"');
