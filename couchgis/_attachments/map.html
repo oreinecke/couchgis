@@ -181,7 +181,8 @@ $(document).ready(function() {
               });
             }
             // If colored black, (Multi)LineStrings are difficult to spot on the map.
-            if (item.shape instanceof Polygon || item.shape instanceof MultiPolygon)
+            if (item.shape instanceof Primitives.Polygon ||
+                item.shape instanceof Primitives.MultiPolygon)
               item.shape.setOptions({fillColor:fillColor});
             else item.shape.setOptions({strokeColor:fillColor});
             item.keep_documents=true;

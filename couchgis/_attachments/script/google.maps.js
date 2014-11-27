@@ -1,14 +1,17 @@
 // If the Google Maps API has been loaded successfully, shorthand
 // google.maps to Maps. Otherwise revert Maps to 'offline-mode' API.
 var Maps = window.google && google.maps || {offline:true};
-// Stash frequently used objects and use GeoJSON type names.
-var LatLng     = Maps.LatLng;
-var Point      = Maps.Marker;
-var Polygon    = Maps.Polygon;
-var LineString = Maps.Polyline;
+// Constructors of geojson primitives can be looked up here.
+var Primitives={
+  Point:      Maps.Marker,
+  Polygon:    Maps.Polygon,
+  LineString: Maps.Polyline
+};
+
+var LatLng = Maps.LatLng;
 
 // add GeoJSON MultiLineString support
-function MultiLineString(options) {
+Primitives.MultiLineString=function(options) {
   var shapes=[];
   var paths=options.paths;
   delete options.paths;
@@ -33,10 +36,10 @@ function MultiLineString(options) {
     for (var s=0;s<shapes.length;s++)
       shapes[s].addListener(name, function() { handler.apply(shape); });
   };
-}
+};
 
 // add GeoJSON MultiPolygon support
-function MultiPolygon(options) {
+Primitives.MultiPolygon=function(options) {
   var shapes=[];
   var paths=options.paths;
   for (var p=0;p<paths.length;p++) {
@@ -59,7 +62,8 @@ function MultiPolygon(options) {
     for (var s=0;s<shapes.length;s++)
       shapes[s].addListener(name, function() { handler.apply(shape); });
   };
-}
+};
+
 
 // Replace all 2-element arrays inside GeoJSON.coordinates with
 // LatLngs; This is written with extra-ugly comma operators and
@@ -88,13 +92,10 @@ function expand_options(options) {
 }
 
 function create_shape(type, options) {
-  if (type==="Point") return new Point(options);
-  if (type==="Polygon") return new Polygon(options);
-  if (type==="LineString") return new LineString(options);
-  if (type==="MultiPolygon") return new MultiPolygon(options);
-  if (type==="MultiLineString") return new MultiLineString(options);
-  // remind myself that this needs work!!!
-  alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+  var Primitive=Primitives[type] || function() {
+    alert("OH NO POKEY AN UNKNOWN GEOJSON TYPE!!!");
+  };
+  return new Primitive(options);
 }
 
 // Provide offline Google Maps API look-and-feel.
@@ -125,12 +126,9 @@ if (Maps.offline) {
   // Offline maps supports undefined map types.
   Maps.MapTypeId={};
   // Use nothing() as an empty constructor.
-  LatLng          = nothing;
-  Point           = nothing;
-  Polygon         = nothing;
-  LineString      = nothing;
-  MultiPolygon    = nothing;
-  MultiLineString = nothing;
+  LatLng = nothing;
+  for (var type in Primitives)
+    Primitives[type]=nothing;
   // The map page attaches a single handler to 'bounds_changed'.
   // It uses no other event types or maps. This allows me to
   // ignore instance, eventName, and multiple handlers.
