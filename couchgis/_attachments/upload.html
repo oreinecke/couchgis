@@ -261,7 +261,8 @@ $(document).ready(function() {
             // Pocket current feature if it links to
             // nothing else than the deleted geometry.
             if ( !acceptor && relayed._deleted===true &&
-                 relays[row.id].properties.GeoJSON_clone.match(/[^\s,;&]+/g).length===1 )
+                 relays[row.id].properties.GeoJSON_clone.replace(/[#%].*($)/gm, '$1')
+                                                        .match(/[^\s,;&]+/g).length===1 )
               acceptor=relays[rows.splice(r,1)[0].id];
             row=rows[r-1] || {};
           } while (row.key===key && r--)
