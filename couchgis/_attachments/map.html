@@ -446,7 +446,8 @@ $(document).ready(function() {
       // most concise and every attempt to do this without resulted in
       // additional clutter. Also I expect filters.length not to exceed 20.
       if (filter[filter_name]==null) return true;
-      if (filter_name==="union") {
+      switch(filter_name) {
+      case "union":
         filter.union=new_filter.union;
         // Tag document selection to bypass _list/tabulate.
         for (var d=0;d<filter.union.length;d++)
@@ -461,22 +462,19 @@ $(document).ready(function() {
         // because I want to leave the top-level filter untouched.
         position++;
         return false;
-      }
-      if (filter_name==="spatial")
-        return (new_filter.spatial);
-      if (filter_name==="time") {
+      case "spatial":
+        return new_filter.spatial;
+      case "time":
         var contains=(ranges.contains(filter.time, new_filter.time));
         if (contains) equal_filter=(ranges.contains(new_filter.time, filter.time));
         return contains;
-      }
-      if (filter_name==="types") {
+      case "types":
         var contains=(new_filter.types.length<=filter.types.length);
         for (var t=0; contains && t<new_filter.types.length; t++)
           contains &= (filter.types.indexOf(new_filter.types[t])!==-1);
         if (contains) equal_filter=(new_filter.types.length===filter.types.length);
         return contains;
-      }
-      if (filter_name==="cuts") {
+      case "cuts":
         var cut=new_filter.cuts[0];
         if (!cut.remove_me) return true;
         var index=filter.cuts.indexOf(cut);
