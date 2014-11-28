@@ -634,11 +634,10 @@ $(document).ready(function() {
     // Pre-filter documents with indexed document field and value.
     if ( options.cuts && documents.length > 500 && function() {
       // Find a cut that neither an _expression nor a _keyword.
-      var cut=function(cuts) {
-        for (var c=0, cut; cut=cuts[c]; c++)
-          if (!/^_(id|expression|keyword)$/.test(cut.field))
-            return cut;
-      }(options.cuts);
+      var cut;
+      for (var c=0; cut=options.cuts[c]; c++)
+        if (!/^_(id|expression|keyword)$/.test(cut.field))
+          break;
       if (!cut) return false;
       // Find latest type list in [ options | filters ].
       var types=options.types || function() {
