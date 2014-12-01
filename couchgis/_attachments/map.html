@@ -613,12 +613,9 @@ $(document).ready(function() {
             for (var d=0, doc; doc=documents[d]; d++)
               if (doc.keep_me || doc[1] in doc_ids)
                 new_documents.push(doc);
-            filters.push(new_filter={
-              documents:new_documents,
-              types:types, time:time
-            });
-            if (types===filters[0].types) delete new_filter.types;
-            if (!time) delete new_filter.time;
+            filters.push(new_filter={ documents:new_documents });
+            if (options.time) new_filter.time=options.time;
+            if (options.types) new_filter.types=options.types;
             delete options.types;
             delete options.time;
             if (function() { for (var prop in options) return true; }())
@@ -647,13 +644,10 @@ $(document).ready(function() {
         for (var d=0, doc; doc=documents[d]; d++)
           if (doc.keep_me || doc[1] in doc_ids)
             new_documents.push(doc);
-        filters.push(new_filter={
-          documents:new_documents,
-          types:types, cuts:[cut]
-        });
+        filters.push(new_filter={ documents:new_documents, cuts:[cut] });
         options.cuts.splice(options.cuts.indexOf(cut), 1);
-        if (types===filters[0].types) delete new_filter.types;
         if (!options.cuts.length) delete options.cuts;
+        if (options.types) new_filter.types=options.types;
         delete options.types;
         if (function() { for (var prop in options) return true; }())
           commands.unshift(options);
