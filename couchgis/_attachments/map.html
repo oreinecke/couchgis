@@ -31,19 +31,34 @@ $(document).ready(function() {
   var ranges=require('views/lib/ranges');
   var indexes=require('views/lib/indexes');
 
-  // call _list/bbox-filter/<view> with some useful options
+  // POST or possibly GET _list/bbox-filter/<view>.
   function list(list, options, success) {
-    var data={keys:options.keys, GeoJSON:options.GeoJSON};
-    delete options.keys;
-    delete options.GeoJSON;
-    list+="?options="+encodeURIComponent(JSON.stringify(options));
-    $.ajax("_list/"+list, {
-      type:"POST",
+    var params={
+      type:"get",
       dataType:"json",
-      data:JSON.stringify(data),
       success:success,
       error:call.that_last_one
-    });
+    };
+    if (options.GeoJSON) {
+      params.type="post";
+      params.data=JSON.stringify({
+        GeoJSON:options.GeoJSON,
+        keys:options.keys
+      });
+      delete options.GeoJSON;
+      delete options.keys;
+      options=encodeURIComponent(JSON.stringify(options));
+      $.ajax("_list/"+list+"?options="+options, params);
+      return;
+    }
+    var keys=JSON.stringify(options.keys);
+    delete options.keys;
+    options=encodeURIComponent(JSON.stringify(options));
+    if (keys.length>4096) {
+      params.type="post";
+      params.data='{"keys":'+keys+'}';
+      $.ajax("_list/"+list+"?options="+options, params);
+    } else $.ajax("_list/"+list+"?options="+options+"&keys="+keys, params);
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
   list.parts=window.location.pathname.split('/');
