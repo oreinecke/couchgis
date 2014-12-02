@@ -1191,14 +1191,9 @@ $(document).ready(function() {
         $("#export [name=url]").val(url).show().focus().select();
       }
     })[$(this).prop('name')];
-    // Provide a permanent link if the URI is small.
     keys=JSON.stringify(keys);
-    if (keys.length<=4096) {
-      translate_url(url+"&keys="+keys);
-      return;
-    }
-    // Otherwise employ index compression.
-    $.getJSON("_view/geojson-doc", function(data) {
+    // Employ index compression if the URL is too large.
+    if (keys.length>4096) $.getJSON("_view/geojson-doc", function(data) {
       // get document order identical to _view/geojson
       var rows=data.rows;
       for (var k=0;k<rows.length;k++)
@@ -1217,7 +1212,9 @@ $(document).ready(function() {
       url+="&end_key="+JSON.stringify([end_row.key, end_row.id]);
       for (var i=0;i<list.length;i++) list[i]-=offset;
       translate_url(url+"&compressed_keys="+indexes.compress(list));
-    });
+    }); else
+    // Otherwise provide a permant link.
+      translate_url(url+"&keys="+keys);
   });
 
   // Hide url text input and display 'get-url' again.
