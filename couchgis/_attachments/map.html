@@ -31,6 +31,57 @@ $(document).ready(function() {
   var ranges=require('views/lib/ranges');
   var indexes=require('views/lib/indexes');
 
+  // Initialize map position and geometry as soon as map has finished loading.
+  Maps.event.addListenerOnce(map, 'tilesloaded', function() {
+    // set viewport and zoom level
+    $.getJSON("_view/dimensions", function(data) {
+      var bbox=data.rows[0].value.bbox;
+      map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
+      // also initialize the time text field
+      $("#filter [name=time]").val(ranges.toString(data.rows[0].value.ranges));
+    });
+    // get list of GeoJSON keys, largest to smallest item
+    $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
+      while (data.rows.length)
+        keys.push(data.rows.shift().id);
+      // get associated document ids
+      $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
+        // Re-build keys to purge orphaned geometries.
+        keys.splice();
+        while (data.rows.length) {
+          var row=data.rows.shift();
+          keys.push(row.key);
+          filters[0].documents.push([row.key, row.id]);
+        }
+        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+        Maps.event.trigger(map, 'bounds_changed');
+      }, "json");
+    });
+    // get doc types and set colors
+    $.getJSON("_view/type-year?group_level=1&descending=true", function(data) {
+      while (data.rows.length) {
+        var type=data.rows.pop().key.pop();
+        var label=$('<label>').text(type)
+                              .prepend( $('<input>').attr({type:"checkbox",name:type}) );
+        $("#filter .types").append(label, ' ');
+        filters[0].types.push(type);
+        // This is one rare advantage of javascripts 'phony' arrays:
+        // I can use fillColors first as a set and then assign keys
+        // to each element!! How nice!!!
+        fillColors[type] = fillColors[type] || fillColors.shift();
+      }
+    });
+    // get doc fields
+    $.getJSON("_view/field-type-value", {
+      group_level:1, descending:true
+    }, function(data) {
+      var optgroup=$("[name=fields]");
+      optgroup.append($("<option>").text("_id"));
+      while (data.rows.length)
+        optgroup.append($("<option>").text(data.rows.pop().key[0]));
+    });
+  });
+
   // POST or possibly GET _list/bbox-filter/<view>.
   function list(list, options, success) {
     var params={
@@ -748,57 +799,6 @@ $(document).ready(function() {
       filter_documents(commands);
     });
   }
-
-  // Initialize map position and geometry as soon as map has finished loading.
-  Maps.event.addListenerOnce(map, 'tilesloaded', function() {
-    // set viewport and zoom level
-    $.getJSON("_view/dimensions", function(data) {
-      var bbox=data.rows[0].value.bbox;
-      map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
-      // also initialize the time text field
-      $("#filter [name=time]").val(ranges.toString(data.rows[0].value.ranges));
-    });
-    // get list of GeoJSON keys, largest to smallest item
-    $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
-      while (data.rows.length)
-        keys.push(data.rows.shift().id);
-      // get associated document ids
-      $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
-        // Re-build keys to purge orphaned geometries.
-        keys.splice();
-        while (data.rows.length) {
-          var row=data.rows.shift();
-          keys.push(row.key);
-          filters[0].documents.push([row.key, row.id]);
-        }
-        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-        Maps.event.trigger(map, 'bounds_changed');
-      }, "json");
-    });
-    // get doc types and set colors
-    $.getJSON("_view/type-year?group_level=1&descending=true", function(data) {
-      while (data.rows.length) {
-        var type=data.rows.pop().key.pop();
-        var label=$('<label>').text(type)
-                              .prepend( $('<input>').attr({type:"checkbox",name:type}) );
-        $("#filter .types").append(label, ' ');
-        filters[0].types.push(type);
-        // This is one rare advantage of javascripts 'phony' arrays:
-        // I can use fillColors first as a set and then assign keys
-        // to each element!! How nice!!!
-        fillColors[type] = fillColors[type] || fillColors.shift();
-      }
-    });
-    // get doc fields
-    $.getJSON("_view/field-type-value", {
-      group_level:1, descending:true
-    }, function(data) {
-      var optgroup=$("[name=fields]");
-      optgroup.append($("<option>").text("_id"));
-      while (data.rows.length)
-        optgroup.append($("<option>").text(data.rows.pop().key[0]));
-    });
-  });
 
   // Refine document list if date has changed.
   $("#filter [name=time]").keypress( function(e) {
