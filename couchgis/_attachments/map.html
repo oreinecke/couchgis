@@ -39,6 +39,21 @@ $(document).ready(function() {
     $("#filter [name=time]").val(ranges.toString(data.rows[0].value.ranges));
   });
 
+  // get doc types and set colors
+  $.getJSON("_view/type-year?group_level=1&descending=true", function(data) {
+    while (data.rows.length) {
+      var type=data.rows.pop().key.pop();
+      var label=$('<label>').text(type)
+                            .prepend( $('<input>').attr({type:"checkbox",name:type}) );
+      $("#filter .types").append(label, ' ');
+      filters[0].types.push(type);
+      // This is one rare advantage of javascripts 'phony' arrays:
+      // I can use fillColors first as a set and then assign keys
+      // to each element!! How nice!!!
+      fillColors[type] = fillColors[type] || fillColors.shift();
+    }
+  });
+
   // Initialize map position and geometry as soon as map has finished loading.
   Maps.event.addListenerOnce(map, 'tilesloaded', function() {
     // get list of GeoJSON keys, largest to smallest item
@@ -57,20 +72,6 @@ $(document).ready(function() {
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
         Maps.event.trigger(map, 'bounds_changed');
       }, "json");
-    });
-    // get doc types and set colors
-    $.getJSON("_view/type-year?group_level=1&descending=true", function(data) {
-      while (data.rows.length) {
-        var type=data.rows.pop().key.pop();
-        var label=$('<label>').text(type)
-                              .prepend( $('<input>').attr({type:"checkbox",name:type}) );
-        $("#filter .types").append(label, ' ');
-        filters[0].types.push(type);
-        // This is one rare advantage of javascripts 'phony' arrays:
-        // I can use fillColors first as a set and then assign keys
-        // to each element!! How nice!!!
-        fillColors[type] = fillColors[type] || fillColors.shift();
-      }
     });
     // get doc fields
     $.getJSON("_view/field-type-value", {
