@@ -248,11 +248,10 @@ $(document).ready(function() {
   update_geometry.highlight_shape=function(e) {
     var item=e.data;
     var bbox=item.GeoJSON.bbox;
+    // Center map to the shape and highlight it.
     map.setCenter(new LatLng( (bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0 ));
     item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
-    // Center map to the shape and highlight it.
     $("#table tbody").prepend(item.tr);
-    e.preventDefault();
   };
 
   update_geometry.create_filter=function(e) {
