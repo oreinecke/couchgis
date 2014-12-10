@@ -121,7 +121,7 @@ $(document).ready(function() {
       if (!item.keep_documents)
         documents=documents.concat(item.keys.slice(1));
     }
-    if (geometries.reverse().length + documents.reverse().length === 0)
+    if (!geometries.length && !documents.length)
       return call.that_last_one();
     var successful=false;
     function ajax() {
