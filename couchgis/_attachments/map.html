@@ -494,7 +494,7 @@ $(document).ready(function() {
       }
 //    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
       delete filter_documents.commands;
-      Maps.event.trigger(map, 'bounds_changed');
+      call.this_one_next(update_items)();
       return;
     }
     // Aquire first property as name of new_filter.
@@ -1111,6 +1111,8 @@ $(document).ready(function() {
     call.this_one_next(update_geometry)();
     // revert to 'refine', if viewport was moved
     Maps.event.addListenerOnce(map, 'bounds_changed', function() {
+      // abort in case [name=precise] was already clicked
+      if ($("#settings [name=simplified]").is(":visible")) return;
       $("#settings [name=precise]").hide();
       $("#settings [name=refine]").show();
     });
@@ -1119,15 +1121,11 @@ $(document).ready(function() {
   $("#settings [name=precise]").click( function() {
     $("#settings [name=precise]").hide();
     $("#settings [name=simplified]").show();
-    Maps.event.clearListeners(map, 'bounds_changed');
-    Maps.event.addListener(map, 'bounds_changed', call.this_one_next(function() {update_items(0);}));
   });
 
   $("#settings [name=simplified]").click( function() {
     $("#settings [name=simplified]").hide();
     $("#settings [name=refine]").show();
-    Maps.event.clearListeners(map, 'bounds_changed');
-    Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
     Maps.event.trigger(map, 'bounds_changed');
   });
 
@@ -1151,9 +1149,12 @@ $(document).ready(function() {
     $("#settings [name=limit]").val(new_limit).change();
   });
 
-  $("#settings [name=limit]").change( function() {
-    Maps.event.trigger(map, 'bounds_changed');
-  });
+  $("#settings [name=limit]").change( call.this_one_next( function() {
+    var pad=viewports[0].pad;
+    for (var v=1; v<viewports.length; v++)
+      viewports[v].pad=pad;
+    update_items();
+  }));
 
   // Suppress page reload if uses hits enter in a text input.
   $("form").submit( function(e) {e.preventDefault();} );
