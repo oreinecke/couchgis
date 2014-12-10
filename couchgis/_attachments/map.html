@@ -54,6 +54,16 @@ $(document).ready(function() {
     }
   });
 
+  // get doc fields
+  $.getJSON("_view/field-type-value", {
+    group_level:1, descending:true
+  }, function(data) {
+    var optgroup=$("[name=fields]");
+    optgroup.append($("<option>").text("_id"));
+    while (data.rows.length)
+      optgroup.append($("<option>").text(data.rows.pop().key[0]));
+  });
+
   // Initialize map position and geometry as soon as map has finished loading.
   Maps.event.addListenerOnce(map, 'tilesloaded', function() {
     // get list of GeoJSON keys, largest to smallest item
@@ -72,15 +82,6 @@ $(document).ready(function() {
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
         Maps.event.trigger(map, 'bounds_changed');
       }, "json");
-    });
-    // get doc fields
-    $.getJSON("_view/field-type-value", {
-      group_level:1, descending:true
-    }, function(data) {
-      var optgroup=$("[name=fields]");
-      optgroup.append($("<option>").text("_id"));
-      while (data.rows.length)
-        optgroup.append($("<option>").text(data.rows.pop().key[0]));
     });
   });
 
