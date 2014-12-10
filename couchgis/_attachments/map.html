@@ -31,15 +31,16 @@ $(document).ready(function() {
   var ranges=require('views/lib/ranges');
   var indexes=require('views/lib/indexes');
 
+  // initialize map viewport
+  $.getJSON("_view/dimensions", function(data) {
+    var bbox=data.rows[0].value.bbox;
+    map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
+    // also initialize the time text field
+    $("#filter [name=time]").val(ranges.toString(data.rows[0].value.ranges));
+  });
+
   // Initialize map position and geometry as soon as map has finished loading.
   Maps.event.addListenerOnce(map, 'tilesloaded', function() {
-    // set viewport and zoom level
-    $.getJSON("_view/dimensions", function(data) {
-      var bbox=data.rows[0].value.bbox;
-      map.setCenter(new LatLng((bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0));
-      // also initialize the time text field
-      $("#filter [name=time]").val(ranges.toString(data.rows[0].value.ranges));
-    });
     // get list of GeoJSON keys, largest to smallest item
     $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
       while (data.rows.length)
