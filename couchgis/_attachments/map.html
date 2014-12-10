@@ -317,12 +317,13 @@ $(document).ready(function() {
   };
 
   // diff-updates items inside viewport
-  function update_items(error) {
+  function update_items() {
     var NE=map.getBounds().getNorthEast();
     var SW=map.getBounds().getSouthWest();
     var options={
       limit:+$("#settings [name=limit]").val() || 1,
-      error:(error===undefined ? (NE.lat()-SW.lat())/100 : error),
+      error:$("#settings [name=simplified]:hidden").length &&
+              +((NE.lat()-SW.lat())/100).toExponential(1),
       bbox:[ SW.lng(), SW.lat(), NE.lng(), NE.lat() ]
     };
     // get viewport that surrounds bbox
