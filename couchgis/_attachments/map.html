@@ -1134,8 +1134,7 @@ $(document).ready(function() {
     while (new_limit<=limit) new_limit*=10;
     if (new_limit>5*limit) new_limit/=5;
     if (new_limit>2*limit) new_limit/=2;
-    $("#settings [name=limit]").val(new_limit);
-    Maps.event.trigger(map, 'bounds_changed');
+    $("#settings [name=limit]").val(new_limit).change();
   });
 
   // decrease limit to next lower [1,2,5,10,20,50,etc]
@@ -1145,16 +1144,14 @@ $(document).ready(function() {
     while (new_limit*10<limit) new_limit*=10;
     if (new_limit*5<limit) new_limit*=5;
     if (new_limit*2<limit) new_limit*=2;
-    $("#settings [name=limit]").val(new_limit);
+    $("#settings [name=limit]").val(new_limit).change();
+  });
+
+  $("#settings [name=limit]").change( function() {
     Maps.event.trigger(map, 'bounds_changed');
   });
 
-  // Suppress page load if user presses enter in any
-  // text input and update map if anything changed.
-  $("#settings").change( function() {
-    Maps.event.trigger(map, 'bounds_changed');
-  });
-
+  // Suppress page reload if uses hits enter in a text input.
   $("form").submit( function(e) {e.preventDefault();} );
 
   $("#export").find("[name=download], [name=get-url]").click( function() {
