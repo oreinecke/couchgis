@@ -68,14 +68,15 @@ $(document).ready(function() {
   Maps.event.addListenerOnce(map, 'tilesloaded', function() {
     // get list of GeoJSON keys, largest to smallest item
     $.getJSON("_view/dimensions?reduce=false&descending=true&end_key=0", function(data) {
-      while (data.rows.length)
-        keys.push(data.rows.shift().id);
+      var geometries=[], rows=data.rows;
+      while (rows.length)
+        geometries.push(rows.pop().id);
       // get associated document ids
-      $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
-        while (data.rows.length) {
-          var row=data.rows.shift();
-          filters[0].documents.push([row.key, row.id]);
-        }
+      $.post("_view/geojson-doc", JSON.stringify({keys:geometries}), function(data) {
+        var documents=filters[0].documents;
+        var rows=data.rows, row;
+        while ( row=rows.pop() )
+          documents.push([row.key, row.id]);
         filter_documents(filter_documents.commands);
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
       }, "json");
