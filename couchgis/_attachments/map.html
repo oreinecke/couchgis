@@ -106,7 +106,7 @@ $(document).ready(function() {
     var keys=JSON.stringify(options.keys);
     delete options.keys;
     options=encodeURIComponent(JSON.stringify(options));
-    if (keys.length>4096) {
+    if (keys.length>8192) {
       params.type="post";
       params.data='{"keys":'+keys+'}';
       $.ajax("_list/"+list+"?options="+options, params);
@@ -349,7 +349,7 @@ $(document).ready(function() {
       // ignore items that were already dropped by previous viewport
       options.keys=vp.prefix.concat(keys.slice(vp.position));
     // Query GeoCouch spatial handler if installed,
-    // but limit output to 1000 items (~200kb).
+    // but limit output to 1500 items (~300kb).
     if (update_items.GeoCouch && options.bbox) $.getJSON("_spatial/bbox", {
       count:true, bbox:options.bbox.toString()
     }, function(data) {
@@ -367,7 +367,7 @@ $(document).ready(function() {
         delete options.bbox;
         delete options.limit;
         list("bbox-filter/bbox", options, success);
-      } else if (data.count>1000) {
+      } else if (data.count>1500) {
         options.keys=vp.prefix.concat(keys.slice(vp.position));
         list("bbox-filter/bbox", options, success);
       } else $.getJSON("_spatial/bbox", {
@@ -1197,7 +1197,7 @@ $(document).ready(function() {
     })[$(this).prop('name')];
     keys=JSON.stringify(keys);
     // Employ index compression if the URL is too large.
-    if (keys.length>4096) $.getJSON("_view/geojson-doc", function(data) {
+    if (keys.length>8192) $.getJSON("_view/geojson-doc", function(data) {
       // get document order identical to _view/geojson
       var rows=data.rows;
       for (var k=0;k<rows.length;k++)
