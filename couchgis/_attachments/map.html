@@ -1061,7 +1061,7 @@ $(document).ready(function() {
       // remove th from #table
       $("#table thead .field").each( function() {
         var th=$(this);
-        if (th.val()!==option.val()) return;
+        if (th.text()!==option.val()) return;
         th.remove();
         return false;
       });
@@ -1070,7 +1070,6 @@ $(document).ready(function() {
     } else {
       var last=$("#table thead th:last");
       var th=$('<th>').text(option.val())
-                      .val(option.val())
                       .addClass("field")
                       .click( function() { select.val($(this).text()).change(); });
       th.html(path.pretty(th.html(), '<br>'));
@@ -1183,7 +1182,7 @@ $(document).ready(function() {
       url+="&include_geojson_id";
     if ($("#export [name=select-fields]:checked").val()==="from-table") {
       var fields=[];
-      $("#table thead .field").each(function() { fields.push($(this).val()); });
+      $("#table thead .field").each(function() { fields.push($(this).text()); });
       url+="&fields="+fields.join(':').replace(/\+/g,'%2B').replace(/\s/g,'%20');
     }
     var translate_url=({
