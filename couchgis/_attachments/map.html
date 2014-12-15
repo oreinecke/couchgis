@@ -198,72 +198,76 @@ $(document).ready(function() {
     window.setTimeout(function() { if (!successful) ajax(); }, 3000);
     function success(data) {
       successful=true;
+      var rows=data.rows;
+      geometries=geometries.length;
+      documents=documents.length;
+      var columns=[];
+      $("#table thead .field").each(function() {
+        columns.push({
+          field:$(this).text(),
+          path:path.decode($(this).text())
+        });
+      });
+      var bull=$("#table thead .geometry span").html();
+      var add_time = !!$("#table thead .title-time").length;
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name=delayed]").prop('checked');
-      var headers=$("#table th");
       var interval=window.setInterval( function() {
-        while (data.rows.length) {
-          var row=data.rows.pop();
+        while (geometries!==0) {
+          var row=rows.pop();
           var item=items[row.key[0]];
-          if (row.value.doc) {
-            data.rows.push(row);
-            var tr=item.tr;
-            tr.html('');
-            // append <th>'s from headers as <td>'s and copy class name
-            headers.each(function() { tr.append($("<td>")); });
-            var columns=tr.find("td");
-            var fillColor=null;
-            for (var d=1;d<item.keys.length;d++) {
-              // Group docs with identical GIS into one li.
-              var doc=data.rows.pop().value.doc;
-              if (!fillColor) fillColor=fillColors[doc.type];
-              headers.each(function(i) {
-                var th=$(this);
-                var td=$(columns[i]);
-                var cl=th.prop('class');
-                if (cl==="title-time" || cl==="title") {
-                  // Link to Futon for the lack of a better interface
-                  // and set link text to a useful item explanation.
-                  var a=$("<a>").attr({
-                    href:"/_utils/document.html?"+list.db+'/'+doc._id,
-                    target:"_blank", title:"..."
-                  }).text( doc[doc.type]||doc.type );
-                  if (cl==="title-time" && doc.time)
-                    a.append(' ('+doc.time+')');
-                  a.one("mouseenter", update_geometry.show_document);
-                  td.append(a, '<br>');
-                // evaluate columns
-                } else if (cl==="field") {
-                  var fields=path.decode(th.val()), value=doc;
-                  while (fields.length && value!=null) value=value[fields.shift()];
-                  var span=$('<span>').text(value);
-                  // Copy cell content and field name to #filter.
-                  span.addClass('field').click({
-                    field:th.text(), value:value
-                  }, update_geometry.create_filter);
-                  td.append(span, '<br>');
-                }
-                if (cl!=="geometry") return;
-                // Set-up link to geometry: I use a very bold bullet point.
-                td.html($("#table thead .geometry span").html()).addClass("geometry");
-                td.click(item, update_geometry.highlight_shape);
-              });
-            }
-            // If colored black, (Multi)LineStrings are difficult to spot on the map.
-            if (item.shape.solid)
-              item.shape.setOptions({fillColor:fillColor});
-            else item.shape.setOptions({strokeColor:fillColor});
-            item.keep_documents=true;
-            continue;
-          }
           var options=expand_options({ coordinates:row.value.GeoJSON.coordinates, map:map});
           if (item.shape==null) {
             item.shape=create_shape(row.value.GeoJSON.type, options);
             item.shape.addListener('click', update_geometry.highlight_row);
           } else item.shape.setOptions(options);
+          geometries--;
           if (timeout) return;
         }
         window.clearInterval(interval);
+        while (rows.length!==0) {
+          var item=items[rows[rows.length-1].key[0]];
+          var index=item.keys.length-1;
+          var row=rows.splice(1-item.keys.length);
+          var tr=$(document.createDocumentFragment());
+          var td=$("<td>");
+          td.html(bull).click(item, update_geometry.highlight_shape).addClass("geometry");
+          tr.append(td);
+          var td=$("<td>");
+          for (var r=0;r<row.length;r++) {
+            var doc=row[r].value.doc;
+            var a=$("<a>").attr({
+              href:"/_utils/document.html?"+list.db+'/'+doc._id,
+              target:"_blank", title:"..."
+            }).text( doc[doc.type]||doc.type );
+            a.one("mouseenter", update_geometry.show_document);
+            if (add_time && doc.time)
+              a.append(' ('+doc.time+')');
+            td.append(a, '<br>');
+          }
+          tr.append(td);
+          for (var c=0, column; column=columns[c]; c++) {
+            var td=$("<td>");
+            for (var r=0;r<row.length;r++) {
+              var value=row[r].value.doc;
+              for (var p=0; value && p!==column.path.length; p++)
+                value=value[column.path[p]];
+              td.append(
+                $("<span>").text(value)
+                           .addClass('field')
+                           .click({ field:column.field, value:value },
+                                    update_geometry.create_filter),
+              '<br>');
+            }
+            tr.append(td);
+          }
+          item.tr.html('').append(tr);
+          var color=fillColors[row[0].value.doc.type];
+          if (item.shape.solid)
+            item.shape.setOptions({fillColor:color});
+          else item.shape.setOptions({strokeColor:color});
+          item.keep_documents=true;
+        }
         call.that_last_one();
       }, timeout);
     }
