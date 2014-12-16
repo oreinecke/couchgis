@@ -210,6 +210,7 @@ $(document).ready(function() {
       });
       var bull=$("#table thead .geometry span").html();
       var add_time = !!$("#table thead .title-time").length;
+      var tbody=$(document.createDocumentFragment());
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name=delayed]").prop('checked');
       var interval=window.setInterval( function() {
@@ -263,13 +264,15 @@ $(document).ready(function() {
             }
             tr.append(td);
           }
-          item.tr.html('').append(tr);
+          if (item.tr) item.tr.html('').append(tr);
+          else tbody.append( item.tr=$("<tr>").append(tr) );
           var color=fillColors[slice[0].value.doc.type];
           if (item.shape.solid)
             item.shape.setOptions({fillColor:color});
           else item.shape.setOptions({strokeColor:color});
           item.keep_documents=true;
         }
+        $("#table tbody").append(tbody);
         call.that_last_one();
       }, timeout);
     }
@@ -393,7 +396,6 @@ $(document).ready(function() {
         }
         extend_vp.dismiss=true;
         items[id]=data[id];
-        table.append( items[id].tr=$("<tr>") );
         // fetch GeoJSON of specified detail level
         var KEYS=[[id, data[id].GeoJSON.error]];
         // skip to matching document id
