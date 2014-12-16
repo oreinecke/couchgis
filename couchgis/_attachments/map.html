@@ -225,22 +225,25 @@ $(document).ready(function() {
           if (timeout) return;
         }
         window.clearInterval(interval);
-        while (rows.length!==0) {
+        while (documents!==0) {
           var item=items[rows[rows.length-1].key[0]];
-          var index=item.keys.length-1;
-          var row=rows.splice(1-item.keys.length);
+          var slice=rows.splice(1-item.keys.length);
+          documents-=slice.length;
           var tr=$(document.createDocumentFragment());
           var td=$("<td>");
-          td.html(bull).click(item, update_geometry.highlight_shape).addClass("geometry");
+          td.html(bull).click(item, update_geometry.highlight_shape)
+                       .addClass("geometry");
           tr.append(td);
           var td=$("<td>");
-          for (var r=0;r<row.length;r++) {
-            var doc=row[r].value.doc;
-            var a=$("<a>").attr({
+          for (var s=0;s<slice.length;s++) {
+            var doc=slice[s].value.doc;
+            var a=$("<a>");
+            a.text( doc[doc.type]||doc.type )
+             .one("mouseenter", update_geometry.show_document)
+             .attr({
               href:"/_utils/document.html?"+list.db+'/'+doc._id,
               target:"_blank", title:"..."
-            }).text( doc[doc.type]||doc.type );
-            a.one("mouseenter", update_geometry.show_document);
+            });
             if (add_time && doc.time)
               a.append(' ('+doc.time+')');
             td.append(a, '<br>');
@@ -248,21 +251,20 @@ $(document).ready(function() {
           tr.append(td);
           for (var c=0, column; column=columns[c]; c++) {
             var td=$("<td>");
-            for (var r=0;r<row.length;r++) {
-              var value=row[r].value.doc;
+            for (var s=0;s<slice.length;s++) {
+              var value=slice[s].value.doc;
               for (var p=0; value && p!==column.path.length; p++)
                 value=value[column.path[p]];
               td.append(
                 $("<span>").text(value)
                            .addClass('field')
                            .click({ field:column.field, value:value },
-                                    update_geometry.create_filter),
-              '<br>');
+                                    update_geometry.create_filter), '<br>');
             }
             tr.append(td);
           }
           item.tr.html('').append(tr);
-          var color=fillColors[row[0].value.doc.type];
+          var color=fillColors[slice[0].value.doc.type];
           if (item.shape.solid)
             item.shape.setOptions({fillColor:color});
           else item.shape.setOptions({strokeColor:color});
