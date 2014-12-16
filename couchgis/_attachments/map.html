@@ -176,7 +176,7 @@ $(document).ready(function() {
         documents=documents.concat(item.keys.slice(1));
     }
     if (!geometries.length && !documents.length)
-      return call.that_last_one();
+      return success({rows:[]});
     var successful=false;
     function ajax() {
       $.ajax("_view/geojson", {
