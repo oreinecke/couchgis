@@ -167,9 +167,14 @@ $(document).ready(function() {
 
   // query for GeoJSON and full documents
   function update_geometry() {
-    var geometries=[], documents=[];
+    var geometries=[], documents=[], old_items=[];
     for (var id in items) {
       var item=items[id];
+      if (item.remove_me) {
+        old_items.push(item);
+        delete items[id];
+        continue;
+      }
       if (!item.keep_shape)
         geometries.push(item.keys[0]);
       if (!item.keep_documents)
@@ -211,9 +216,16 @@ $(document).ready(function() {
       var bull=$("#table thead .geometry span").html();
       var add_time = !!$("#table thead .title-time").length;
       var tbody=$(document.createDocumentFragment());
+      var old_tbody=$();
       // timeout is 5ms or instantaneous
       var timeout = 5 * $("#settings [name=delayed]").prop('checked');
       var interval=window.setInterval( function() {
+        while (old_items.length!==0) {
+          var item=old_items.pop();
+          old_tbody=old_tbody.add(item.tr);
+          item.shape.setMap();
+          if (timeout) return;
+        }
         while (geometries!==0) {
           var row=rows.pop();
           var item=items[row.key[0]];
@@ -273,6 +285,7 @@ $(document).ready(function() {
           item.keep_documents=true;
         }
         $("#table tbody").append(tbody);
+        old_tbody.remove();
         call.that_last_one();
       }, timeout);
     }
@@ -406,12 +419,12 @@ $(document).ready(function() {
           KEYS.push(documents[position++]);
         items[id].keys=KEYS;
       }
-      // remove out-of-viewport shapes and links
+      // stage out-of-viewport items for deletion
+      for (var id in old_items)
+        items[id].remove_me=true;
       for (var id in old_items) {
         extend_vp.dismiss=true;
-        items[id].shape.setMap();
-        items[id].tr.remove();
-        delete items[id];
+        break;
       }
       // Fetch changed geometries in 50 ms.
       window.setTimeout(update_geometry, 50);
