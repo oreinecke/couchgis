@@ -145,17 +145,15 @@ function(head, req) {
       send('<Row>');
       var properties=features[f].properties;
       if (include_WKT) {
-        var geometry=features[f].geometry, _WKT="";
-        (function toWKT(c) {
+        var geometry=features[f].geometry, coordinates=geometry.coordinates;
+        properties._WKT=geometry.type.toUpperCase() + function toWKT(c) {
           if (typeof c[0]==="number")
-            return _WKT+=c[0].toPrecision(13)+' '+c[1].toPrecision(13);
-          _WKT+='(';
-          for (var i=0; i<c.length; toWKT(c[i++]))
-            if (i) _WKT+=', ';
-          _WKT+=')';
-        })(geometry.coordinates);
-        if (geometry.type==="Point") properties._WKT="POINT("+_WKT+")";
-        else properties._WKT=geometry.type.toUpperCase()+_WKT;
+            return c[0].toPrecision(13)+' '+c[1].toPrecision(13);
+          var part='';
+          for (var i=0; i<c.length; part+=toWKT(c[i++]))
+            if (i) part+=', ';
+          return '('+part+')';
+        }(geometry.type==="Point" ? [coordinates] : coordinates);
       }
       for (var g=0;g<fields.length;g++) {
         var field=fields[g];
