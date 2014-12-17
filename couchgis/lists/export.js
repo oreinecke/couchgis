@@ -148,7 +148,7 @@ function(head, req) {
         var geometry=features[f].geometry, _WKT="";
         (function toWKT(c) {
           if (typeof c[0]==="number")
-            return _WKT+=c.join(' ');
+            return _WKT+=c[0].toPrecision(13)+' '+c[1].toPrecision(13);
           _WKT+='(';
           for (var i=0; i<c.length; toWKT(c[i++]))
             if (i) _WKT+=', ';
