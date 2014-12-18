@@ -533,6 +533,10 @@ $(document).ready(function() {
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       $("#modify").hide();
       $("#reduce").show();
+      if (Maps.offline) {
+        $("#map").hide();
+        $("#reduce [name=show]").prop('disabled', true);
+      }
       map = map || new Maps.Map($('#map')[0], {
         zoom: 17, mapTypeId: Maps.MapTypeId.SATELLITE,
         center: new LatLng(50.83730534254573, 13.938310197234163)
