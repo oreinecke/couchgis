@@ -398,24 +398,26 @@ $(document).ready(function() {
       for (var id in items) old_items[id]=null;
       var documents=update_items.documents, position=0;
       for (var id in data) {
-        if (items[id]) {
+        var item=items[id], KEYS;
+        if (item) {
           delete old_items[id];
-          var KEYS=items[id].keys;
-          items[id].keep_shape=(KEYS[0][1]===data[id].GeoJSON.error);
-          KEYS[0][1]=data[id].GeoJSON.error;
-          continue;
+          KEYS=item.keys;
+          var error=data[id].GeoJSON.error;
+          item.keep_shape = KEYS[0][1]===error;
+          KEYS[0][1]=error;
+        } else {
+          item=items[id]=data[id];
+          item.keys=KEYS=[[id, item.GeoJSON.error]];
+          extend_vp.dismiss=true;
         }
-        extend_vp.dismiss=true;
-        items[id]=data[id];
-        // fetch GeoJSON of specified detail level
-        var KEYS=[[id, data[id].GeoJSON.error]];
-        // skip to matching document id
-        while (documents[position][0]!==id)
-          position=(position+1)%documents.length;
-        // add all associated documents
-        while (position<documents.length && documents[position][0]===id)
-          KEYS.push(documents[position++]);
-        items[id].keys=KEYS;
+        if (!item.keep_documents) {
+          KEYS.splice(1);
+          while (documents[position][0]!==id)
+            position=(position+1)%documents.length;
+          // add all associated documents
+          while (position<documents.length && documents[position][0]===id)
+            KEYS.push(documents[position++]);
+        }
       }
       // stage out-of-viewport items for deletion
       for (var id in old_items)
@@ -494,25 +496,14 @@ $(document).ready(function() {
     // If the command stack is depleted, reset
     // viewports, update geometries and etc.
     if (!new_filter) {
+      delete filter_documents.commands;
       var documents=update_items.documents=filters[filters.length-1].documents;
       keys.splice(0);
-      viewports.splice(1);
-      for (var d=0, id=null; d<documents.length; d++) {
-        if (id===documents[d][0]) continue;
-        id=documents[d][0];
-        keys.push(id);
-        if (!items[id]) continue;
-        var old_keys=items[id].keys;
-        old_keys.splice(1);
-        while (d<documents.length && id===documents[d][0])
-          old_keys.push(documents[d++]);
-        // update document list in the next _view/geojson
+      for (var d=0, id=null, doc; doc=documents[d]; d++)
+        if (id!==doc[0]) keys.push(id=doc[0]);
+      for (var id in items)
         items[id].keep_documents=false;
-        // the nested loop results in an off-by-one document index
-        d--;
-      }
-//    window.setTimeout(function() { Maps.event.trigger(map, 'bounds_changed'); },50);
-      delete filter_documents.commands;
+      viewports.splice(1);
       call.this_one_next(update_items)();
       return;
     }
