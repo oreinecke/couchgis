@@ -1276,9 +1276,10 @@ $(document).ready(function() {
       while (data.rows.length)
         replication.doc_ids.push(data.rows.pop().id);
       var complete=function(jqXHR, textStatus) {
-        if ( textStatus!=="success" && data.target.indexOf('/')!==-1 && !/^https?:/.test(data.target) ) {
-          $("#export [name=filename]").val(data.target="http://"+data.target);
-          this.data=JSON.stringify(data);
+        // retry target prefixed with http:// if it looks like smith.iriscouch.com/db
+        if ( textStatus!=="success" && replication.target.match('/') && !/^https?:/.test(replication.target) ) {
+          $("#export [name=filename]").val(replication.target="http://"+replication.target);
+          this.data=JSON.stringify(replication);
           $.ajax("/_replicate", this);
           return;
         }
@@ -1293,8 +1294,8 @@ $(document).ready(function() {
         $("#export [name=replicate]").prop('disabled', false);
         if (textStatus!=="success") return;
         $("#export [name=replicate]").hide();
-        var href=data.target+'/'+list.app+"/index.html";
-        if (!/^https?:/.test(data.target)) href="../../../"+href;
+        var href=replication.target+'/'+list.app+"/index.html";
+        if (!/^https?:/.test(replication.target)) href="../../../"+href;
         $("#export [name=replicant]").attr({ href:href }).show().focus();
       }
       $.ajax("/_replicate", {
