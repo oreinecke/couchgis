@@ -393,12 +393,10 @@ $(document).ready(function() {
       }, this.success);
     }); else list("bbox-filter/bbox", options, success);
     function success(data) {
-      var table = $("#table tbody");
-      var position=0;
       // lists items to be removed as {id:null}
       var old_items={};
       for (var id in items) old_items[id]=null;
-      var documents=update_items.documents;
+      var documents=update_items.documents, position=0;
       for (var id in data) {
         if (items[id]) {
           delete old_items[id];
