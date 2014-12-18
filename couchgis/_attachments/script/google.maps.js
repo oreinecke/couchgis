@@ -65,8 +65,10 @@ Primitives.MultiPolygon=function(options) {
 };
 
 // Tag two-dimensional primitives.
-Primitives.Polygon.prototype.solid=true;
-Primitives.MultiPolygon.prototype.solid=true;
+if (!Maps.offline) {
+  Primitives.Polygon.prototype.solid=true;
+  Primitives.MultiPolygon.prototype.solid=true;
+}
 
 // Replace all 2-element arrays of
 // GeoJSON.coordinates with LatLngs.
