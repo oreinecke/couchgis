@@ -393,14 +393,10 @@ $(document).ready(function() {
       }, this.success);
     }); else list("bbox-filter/bbox", options, success);
     function success(data) {
-      // lists items to be removed as {id:null}
-      var old_items={};
-      for (var id in items) old_items[id]=null;
       var documents=update_items.documents, position=0;
       for (var id in data) {
         var item=items[id], KEYS;
         if (item) {
-          delete old_items[id];
           KEYS=item.keys;
           var error=data[id].GeoJSON.error;
           item.keep_shape = KEYS[0][1]===error;
@@ -420,11 +416,10 @@ $(document).ready(function() {
         }
       }
       // stage out-of-viewport items for deletion
-      for (var id in old_items)
+      for (var id in items) {
+        if (id in data) continue;
         items[id].remove_me=true;
-      for (var id in old_items) {
         extend_vp.dismiss=true;
-        break;
       }
       // Fetch changed geometries in 50 ms.
       window.setTimeout(update_geometry, 50);
