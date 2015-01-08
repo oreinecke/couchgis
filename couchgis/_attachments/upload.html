@@ -613,7 +613,7 @@ $(document).ready(function() {
         this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
         shape=this;
         var a=$("#clone-from a");
-        a.prop('href',"/_utils/document.html?"+db+'/'+this.GeoJSON_clone);
+        a.prop('href', "_show/edit/"+this.GeoJSON_clone);
         if (this.GeoJSON_clone) $.getJSON('/'+db+'/'+this.GeoJSON_clone, function(doc) {
           a.html(doc[doc.type] || doc);
           if (doc.time) a.append(' ('+doc.time+')');

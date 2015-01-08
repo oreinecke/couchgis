@@ -254,7 +254,7 @@ $(document).ready(function() {
             a.text( doc[doc.type]||doc.type )
              .one("mouseenter", update_geometry.show_document)
              .attr({
-              href:"/_utils/document.html?"+list.db+'/'+doc._id,
+              href:"_show/edit/"+doc._id,
               target:"_blank", title:"..."
             });
             if (add_time && doc.time)
