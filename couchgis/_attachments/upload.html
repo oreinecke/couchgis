@@ -614,10 +614,15 @@ $(document).ready(function() {
         shape=this;
         var a=$("#clone-from a");
         a.prop('href', "_show/edit/"+this.GeoJSON_clone);
-        if (this.GeoJSON_clone) $.getJSON('/'+db+'/'+this.GeoJSON_clone, function(doc) {
-          a.text(doc[doc.type] || doc);
-          if (doc.time) a.append(' ('+doc.time+')');
-        });
+        if (this.GeoJSON_clone) {
+          $.getJSON('/'+db+'/'+this.GeoJSON_clone, function(doc) {
+            a.text(doc[doc.type] || doc);
+            if (doc.time) a.append(' ('+doc.time+')');
+          });
+          $.get('_show/plaintext/'+this.GeoJSON_clone, function(text) {
+            a.attr('title', text);
+          });
+        }
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
