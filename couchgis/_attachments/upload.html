@@ -615,7 +615,7 @@ $(document).ready(function() {
         var a=$("#clone-from a");
         a.prop('href', "_show/edit/"+this.GeoJSON_clone);
         if (this.GeoJSON_clone) $.getJSON('/'+db+'/'+this.GeoJSON_clone, function(doc) {
-          a.html(doc[doc.type] || doc);
+          a.text(doc[doc.type] || doc);
           if (doc.time) a.append(' ('+doc.time+')');
         });
         var spans={ true: $("#clone-from"), false: $("#create-new") };
