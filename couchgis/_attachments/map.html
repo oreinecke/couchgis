@@ -214,7 +214,7 @@ $(document).ready(function() {
           path:path.decode($(this).text())
         });
       });
-      var bull=$("#table thead .geometry span").html();
+      var bull=$("#table thead td.geometry");
       var add_time = !!$("#table thead .title-time").length;
       var tbody=$(document.createDocumentFragment());
       var old_tbody=$();
@@ -244,9 +244,8 @@ $(document).ready(function() {
           var slice=rows.splice(1-item.keys.length);
           documents-=slice.length;
           var tr=$(document.createDocumentFragment());
-          var td=$("<td>");
-          td.html(bull).click(item, update_geometry.highlight_shape)
-                       .addClass("geometry");
+          var td=bull.clone().show()
+                     .click(item, update_geometry.highlight_shape);
           tr.append(td);
           var td=$("<td>");
           for (var s=0;s<slice.length;s++) {
@@ -1319,7 +1318,6 @@ $(document).ready(function() {
   #table th.title:hover,
   #table th.title-time:hover,
   #table td span.field:hover {cursor:pointer}
-  #table .geometry {font-weight:900}
 </style>
 
   </head>
@@ -1398,7 +1396,8 @@ $(document).ready(function() {
   <table id="table">
     <thead><tr>
       <!-- link to highlight geometry in the map canvas -->
-      <th class="geometry"><span style="display:none">&bull;</span></th>
+      <td class="geometry" style="font-weight:900;display:none">&bull;</td>
+      <th class="geometry"></th>
       <th class="title-time">Beschreibung</th>
       <th><select name="field">
         <!-- unselect any column on page load -->
