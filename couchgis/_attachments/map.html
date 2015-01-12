@@ -64,22 +64,23 @@ $(document).ready(function() {
       optgroup.append($("<option>").text(data.rows.pop().key[0]));
   });
 
-  // Initialize map position and geometry as soon as map has finished loading.
-  Maps.event.addListenerOnce(map, 'tilesloaded', function() {
-    $.getJSON("_view/geojson-doc", function(data) {
-      var geojson_doc={};
+  $.getJSON("_view/geojson-doc", function(data) {
+    var geojson_doc={};
+    var rows=data.rows, row;
+    while ( row=rows.pop() )
+      ( geojson_doc[row.key] || (geojson_doc[row.key]=[]) ).push([row.key, row.id]);
+    // get list of GeoJSON keys, largest to smallest item
+    $.getJSON("_view/dimensions?reduce=false&start_key=0", function(data) {
       var rows=data.rows, row;
+      var documents=filters[0].documents;
       while ( row=rows.pop() )
-        ( geojson_doc[row.key] || (geojson_doc[row.key]=[]) ).push([row.key, row.id]);
-      // get list of GeoJSON keys, largest to smallest item
-      $.getJSON("_view/dimensions?reduce=false&start_key=0", function(data) {
-        var rows=data.rows, row;
-        var documents=filters[0].documents;
-        while ( row=rows.pop() )
-          Array.prototype.push.apply(documents, geojson_doc[row.id]);
+        Array.prototype.push.apply(documents, geojson_doc[row.id]);
+      function finalize() {
         filter_documents(filter_documents.commands);
         Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
-      });
+      }
+      if (map.getBounds()) finalize();
+      else Maps.event.addListenerOnce(map, 'tilesloaded', finalize);
     });
   });
 
