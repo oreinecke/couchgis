@@ -215,6 +215,7 @@ $(document).ready(function() {
         });
       });
       var bull=$("#table thead td.geometry");
+      var info=$("#table thead th").filter(".title,.title-time").find("a");
       var add_time = !!$("#table thead .title-time").length;
       var tbody=$(document.createDocumentFragment());
       var old_tbody=$();
@@ -1398,7 +1399,11 @@ $(document).ready(function() {
       <!-- link to highlight geometry in the map canvas -->
       <td class="geometry" style="font-weight:900;display:none">&bull;</td>
       <th class="geometry"></th>
-      <th class="title-time">Beschreibung</th>
+      <th class="title-time">
+        Beschreibung
+        <!-- optional link to source documents -->
+        <a target="_blank" style="text-decoration:none;font-weight:normal;display:none">&#8520</a>
+      </th>
       <th><select name="field">
         <!-- unselect any column on page load -->
         <option selected style="display:none"></option>
