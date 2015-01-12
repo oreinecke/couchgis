@@ -77,7 +77,7 @@ $(document).ready(function() {
         Array.prototype.push.apply(documents, geojson_doc[row.id]);
       function finalize() {
         filter_documents(filter_documents.commands);
-        Maps.event.addListener(map, 'bounds_changed', call.this_one_next(update_items));
+        map.addListener('bounds_changed', call.this_one_next(update_items));
       }
       if (map.getBounds()) finalize();
       else Maps.event.addListenerOnce(map, 'tilesloaded', finalize);
