@@ -162,6 +162,27 @@ string as such:
 Any character other than dash/comma/ampersand/semicolon can be freely used.
 This way document times may also read "von ca. 1970 - 2000" or something.
 
+###`doc.info`
+
+If you have pdf's, spreadsheets etc. that provide some insight into your
+uploaded features (I am usually handed a DVD or something), attach them to an
+info document: Create a new document in Futon and upload some files. Also add a
+few properties like Info or ReadMe. Set `doc.info` to the the info document id.
+
+The map page will display a small link next to the item title. This will direct
+you to the nice Futon page of the info document.
+
+If you don't like to upload all attachments one by one, place them in
+`_attachments`, write a text file for each property, and launch
+
+```
+$ curl localhost:5984/_uuids | grep -o '[0-9a-z]\+' | tail -n 1 > _id
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    47  100    47    0     0    227      0 --:--:-- --:--:-- --:--:--   239
+$ erica push --is-ddoc=false localhost:5984/db
+```
+
 How to Filter Documents
 -----------------------
 
