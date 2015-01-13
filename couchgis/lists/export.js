@@ -47,6 +47,7 @@ function(head, req) {
       else continue;
       if (doc_ids.indexOf(doc._id)!==-1) continue;
       if (filetype==="xml") doc_ids.push(doc._id);
+      delete doc.info;
       delete doc.ranges;
       if (!include_revision) {
         delete doc._rev;
