@@ -260,7 +260,10 @@ $(document).ready(function() {
             });
             if (add_time && doc.time)
               a.append(' ('+doc.time+')');
-            td.append(a, '<br>');
+            td.append(a);
+            if (doc.info)
+              td.append(' ', info.clone().prop('href', doc.info).show());
+            td.append('<br>');
           }
           tr.append(td);
           for (var c=0, column; column=columns[c]; c++) {

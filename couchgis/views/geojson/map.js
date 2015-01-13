@@ -35,6 +35,7 @@ function(doc) {
     type:doc.type,
     time:doc.time,
     ranges:ranges.toRanges(doc.time),
+    info:doc.info && '_show/edit/'+doc.info,
     GeoJSON_clone:doc.GeoJSON_clone
   }};
   for (var field in doc) {
