@@ -18,7 +18,7 @@ function(head, req) {
   var include_WKT='include_WKT' in req.query;
   var include_JSON='include_JSON' in req.query;
   var index=0, next_index=indexes.pop();
-  start({'headers':{
+  start({headers:{
     'Content-Type':{
       geojson:'application/json;charset=utf-8',
       xml:'text/xml'

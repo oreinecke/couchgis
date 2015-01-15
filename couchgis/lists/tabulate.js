@@ -1,7 +1,7 @@
 // Similar to _list/tabulate from toolkit but more JSON-ish.
 
 function(head, req) {
-  start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
+  start({headers:{'Content-Type':'application/json;charset=utf-8'}});
   var options=JSON.parse(req.query.options);
   function pass() {return true;}
   var row;

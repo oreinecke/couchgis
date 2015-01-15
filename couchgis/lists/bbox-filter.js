@@ -2,7 +2,7 @@
 // intersecting with the one specified in req.query.
 
 function(head, req) {
-  start({'headers':{'Content-Type':'application/json;charset=utf-8'}});
+  start({headers:{'Content-Type':'application/json;charset=utf-8'}});
   var options=JSON.parse(req.query.options || '{}');
   // initialize to false if none provided
   var bbox=options.bbox || false;
