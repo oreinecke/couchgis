@@ -822,7 +822,7 @@ $(document).ready(function() {
   // Remove document time constraint.
   $("#time-is :button").click(function() {
     filter_documents({ time:"" });
-    $("#filter [name=time]").val('');
+    $("#filter [name=time]").focus().select();
     $("#time-is").hide();
   });
 
