@@ -103,7 +103,7 @@ function(head, req) {
     if (keywords.length) contains_keyword=function(doc) {
       var content=JSON.stringify(doc).match(/"(\\"|[^"])+"|[\d.e+-]+|true|false/g);
       for (var c=0, cc; cc=content[c]; c++)
-        if (cc[0]==='"') content[c]=JSON.parse(cc);
+        if (cc[0]==='"') content[c]=cc.slice(1,-1);
       content=content.join('\n');
       for (var k=0;k<keywords.length;k++)
         if (!keywords[k].test(content)) return false;
