@@ -4,7 +4,5 @@
 function reduce(keys, values, rereduce) {
   if (rereduce) return values.pop();
   var key=keys.pop()[0];
-  var doc={type:key[1]};
-  doc[key[0]]=key[2];
-  return {doc:doc};
+  return { doc:{ type:key[1], content:key[2] } };
 }
