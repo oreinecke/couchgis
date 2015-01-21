@@ -34,8 +34,9 @@ function(head, req) {
     // sort cuts into these handy arrays:
     while (options.cuts.length) {
       var cut=options.cuts.shift();
+      switch(cut.field) {
       // eval()'d expression must be true
-      if (cut.field==="_expression") {
+      case "_expression":
         // concat RegExp /ab/ and /c/ into /(ab|c)/
         function join() {
           var result="";
@@ -64,17 +65,18 @@ function(head, req) {
           // e) Here I remove quotes from quoted field names.
         }
         expressions.push(expression);
-      } else {
-        cut.value=cut.value && new RegExp(cut.value, 'i');
-        cut.field=path.decode(cut.field);
-        // value should be somewhere in the document
-        if (cut.field[0]==="_keyword") keywords.push(cut.value);
+        break;
+      // value should be somewhere in the document
+      case "_keyword":
+        keywords.push(new RegExp(cut.value, 'i'));
+        break;
+      default:
         // value must match
-        else if (cut.value) {
-          fields.push(cut.field);
-          values.push(cut.value);
+        if (cut.value) {
+          fields.push(path.decode(cut.field));
+          values.push(new RegExp(cut.value, 'i'));
         // ignore value but require field to be non-null
-        } else non_nulls.push(cut.field);
+        } else non_nulls.push(path.decode(cut.field));
       }
     }
     if (non_nulls.length) defines_field=function(doc) {
