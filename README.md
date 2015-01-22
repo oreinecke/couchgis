@@ -375,3 +375,23 @@ nested objects from this notation by adhering to a few simple rules:
   object":{"object's field":true}}`
 - At the end, empty objects are scratched from the new document:
   `{"obj.prop":"null", "obj.field":"undefined"} -> {}`
+
+###How LibreOffice Calc Handles Line Breaks
+
+LibreOffice Calc handles line breaks in a very crappy way. I can't really blame
+them for not properly supporing an outdated and bulky format. Sadly, it still
+beats writing _Office Open XML Spreadsheets_ etc. let alone reading them.
+
+What happens is that
+- line breaks of a downloaded XML spreadsheet are displayed only when editing a
+  cell, or if some weird formatting is applied that makes normal cells look
+  spooky ('Horizontal': 'Distributed' or something),
+- bare line breaks are removed from the saved XML spreadsheet,
+- as well as XML-style line breaks (`&#10;`).
+
+This sounds like bad news, because it removes newlines by accident. I've
+circumvented the annoyance by exporting line breaks as `&#13;&#10`, the XML
+equivalent of a DOS CR-LF. LibreOffice Calc strips these little gold nuggets
+down to `&#13;` and displays the remainder still as a line break.
+MS-Excel reads `&10;` as line break and `&13;` as a strange empty character,
+but saves everything as-is.
