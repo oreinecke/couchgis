@@ -140,7 +140,7 @@ function(head, req) {
     send('<Table>');
     send('<Row ss:AutoFitHeight="0" ss:Height="24">');
     for (var g=0;g<fields.length;g++)
-      send('<Cell><Data ss:Type="String">'+path.pretty(fields[g],'&#10;')+'</Data></Cell>');
+      send('<Cell><Data ss:Type="String">'+path.pretty(fields[g],'&#13;&#10;')+'</Data></Cell>');
     send('</Row>');
     for (var f=0;f<features.length;f++) {
       send('<Row>');
@@ -163,7 +163,7 @@ function(head, req) {
           send('<Cell><Data ss:Type="Number">'+data+'</Data></Cell>');
         else if (typeof data==="string")
           send('<Cell><Data ss:Type="String">'+data.replace(/&/g,'&amp;')
-                                                   .replace(/\n/g,'&#10;')
+                                                   .replace(/\n/g,'&#13;&#10;')
                                                    .replace(/</g,'&lt;')
                                                    .replace(/>/g,'&gt;')+'</Data></Cell>');
         else if (typeof data==="boolean")

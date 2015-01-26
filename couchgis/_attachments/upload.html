@@ -183,7 +183,7 @@ $(document).ready(function() {
               if (!columns[c].xml.length) continue;
               var data=row[c].xml[0] || {xml:""};
               if (data['ss:Type']==="String") data.xml=data.xml.replace(/&amp;/g,'&')
-                                                               .replace(/&#10;/g,'\n')
+                                                               .replace(/&#(13;&#10|10|13);/g,'\n')
                                                                .replace(/&lt;/g,'<')
                                                                .replace(/&gt;/g,'>');
               if (data['ss:Type']==="Number") data.xml=parseFloat(data.xml);
