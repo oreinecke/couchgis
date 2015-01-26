@@ -103,12 +103,21 @@ function(head, req) {
       return true;
     };
     if (keywords.length) contains_keyword=function(doc) {
-      var content=JSON.stringify(doc).match(/"(\\"|[^"])+"|[\d.e+-]+|true|false/g);
-      for (var c=0, cc; cc=content[c]; c++)
-        if (cc[0]==='"') content[c]=cc.slice(1,-1);
-      content=content.join('\n');
-      for (var k=0;k<keywords.length;k++)
-        if (!keywords[k].test(content)) return false;
+      var keyword, found;
+      function search_document(key, value) {
+        if (found) return;
+        if ( !Array.isArray(this) && keyword.test(key) ) {
+          found=true;
+          return;
+        }
+        if (value!==null && typeof value==="object") return value;
+        found=keyword.test(String(value));
+      }
+      for (var k=0; keyword=keywords[k]; k++) {
+        found=false;
+        JSON.stringify(doc, search_document);
+        if (!found) return false;
+      };
       return true;
     };
     if (expressions.length) matches_expression=function(doc) {
