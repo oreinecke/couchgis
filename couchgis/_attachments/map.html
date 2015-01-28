@@ -822,7 +822,7 @@ $(document).ready(function() {
   // Remove document time constraint.
   $("#time-is :button").click(function() {
     filter_documents({ time:"" });
-    $("#filter [name=time]").focus().select();
+    $("#filter [name=time]").select();
     $("#time-is").hide();
   });
 
@@ -1189,7 +1189,7 @@ $(document).ready(function() {
         // hide download button
         $("#export [name=get-url]").hide();
         // display the url in a selected text input
-        $("#export [name=url]").val(url).show().focus().select();
+        $("#export [name=url]").val(url).show().select();
       }
     })[$(this).prop('name')];
     keys=JSON.stringify(keys);
