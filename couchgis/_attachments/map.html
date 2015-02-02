@@ -757,7 +757,10 @@ $(document).ready(function() {
         key.start=key.start || type;
         key.end=type || key.end;
         if (type || !key.start || !key.end) continue;
-        ranges.push({start_key:[cut.field, key.start, null], end_key:[cut.field, key.end, {}]});
+        ranges.push({
+          start_key:[cut.field, key.start, null],
+          end_key:[cut.field, key.end, {}]
+        });
         key.start=key.end=undefined;
       }
       var length=ranges.length, range, keys=[], rows=keys;
