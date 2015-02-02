@@ -94,10 +94,9 @@ function(head, req) {
       for (var f=0;f<fields.length;f++) {
         var field=fields[f];
         var value=doc;
-        for (var g=0;g<field.length && value!=null;g++)
-          value=value[field[g]];
-        if (value==null) return false;
-        if (typeof(value)==="number") value=String(value);
+        for (var g=0; g!==field.length; g++)
+          if ( (value=value[field[g]])===undefined )
+            return false;
         if (!values[f].test(value)) return false;
       }
       return true;
