@@ -987,6 +987,58 @@ $(document).ready(function() {
       $("#filter [name=content]").val('');
   });
 
+  $("#filter [name=content]").autocomplete({ source:function(request, response) {
+    var field=$("#filter [name=field]").val();
+    // no suggestions for javascript functions
+    if (/^_(expression|keyword)$/.test(field))
+      return response([]);
+    var types=$("#filter .types :checked");
+    if (!types.length) types=$("#filter .types :checkbox");
+    // Hash each label to null.
+    var labels={}, suggestions=[];
+    var matcher=new RegExp(request.term, "i");
+    types.each(function() {
+      var type=$(this).prop('name');
+      var params={
+        limit:100, group:true, inclusive_end:false,
+        start_key:JSON.stringify([field, type, ""]),
+        end_key:JSON.stringify([field, type, []])
+      };
+      $.getJSON("_view/field-type-value", params, function(data) {
+        var rows=data.rows;
+        // The document doesn't count if it
+        // doesn't even have the field in it.
+        if (!rows.length) return;
+        // Sample unique matching suggestions.
+        for (var r=0;r!==rows.length;r++) {
+          if (suggestions.length===50) break;
+          var label=rows[r].key[2];
+          if ( label in labels || !matcher.test(label) )
+            continue;
+          labels[label]=null;
+          var value=label;
+          value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
+          value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
+          suggestions.push({ label:label, value:value });
+        }
+        // Do not show empty suggestions
+        // unless nothing actually matches.
+        if (suggestions.length || rows.length!==params.limit)
+          response(suggestions);
+        // If 100 rows or more are encountered, it is
+        // usually faster to proceed with ungrouped rows.
+        if (rows.length===params.limit) {
+          params.start_key=JSON.stringify(rows.pop().key);
+          delete params.group;
+          params.reduce=false;
+          params.limit=2000;
+          // Resume with next chunk.
+          if (suggestions.length!==50)
+            $.getJSON("_view/field-type-value", params, this.success);
+        }
+      });
+    });
+  }, minLength:0 });
 
   // Add or remove column to #table.
   $("#table [name=field]").change( function() {
