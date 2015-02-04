@@ -992,18 +992,30 @@ $(document).ready(function() {
     // no suggestions for javascript functions
     if (/^_(expression|keyword)$/.test(field))
       return response([]);
-    var types=$("#filter .types :checked");
-    if (!types.length) types=$("#filter .types :checkbox");
+    var types=[];
+    $("#filter .types :checked").each(function() {
+      types.push($(this).prop('name'));
+    });
+    if (!types.length) types=filters[0].types;
+    // Extract type intervals.
+    var ranges=[];
+    for (var t=0, key={}; t!==filters[0].types.length+1; t++) {
+      var type=types[types.indexOf(filters[0].types[t])];
+      key.start=key.start || type;
+      key.end=type || key.end;
+      if (type || !key.start || !key.end) continue;
+      ranges.push({
+        start_key:JSON.stringify([field, key.start, null]),
+        end_key:JSON.stringify([field, key.end, {}])
+      });
+      key.start=key.end=undefined;
+    }
     // Hash each label to null.
     var labels={}, suggestions=[];
     var matcher=new RegExp(request.term, "i");
-    types.each(function() {
-      var type=$(this).prop('name');
-      var params={
-        limit:100, group:true, inclusive_end:false,
-        start_key:JSON.stringify([field, type, ""]),
-        end_key:JSON.stringify([field, type, []])
-      };
+    while (ranges.length) ( function(params) {
+      params.limit=100;
+      params.group=true;
       $.getJSON("_view/field-type-value", params, function(data) {
         var rows=data.rows;
         // The document doesn't count if it
@@ -1037,7 +1049,7 @@ $(document).ready(function() {
             $.getJSON("_view/field-type-value", params, this.success);
         }
       });
-    });
+    }(ranges.pop()) );
   }, minLength:0 });
 
   // Add or remove column to #table.
