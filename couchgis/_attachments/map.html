@@ -983,7 +983,7 @@ $(document).ready(function() {
 
   // Clear text input on field change.
   $("#filter [name=field]").change( function(e) {
-    if (e.originalEvent)
+    if (e.originalEvent && !/^_(expression|keyword)$/.test($(this).val()))
       $("#filter [name=content]").val('');
   });
 
