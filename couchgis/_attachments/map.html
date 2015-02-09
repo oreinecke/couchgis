@@ -998,7 +998,7 @@ $(document).ready(function() {
     });
     if (!types.length) types=filters[0].types;
     // Extract type intervals.
-    var ranges=[];
+    var ranges=[], params;
     for (var t=0, key={}; t!==filters[0].types.length+1; t++) {
       var type=types[types.indexOf(filters[0].types[t])];
       key.start=key.start || type;
@@ -1013,10 +1013,10 @@ $(document).ready(function() {
     // Hash each label to null.
     var labels={}, suggestions=[];
     var matcher=new RegExp(request.term, "i");
-    while (ranges.length) ( function(params) {
-      params.limit=100;
-      params.group=true;
-      $.getJSON("_view/field-type-value", params, function(data) {
+    while ( params=ranges.pop() ) $.ajax({
+      url:"_view/field-type-value", dataType:"json",
+      params: $.extend(params, {limit:100, group:true}),
+      data:params, success:function(data) {
         var rows=data.rows;
         // The document doesn't count if it
         // doesn't even have the field in it.
@@ -1033,6 +1033,7 @@ $(document).ready(function() {
           value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
           suggestions.push({ label:label, value:value });
         }
+        var params=this.params;
         // Do not show empty suggestions
         // unless nothing actually matches.
         if (suggestions.length || rows.length!==params.limit)
@@ -1044,12 +1045,17 @@ $(document).ready(function() {
           delete params.group;
           params.reduce=false;
           params.limit=2000;
+          if (suggestions.length===50) return;
           // Resume with next chunk.
-          if (suggestions.length!==50)
-            $.getJSON("_view/field-type-value", params, this.success);
+          $.ajax("_view/field-type-value", {
+            data:params,
+            params:params,
+            dataType: "json",
+            success:this.success
+          });
         }
-      });
-    }(ranges.pop()) );
+      }
+    });
   }, minLength:0 });
 
   // Add or remove column to #table.
