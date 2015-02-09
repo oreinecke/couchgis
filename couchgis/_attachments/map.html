@@ -741,12 +741,12 @@ $(document).ready(function() {
           // pretty much lost in all the HTML forms and whatnot.
           try { values.push(JSON.parse(values[v])); } catch(err) {};
         }
-        var keys=[];
+        var view_keys=[];
         for (var t=0; t<types.length; t++)
         for (var v=0; v<values.length; v++)
-          keys.push([cut.field, types[t], values[v]]);
+          view_keys.push([cut.field, types[t], values[v]]);
         $.getJSON("_view/field-type-value", {
-          reduce:false, keys:JSON.stringify(keys)
+          reduce:false, view_keys:JSON.stringify(view_keys)
         }, success);
         return true;
       }
@@ -763,23 +763,23 @@ $(document).ready(function() {
         });
         key.start=key.end=undefined;
       }
-      var length=ranges.length, keys=[], rows=keys;
+      var length=ranges.length, view_keys=[], view_rows=view_keys;
       if (cut.value) while ( params=ranges.pop() ) {
         params.group=true;
         $.getJSON("_view/field-type-value", params, function(data) {
           var rows=data.rows, key;
           while ( row=rows.pop() )
             if (RegExp(cut.value, 'i').test(row.key[2]))
-              keys.push(row.key);
+              view_keys.push(row.key);
           if (--length===0) $.getJSON("_view/field-type-value", {
-            reduce:false, keys:JSON.stringify(keys)
+            reduce:false, keys:JSON.stringify(view_keys)
           }, success);
         });
       } else while ( params=ranges.pop() ) {
         params.reduce=false;
         $.getJSON("_view/field-type-value", params, function(data) {
-          Array.prototype.push.apply(rows, data.rows);
-          if (--length===0) success({rows:rows});
+          Array.prototype.push.apply(view_rows, data.rows);
+          if (--length===0) success({rows:view_rows});
         });
       }
       return true;
