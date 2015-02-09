@@ -766,8 +766,8 @@ $(document).ready(function() {
       var length=ranges.length, view_keys=[], view_rows=view_keys;
       if (cut.value) while ( params=ranges.pop() ) $.ajax({
         url:"_view/field-type-value", dataType:"json",
-        data:$.extend(params, {group:true}),
-        success:function(data) {
+        params:$.extend(params, {group:true}),
+        data:params, success:function(data) {
           var rows=data.rows, key;
           while ( row=rows.pop() )
             if (RegExp(cut.value, 'i').test(row.key[2]))
