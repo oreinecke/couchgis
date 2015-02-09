@@ -764,9 +764,10 @@ $(document).ready(function() {
         key.start=key.end=undefined;
       }
       var length=ranges.length, view_keys=[], view_rows=view_keys;
-      if (cut.value) while ( params=ranges.pop() ) {
-        params.group=true;
-        $.getJSON("_view/field-type-value", params, function(data) {
+      if (cut.value) while ( params=ranges.pop() ) $.ajax({
+        url:"_view/field-type-value", dataType:"json",
+        data:$.extend(params, {group:true}),
+        success:function(data) {
           var rows=data.rows, key;
           while ( row=rows.pop() )
             if (RegExp(cut.value, 'i').test(row.key[2]))
@@ -775,7 +776,7 @@ $(document).ready(function() {
             reduce:false, keys:JSON.stringify(view_keys)
           }, success);
         });
-      } else while ( params=ranges.pop() ) {
+      }); else while ( params=ranges.pop() ) {
         params.reduce=false;
         $.getJSON("_view/field-type-value", params, function(data) {
           Array.prototype.push.apply(view_rows, data.rows);
