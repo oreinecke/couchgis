@@ -1024,7 +1024,7 @@ $(document).ready(function() {
         // Sample unique matching suggestions.
         for (var r=0;r!==rows.length;r++) {
           if (suggestions.length===50) break;
-          var label=rows[r].key[2];
+          var label=rows[r].key[2].toString();
           if ( label in labels || !matcher.test(label) )
             continue;
           labels[label]=null;
