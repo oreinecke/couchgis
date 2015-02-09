@@ -751,25 +751,22 @@ $(document).ready(function() {
         return true;
       }
       // Extract type intervals.
-      var ranges=[];
+      var ranges=[], params;
       for (var t=0, key={}; t!==filters[0].types.length+1; t++) {
         var type=types[types.indexOf(filters[0].types[t])];
         key.start=key.start || type;
         key.end=type || key.end;
         if (type || !key.start || !key.end) continue;
         ranges.push({
-          start_key:[cut.field, key.start, null],
-          end_key:[cut.field, key.end, {}]
+          start_key:JSON.stringify([cut.field, key.start, null]),
+          end_key:JSON.stringify([cut.field, key.end, {}])
         });
         key.start=key.end=undefined;
       }
-      var length=ranges.length, range, keys=[], rows=keys;
-      if (cut.value) while ( range=ranges.pop() )
-        $.getJSON("_view/field-type-value", {
-          start_key:JSON.stringify(range.start_key),
-          end_key:JSON.stringify(range.end_key),
-          group:true,
-        }, function(data) {
+      var length=ranges.length, keys=[], rows=keys;
+      if (cut.value) while ( params=ranges.pop() ) {
+        params.group=true;
+        $.getJSON("_view/field-type-value", params, function(data) {
           var rows=data.rows, key;
           while ( row=rows.pop() )
             if (RegExp(cut.value, 'i').test(row.key[2]))
@@ -778,15 +775,13 @@ $(document).ready(function() {
             reduce:false, keys:JSON.stringify(keys)
           }, success);
         });
-      else while ( range=ranges.pop() )
-        $.getJSON("_view/field-type-value", {
-          reduce:false,
-          start_key:JSON.stringify(range.start_key),
-          end_key:JSON.stringify(range.end_key)
-        }, function(data) {
+      } else while ( params=ranges.pop() ) {
+        params.reduce=false;
+        $.getJSON("_view/field-type-value", params, function(data) {
           Array.prototype.push.apply(rows, data.rows);
           if (--length===0) success({rows:rows});
         });
+      }
       return true;
     }()) return;
     options.keys=[];
