@@ -768,7 +768,7 @@ $(document).ready(function() {
         url:"_view/field-type-value", dataType:"json",
         params:$.extend(params, {limit:100, group:true}),
         data:params, success:function(data) {
-          var rows=data.rows, key;
+          var rows=data.rows;
           for (var r=0, row; row=rows[r]; r++)
             if (RegExp(cut.value, 'i').test(row.key[2])) {
               if (row.id) view_rows.push(row);
@@ -1030,7 +1030,7 @@ $(document).ready(function() {
     var matcher=new RegExp(request.term, "i");
     while ( params=ranges.pop() ) $.ajax({
       url:"_view/field-type-value", dataType:"json",
-      params: $.extend(params, {limit:100, group:true}),
+      params:$.extend(params, {limit:100, group:true}),
       data:params, success:function(data) {
         var rows=data.rows;
         // The document doesn't count if it
@@ -1065,7 +1065,7 @@ $(document).ready(function() {
           $.ajax("_view/field-type-value", {
             data:params,
             params:params,
-            dataType: "json",
+            dataType:"json",
             success:this.success
           });
         }
