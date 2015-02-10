@@ -1049,30 +1049,11 @@ $(document).ready(function() {
       types.push($(this).prop('name'));
     });
     if (!types.length) types=filters[0].types;
-    // Extract type intervals.
-    var ranges=[], params;
-    for (var t=0, key={}; t!==filters[0].types.length+1; t++) {
-      var type=types[types.indexOf(filters[0].types[t])];
-      key.start=key.start || type;
-      key.end=type || key.end;
-      if (type || !key.start || !key.end) continue;
-      ranges.push({
-        start_key:JSON.stringify([field, key.start, null]),
-        end_key:JSON.stringify([field, key.end, {}])
-      });
-      key.start=key.end=undefined;
-    }
     // Hash each label to null.
     var labels={}, suggestions=[];
     var matcher=new RegExp(request.term, "i");
-    while ( params=ranges.pop() ) $.ajax({
-      url:"_view/field-type-value", dataType:"json",
-      params:$.extend(params, {limit:100, group:true}),
-      data:params, success:function(data) {
+    filter_documents.fold_values(field, types, {limit:100, group:true}, function(data, next) {
         var rows=data.rows;
-        // The document doesn't count if it
-        // doesn't even have the field in it.
-        if (!rows.length) return;
         // Sample unique matching suggestions.
         for (var r=0;r!==rows.length;r++) {
           if (suggestions.length===50) break;
@@ -1087,25 +1068,17 @@ $(document).ready(function() {
         }
         // Do not show empty suggestions
         // unless nothing actually matches.
-        if (suggestions.length || rows.length!==params.limit)
+        if (suggestions.length || !next)
           response(suggestions);
         if (suggestions.length===50) return;
         // If 100 rows or more are encountered, it is
         // usually faster to proceed with ungrouped rows.
         var params=this.params;
-        if (rows.length!==params.limit) return;
-        params.start_key=JSON.stringify(rows.pop().key);
         delete params.group;
         params.reduce=false;
         params.limit=2000;
         // Resume with next chunk.
-        $.ajax("_view/field-type-value", {
-          data:params,
-          params:params,
-          dataType:"json",
-          success:this.success
-        });
-      }
+        next();
     });
   }, minLength:0 });
 
