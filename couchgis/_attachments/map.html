@@ -824,6 +824,43 @@ $(document).ready(function() {
     });
   }
 
+  // Flick through _view/field-type-value in easy chunks.
+  filter_documents.fold_values=function(field, types, params, process) {
+    var url="_view/field-type-value";
+    // Extract type intervals.
+    var ranges=[];
+    for (var t=0, key={}; t!==filters[0].types.length+1; t++) {
+      var type=types[types.indexOf(filters[0].types[t])];
+      key.start=key.start || type;
+      key.end=type || key.end;
+      if (type || !key.start || !key.end) continue;
+      ranges.push($.extend({
+        start_key:JSON.stringify([field, key.start, null]),
+        end_key:JSON.stringify([field, key.end, {}])
+      }, params));
+      key.start=key.end=undefined;
+    }
+    var length=ranges.length;
+    var common_options={
+      url:"_view/field-type-value", dataType:"json",
+      success:function(data) {
+        var process_arguments=[data];
+        var rows=data.rows;
+        params=this.params;
+        if (rows.length===params.limit) {
+          params.start_key=JSON.stringify(rows.pop().key);
+          $.extend(options, common_options);
+          var options=$.extend({ data:params, params:params }, common_options);
+          process_arguments.push(function() { $.ajax(options); });
+        } else if (--length!==0)
+          process_arguments.push(function() {});
+        process.apply(this, process_arguments);
+      }
+    };
+    while ( params=ranges.pop() )
+      $.ajax($.extend({data:params, params:params}, common_options));
+  };
+
   // Refine document list if date has changed.
   $("#filter [name=time]").keypress( function(e) {
     if (e.originalEvent && e.which!==13) return;
