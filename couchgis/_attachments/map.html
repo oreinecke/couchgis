@@ -745,39 +745,36 @@ $(document).ready(function() {
         for (var t=0; t<types.length; t++)
         for (var v=0; v<values.length; v++)
           view_keys.push([cut.field, types[t], values[v]]);
-        $.getJSON("_view/field-type-value", {
+        return $.getJSON("_view/field-type-value", {
           reduce:false, keys:JSON.stringify(view_keys)
         }, success);
-        return;
       }
       var view_keys=[], view_rows=[];
-      if (cut.value) {
-        var matcher=new RegExp(cut.value, "i");
-        filter_documents.fold_values(cut.field, types, {limit:100, group:true}, function(data, next) {
-          var rows=data.rows;
-          for (var r=0, row; row=rows[r]; r++)
-            if (matcher.test(row.key[2])) {
-              if (row.id) view_rows.push(row);
-              else view_keys.push(row.key);
-            }
-          if (!next) return $.getJSON("_view/field-type-value", {
-            reduce:false, keys:JSON.stringify(view_keys)
-          }, function(data) {
-            Array.prototype.push.apply(view_rows, data.rows);
-            success({rows:view_rows});
-          });
-          var params=this.params;
-          delete params.group;
-          params.reduce=false;
-          params.limit=2000;
-          next();
-        });
-      } else {
-        filter_documents.fold_values(cut.field, types, {reduce:false}, function(data, next) {
+      if (!cut.value)
+        return filter_documents.fold_values(cut.field, types, {reduce:false}, function(data, next) {
           Array.prototype.push.apply(view_rows, data.rows);
           if (!next) success({rows:view_rows});
         });
-      }
+      var matcher=new RegExp(cut.value, "i");
+      filter_documents.fold_values(cut.field, types, {limit:100, group:true}, function(data, next) {
+        var rows=data.rows;
+        for (var r=0, row; row=rows[r]; r++)
+          if (matcher.test(row.key[2])) {
+            if (row.id) view_rows.push(row);
+            else view_keys.push(row.key);
+          }
+        if (!next) return $.getJSON("_view/field-type-value", {
+          reduce:false, keys:JSON.stringify(view_keys)
+        }, function(data) {
+          Array.prototype.push.apply(view_rows, data.rows);
+          success({rows:view_rows});
+        });
+        var params=this.params;
+        delete params.group;
+        params.reduce=false;
+        params.limit=2000;
+        next();
+      });
       return;
     }
     options.keys=[];
