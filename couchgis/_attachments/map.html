@@ -795,11 +795,10 @@ $(document).ready(function() {
             success({rows:view_rows});
           });
         }
-      }); else while ( params=ranges.pop() ) {
-        params.reduce=false;
-        $.getJSON("_view/field-type-value", params, function(data) {
+      }); else {
+        filter_documents.fold_values(cut.field, types, {reduce:false}, function(data, next) {
           Array.prototype.push.apply(view_rows, data.rows);
-          if (--length===0) success({rows:view_rows});
+          if (!next) success({rows:view_rows});
         });
       }
       return true;
