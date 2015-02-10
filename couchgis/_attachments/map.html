@@ -1053,32 +1053,32 @@ $(document).ready(function() {
     var labels={}, suggestions=[];
     var matcher=new RegExp(request.term, "i");
     filter_documents.fold_values(field, types, {limit:100, group:true}, function(data, next) {
-        var rows=data.rows;
-        // Sample unique matching suggestions.
-        for (var r=0;r!==rows.length;r++) {
-          if (suggestions.length===50) break;
-          var label=rows[r].key[2].toString();
-          if ( label in labels || !matcher.test(label) )
-            continue;
-          labels[label]=null;
-          var value=label;
-          value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
-          value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
-          suggestions.push({ label:label, value:value });
-        }
-        // Do not show empty suggestions
-        // unless nothing actually matches.
-        if (suggestions.length || !next)
-          response(suggestions);
-        if (suggestions.length===50) return;
-        // If 100 rows or more are encountered, it is
-        // usually faster to proceed with ungrouped rows.
-        var params=this.params;
-        delete params.group;
-        params.reduce=false;
-        params.limit=2000;
-        // Resume with next chunk.
-        next();
+      var rows=data.rows;
+      // Sample unique matching suggestions.
+      for (var r=0;r!==rows.length;r++) {
+        if (suggestions.length===50) break;
+        var label=rows[r].key[2].toString();
+        if ( label in labels || !matcher.test(label) )
+          continue;
+        labels[label]=null;
+        var value=label;
+        value=JSON.stringify(value).slice(1,-1).replace(/\\"/g, '"');
+        value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
+        suggestions.push({ label:label, value:value });
+      }
+      // Do not show empty suggestions
+      // unless nothing actually matches.
+      if (suggestions.length || !next)
+        response(suggestions);
+      if (suggestions.length===50) return;
+      // If 100 rows or more are encountered, it is
+      // usually faster to proceed with ungrouped rows.
+      var params=this.params;
+      delete params.group;
+      params.reduce=false;
+      params.limit=2000;
+      // Resume with next chunk.
+      next();
     });
   }, minLength:0 });
 
