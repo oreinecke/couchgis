@@ -1048,27 +1048,26 @@ $(document).ready(function() {
           value='^'+value.replace(/[.*+?^=${}()|\[\]]/g, "\\$&")+'$';
           suggestions.push({ label:label, value:value });
         }
-        var params=this.params;
         // Do not show empty suggestions
         // unless nothing actually matches.
         if (suggestions.length || rows.length!==params.limit)
           response(suggestions);
+        if (suggestions.length===50) return;
         // If 100 rows or more are encountered, it is
         // usually faster to proceed with ungrouped rows.
-        if (rows.length===params.limit) {
-          params.start_key=JSON.stringify(rows.pop().key);
-          delete params.group;
-          params.reduce=false;
-          params.limit=2000;
-          if (suggestions.length===50) return;
-          // Resume with next chunk.
-          $.ajax("_view/field-type-value", {
-            data:params,
-            params:params,
-            dataType:"json",
-            success:this.success
-          });
-        }
+        var params=this.params;
+        if (rows.length!==params.limit) return;
+        params.start_key=JSON.stringify(rows.pop().key);
+        delete params.group;
+        params.reduce=false;
+        params.limit=2000;
+        // Resume with next chunk.
+        $.ajax("_view/field-type-value", {
+          data:params,
+          params:params,
+          dataType:"json",
+          success:this.success
+        });
       }
     });
   }, minLength:0 });
