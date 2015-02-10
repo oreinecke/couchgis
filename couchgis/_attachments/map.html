@@ -1068,7 +1068,7 @@ $(document).ready(function() {
         suggestions.push({ label:label, value:value });
       }
       // Do not show empty suggestions
-      // unless nothing actually matches.
+      // unless nothing matches at all.
       if (suggestions.length || !next)
         response(suggestions);
       // If 100 rows or more are encountered, it is
