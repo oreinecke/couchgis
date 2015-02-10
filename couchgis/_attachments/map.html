@@ -752,10 +752,11 @@ $(document).ready(function() {
       }
       var view_keys=[], view_rows=[];
       if (cut.value) {
+        var matcher=new RegExp(cut.value, "i");
         filter_documents.fold_values(cut.field, types, {limit:100, group:true}, function(data, next) {
           var rows=data.rows;
           for (var r=0, row; row=rows[r]; r++)
-            if (RegExp(cut.value, 'i').test(row.key[2])) {
+            if (matcher.test(row.key[2])) {
               if (row.id) view_rows.push(row);
               else view_keys.push(row.key);
             }
