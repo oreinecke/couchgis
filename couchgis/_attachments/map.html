@@ -746,7 +746,7 @@ $(document).ready(function() {
         for (var v=0; v<values.length; v++)
           view_keys.push([cut.field, types[t], values[v]]);
         $.getJSON("_view/field-type-value", {
-          reduce:false, view_keys:JSON.stringify(view_keys)
+          reduce:false, keys:JSON.stringify(view_keys)
         }, success);
         return;
       }
