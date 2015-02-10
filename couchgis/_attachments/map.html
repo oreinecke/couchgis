@@ -764,10 +764,8 @@ $(document).ready(function() {
         key.start=key.end=undefined;
       }
       var length=ranges.length, view_keys=[], view_rows=[];
-      if (cut.value) while ( params=ranges.pop() ) $.ajax({
-        url:"_view/field-type-value", dataType:"json",
-        params:$.extend(params, {limit:100, group:true}),
-        data:params, success:function(data) {
+      if (cut.value) {
+        filter_documents.fold_values(cut.field, types, {limit:100, group:true}, function(data, next) {
           var rows=data.rows;
           for (var r=0, row; row=rows[r]; r++)
             if (RegExp(cut.value, 'i').test(row.key[2])) {
@@ -775,27 +773,20 @@ $(document).ready(function() {
               else view_keys.push(row.key);
             }
           var params=this.params;
-          if (rows.length===params.limit) {
-            params.start_key=JSON.stringify(rows.pop().key);
+          if (next) {
             delete params.group;
             params.reduce=false;
             params.limit=2000;
-            $.ajax("_view/field-type-value", {
-              data:params,
-              params:params,
-              dataType:"json",
-              success:this.success
-            });
-            return;
+            next();
           }
-          if (--length===0) $.getJSON("_view/field-type-value", {
+          if (!next) $.getJSON("_view/field-type-value", {
             reduce:false, keys:JSON.stringify(view_keys)
           }, function(data) {
             Array.prototype.push.apply(view_rows, data.rows);
             success({rows:view_rows});
           });
-        }
-      }); else {
+        });
+      } else {
         filter_documents.fold_values(cut.field, types, {reduce:false}, function(data, next) {
           Array.prototype.push.apply(view_rows, data.rows);
           if (!next) success({rows:view_rows});
