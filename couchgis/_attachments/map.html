@@ -760,19 +760,17 @@ $(document).ready(function() {
               if (row.id) view_rows.push(row);
               else view_keys.push(row.key);
             }
-          var params=this.params;
-          if (next) {
-            delete params.group;
-            params.reduce=false;
-            params.limit=2000;
-            next();
-          }
-          if (!next) $.getJSON("_view/field-type-value", {
+          if (!next) return $.getJSON("_view/field-type-value", {
             reduce:false, keys:JSON.stringify(view_keys)
           }, function(data) {
             Array.prototype.push.apply(view_rows, data.rows);
             success({rows:view_rows});
           });
+          var params=this.params;
+          delete params.group;
+          params.reduce=false;
+          params.limit=2000;
+          next();
         });
       } else {
         filter_documents.fold_values(cut.field, types, {reduce:false}, function(data, next) {
