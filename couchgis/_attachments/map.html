@@ -697,13 +697,13 @@ $(document).ready(function() {
       return;
     }
     // Pre-filter documents with indexed document field and value.
-    if ( options.cuts && documents.length > 500 && function() {
+    while ( options.cuts && documents.length > 500 ) {
       // Find a cut that neither an _expression nor a _keyword.
       var cut;
       for (var c=0; cut=options.cuts[c]; c++)
         if (!/^_(id|expression|keyword)$/.test(cut.field))
           break;
-      if (!cut) return false;
+      if (!cut) break;
       var types=options.types || recent.types;
       // Update filter queue with the view result.
       function success(data) {
@@ -748,7 +748,7 @@ $(document).ready(function() {
         $.getJSON("_view/field-type-value", {
           reduce:false, view_keys:JSON.stringify(view_keys)
         }, success);
-        return true;
+        return;
       }
       var view_keys=[], view_rows=[];
       if (cut.value) {
@@ -778,8 +778,8 @@ $(document).ready(function() {
           if (!next) success({rows:view_rows});
         });
       }
-      return true;
-    }()) return;
+      return;
+    }
     options.keys=[];
     for (var d=0, doc; doc=documents[d]; d++)
       if (!doc.keep_me) options.keys.push(doc);
