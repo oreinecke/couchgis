@@ -635,6 +635,8 @@ $(document).ready(function() {
       if (new_filter.spatial===false) continue;
       if ('spatial' in filter) commands.push(filter);
     }
+    recent.time = options.time || recent.time;
+    recent.types = options.types || recent.types;
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
     // Remove filter from options if an identical one has already been applied.
@@ -644,8 +646,7 @@ $(document).ready(function() {
       return filter_documents(commands);
     // Pre-filter documents with indexed type and year.
     if ( (options.types || options.time) && documents.length>500 ) {
-      var types=options.types || recent.types;
-      var time=options.time || recent.time;
+      var types=recent.types, time=recent.time;
       $.getJSON("_view/type-year", {
         group:true,
         start_key:JSON.stringify([types[0]]),
@@ -704,7 +705,7 @@ $(document).ready(function() {
         if (!/^_(id|expression|keyword)$/.test(cut.field))
           break;
       if (!cut) break;
-      var types=options.types || recent.types;
+      var types=recent.types;
       // Update filter queue with the view result.
       function success(data) {
         var doc_ids={};
