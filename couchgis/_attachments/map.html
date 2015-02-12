@@ -246,7 +246,7 @@ $(document).ready(function() {
           documents-=slice.length;
           var tr=$(document.createDocumentFragment());
           var td=bull.clone().show()
-                     .click(item, update_geometry.highlight_shape);
+                     .one("click", item, update_geometry.highlight_shape);
           tr.append(td);
           var td=$("<td>");
           for (var s=0;s<slice.length;s++) {
@@ -283,9 +283,14 @@ $(document).ready(function() {
           if (item.tr) item.tr.html('').append(tr);
           else tbody.append( item.tr=$("<tr>").append(tr) );
           var color=fillColors[slice[0].value.doc.type];
-          if (item.shape.solid)
+          if (item.shape.solid) {
             item.shape.setOptions({fillColor:color});
-          else item.shape.setOptions({strokeColor:color});
+            item.strokeColor="black";
+          }
+          else {
+            item.shape.setOptions({strokeColor:color});
+            item.strokeColor=color;
+          }
           item.keep_documents=true;
         }
         $("#table tbody").append(tbody);
@@ -319,11 +324,20 @@ $(document).ready(function() {
 
   update_geometry.highlight_shape=function(e) {
     var item=e.data;
-    var bbox=item.GeoJSON.bbox;
     // Center map to the shape and highlight it.
-    map.panTo(new LatLng( (bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0 ));
-    item.shape.setOptions({strokeColor:"#FF0000", zIndex:new Date().getTime()});
+    item.shape.setOptions({strokeColor:"red", zIndex:new Date().getTime()});
+    $(this).css('color',"red").one("click", item, update_geometry.unhighlight_shape);
+    if (item.do_not_move_me) return;
     $("#table tbody").prepend(item.tr);
+    var bbox=item.GeoJSON.bbox;
+    map.panTo(new LatLng( (bbox[3]+bbox[1])/2.0, (bbox[2]+bbox[0])/2.0 ));
+    item.do_not_move_me=true;
+  };
+
+  update_geometry.unhighlight_shape=function(e) {
+    var item=e.data;
+    item.shape.setOptions({strokeColor:item.strokeColor});
+    $(this).css('color',"black").one("click", item, update_geometry.highlight_shape);
   };
 
   update_geometry.create_filter=function(e) {
