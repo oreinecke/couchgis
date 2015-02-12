@@ -502,8 +502,6 @@ $(document).ready(function() {
     var filter_name=function() {for (var prop in new_filter) return prop;}();
     // In any case, we can use the full, non-filtered document list.
     var documents=filters[0].documents;
-    // Remind me if we already have an identical filter in place.
-    var equal_filter=false;
     var position=0;
     // Fetch most-recent time and type for secondary index queries.
     var recent={};
@@ -540,13 +538,15 @@ $(document).ready(function() {
         return new_filter.spatial;
       case "time":
         var contains=(ranges.contains(filter.time, new_filter.time));
-        if (contains) equal_filter=(ranges.contains(new_filter.time, filter.time));
+        if (contains)
+          new_filter.remove_me = ranges.contains(new_filter.time, filter.time);
         return contains;
       case "types":
         var contains=(new_filter.types.length<=filter.types.length);
         for (var t=0; contains && t<new_filter.types.length; t++)
           contains &= (filter.types.indexOf(new_filter.types[t])!==-1);
-        if (contains) equal_filter=(new_filter.types.length===filter.types.length);
+        if (contains)
+          new_filter.remove_me = new_filter.types.length===filter.types.length;
         return contains;
       case "cuts":
         var cut=new_filter.cuts[0];
@@ -640,7 +640,7 @@ $(document).ready(function() {
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
     // Remove filter from options if an identical one has already been applied.
-    if (equal_filter) delete options[filter_name];
+    if (new_filter.remove_me) delete options[filter_name];
     // Avoid query if all filters have been removed from options.
     if (!function() { for (var prop in options) return true; }())
       return filter_documents(commands);
