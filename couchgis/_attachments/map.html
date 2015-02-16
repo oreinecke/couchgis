@@ -252,7 +252,7 @@ $(document).ready(function() {
             tr=$("<tr>").append(td);
             tbody.append( item.tr=tr );
           }
-          var td=$("<td>");
+          td=$("<td>");
           for (var s=0;s<slice.length;s++) {
             var doc=slice[s].value.doc;
             var a=$("<a>");
@@ -271,7 +271,7 @@ $(document).ready(function() {
           }
           tr.append(td);
           for (var c=0, column; column=columns[c]; c++) {
-            var td=$("<td>");
+            td=$("<td>");
             for (var s=0;s<slice.length;s++) {
               var value=slice[s].value.doc;
               for (var p=0; value && p!==column.path.length; p++)
