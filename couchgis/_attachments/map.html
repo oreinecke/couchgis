@@ -525,8 +525,8 @@ $(document).ready(function() {
     // non-containing) filter is found, this one and every filter following it
     // need to be re-evaluated.
     while ( position<filters.length && function(filter) {
-      recent.time = filter.time || recent.time;
-      recent.types = filter.types || recent.types;
+      if ('time' in filter) recent.time=filter.time;
+      if ('types' in filter) recent.types=filter.types;
       // In this part we determine for each filter type if it
       // a) is more restrictive than an already applied filter, and
       // b) happens to be identical to said filter.
@@ -651,8 +651,8 @@ $(document).ready(function() {
       if (new_filter.spatial===false) continue;
       if ('spatial' in filter) commands.push(filter);
     }
-    recent.time = options.time || recent.time;
-    recent.types = options.types || recent.types;
+    if ('time' in options) recent.time=options.time;
+    if ('types' in options) recent.types=options.types;
     // Remove options.cuts array if empty.
     if (!options.cuts.length) delete options.cuts;
     // Remove filter from options if an identical one has already been applied.
