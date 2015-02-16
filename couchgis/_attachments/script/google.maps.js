@@ -110,6 +110,8 @@ if (Maps.offline) {
   // entire planet and does nothing else.
   Maps.Map=function() {
     this.setCenter=nothing;
+    this.panTo=nothing;
+    this.addListener=nothing;
     this.getBounds=function() {
       return {
         getNorthEast:function() {
