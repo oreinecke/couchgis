@@ -21,6 +21,9 @@ function toRange(range) {
   };
 }
 
+var Ranges={};
+module.exports=Ranges;
+
 // Convert list of ranges to ranges object.
 
 function toRanges(ranges) {
@@ -39,12 +42,12 @@ function toRanges(ranges) {
     }
   });
 }
-exports.toRanges=toRanges;
+Ranges.toRanges=toRanges;
 
 // Convert range to string. If no day is given,
 // MM/YYYY is returned, DD.MM.YYYY otherwise.
 
-exports.toString=function(ranges) {
+Ranges.toString=function(ranges) {
   for (var r=0;r<ranges.length;r++) {
     var begin=ranges[r].begin.reverse();
     var end=ranges[r].end.reverse();
@@ -58,7 +61,7 @@ exports.toString=function(ranges) {
 
 // Returns true if ranges a contain ranges b.
 
-exports.contains=function(a, b) {
+Ranges.contains=function(a, b) {
   a=toRanges(a);
   b=toRanges(b);
   function greater(a, b) {
@@ -90,7 +93,7 @@ exports.contains=function(a, b) {
 
 // Returns true if ranges a overlap with ranges b.
 
-exports.intersects=function(a, b) {
+Ranges.intersects=function(a, b) {
   a=toRanges(a);
   b=toRanges(b);
   function greater(l,r) {
