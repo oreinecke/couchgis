@@ -14,11 +14,8 @@ function(head, req) {
   }
   var time_matches=pass;
   if ('time' in options) {
-    var ranges=require('views/lib/ranges');
-    var time=ranges.toRanges(options.time);
-    time_matches=function(doc_time) {
-      return ranges.intersects(time, doc_time);
-    };
+    var time=require('views/lib/ranges')(options.time);
+    time_matches=time.intersects.bind(time);
   }
   var defines_field=pass;
   var matches_value=pass;
