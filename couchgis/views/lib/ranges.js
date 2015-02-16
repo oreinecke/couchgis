@@ -24,23 +24,29 @@ function toRange(range) {
 // Ranges object generator.
 
 function Ranges(time) {
-  if (!time) return [toRange()];
-  if (typeof(time)==="object") return time.slice();
-  var result=String(time).split(/\s*[,;&]\s*/);
+  var result;
+  if (!time)
+    result=[toRange()];
+  else if (typeof(time)==="object")
+    result=time.slice();
+  else {
+    result=String(time).split(/\s*[,;&]\s*/);
+    for (var r=0;r<result.length;r++)
+      result[r]=toRange(result[r]);
+    result.sort(function(l,r) {
+      l=l.begin; r=r.begin;
+      for (var d=0;d<3;d++) {
+        if (d===l.length && d===r.length) break;
+        if (d===l.length || d===r.length)
+          return (d===r.length) - (d===l.length);
+        if (l[d]!==r[d]) return l[d]-r[d];
+      }
+    });
+  }
   result.toString=toString;
   result.contains=contains;
   result.intersects=intersects;
-  for (var r=0;r<result.length;r++)
-    result[r]=toRange(result[r]);
-  return result.sort(function(l,r) {
-    l=l.begin; r=r.begin;
-    for (var d=0;d<3;d++) {
-      if (d===l.length && d===r.length) break;
-      if (d===l.length || d===r.length)
-        return (d===r.length) - (d===l.length);
-      if (l[d]!==r[d]) return l[d]-r[d];
-    }
-  });
+  return result;
 };
 module.exports=Ranges;
 
