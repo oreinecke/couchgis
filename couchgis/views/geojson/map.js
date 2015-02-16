@@ -25,7 +25,6 @@ function(doc) {
       error=simplified_GeoJSON.error;
     }
   }
-  var ranges=require('views/lib/ranges');
   if (!doc.type) return;
   var ids=doc["GeoJSON" in doc?"_id":"GeoJSON_clone"];
   if (!ids) return;
@@ -34,7 +33,7 @@ function(doc) {
     _rev:doc._rev,
     type:doc.type,
     time:doc.time,
-    ranges:ranges.toRanges(doc.time),
+    ranges:require('views/lib/ranges')(doc.time),
     info:doc.info && '_show/edit/'+doc.info,
     GeoJSON_clone:doc.GeoJSON_clone
   }};
