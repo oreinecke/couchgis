@@ -131,7 +131,7 @@ $(document).ready(function() {
       // We might as well do the closure here, because this
       // is used only for event handler registration anyway.
       return function() {
-        if (call.now!==null) call.next=what;
+        if (call.now) call.next=what;
         else (call.now=what)();
       }
     },
@@ -139,7 +139,7 @@ $(document).ready(function() {
       window.setTimeout(function() {
         call.now=call.next;
         call.next=null;
-        if (call.now!==null) call.now();
+        if (call.now) call.now();
       }, 500);
     },
     no_one:function() {
