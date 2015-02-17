@@ -553,12 +553,12 @@ $(document).ready(function() {
       case "spatial":
         return new_filter.spatial;
       case "time":
-        var contains = ranges(filter.time).contains(new_filter.time);
+        var contains=ranges(filter.time).contains(new_filter.time);
         if (contains)
           new_filter.remove_me = ranges(new_filter.time).contains(filter.time);
         return contains;
       case "types":
-        var contains=(new_filter.types.length<=filter.types.length);
+        var contains = new_filter.types.length<=filter.types.length;
         for (var t=0; contains && t<new_filter.types.length; t++)
           contains &= (filter.types.indexOf(new_filter.types[t])!==-1);
         if (contains)
