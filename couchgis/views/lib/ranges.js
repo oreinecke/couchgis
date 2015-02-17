@@ -4,8 +4,8 @@ function toDate(date) {
   date=date.match(/\d+/g);
   if (!date) return [];
   if (date[0].length!==4) date.reverse();
-  for (var d=0;d<date.length;d++)
-    date[d]=parseInt(date[d].replace(/^0/g, ""));
+  for (var d=0;d!==date.length;d++)
+    date[d]=+date[d];
   return date;
 }
 
@@ -13,7 +13,6 @@ function toDate(date) {
 
 function toRange(range) {
   if (!range) return { begin:[], end:[] };
-  if (typeof(range)==="object") return range;
   range=range.split('-');
   return {
     begin:toDate(range[0]),
@@ -47,7 +46,7 @@ function Ranges(time) {
   result.contains=contains;
   result.intersects=intersects;
   return result;
-};
+}
 module.exports=Ranges;
 
 // Convert range to string. If no day is given,
@@ -64,26 +63,6 @@ function toString() {
   }
   return this.join(', ');
 }
-
-// Returns true if Ranges overlap with b.
-
-function intersects(b) {
-  var a=this.slice();
-  b=Ranges(b);
-  function greater(l,r) {
-    for (var d=0;d<3;d++) {
-      if (d===l.length || d===r.length) break;
-      if (l[d]>r[d]) return true;
-      if (l[d]<r[d]) break;
-    }
-  }
-  var a0=a.shift();
-  var b0=b.shift();
-  while (a0 && b0)
-    if (greater(a0.begin, b0.end)) b0=b.shift();
-    else if (greater(b0.begin, a0.end)) a0=a.shift();
-    else return true;
-};
 
 // Returns true if Ranges contain b.
 
@@ -115,4 +94,24 @@ function contains(b) {
       return false;
   }
   return true;
-};
+}
+
+// Returns true if Ranges overlap with b.
+
+function intersects(b) {
+  var a=this.slice();
+  b=Ranges(b);
+  function greater(l,r) {
+    for (var d=0;d<3;d++) {
+      if (d===l.length || d===r.length) break;
+      if (l[d]>r[d]) return true;
+      if (l[d]<r[d]) break;
+    }
+  }
+  var a0=a.shift();
+  var b0=b.shift();
+  while (a0 && b0)
+    if (greater(a0.begin, b0.end)) b0=b.shift();
+    else if (greater(b0.begin, a0.end)) a0=a.shift();
+    else return true;
+}
