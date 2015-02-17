@@ -10,48 +10,44 @@
 <script>
 $(document).ready(function() {
 
-  var log={
-    success: function(resp) {
-      var name=resp.userCtx.name;
-      if (name!==null || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")!==-1) {
-        $("#logout").show();
-        // link to futon user doc
-        if (name)
-          $("#logout a").html(name)
-                        .prop('href',"/_utils/document.html?_users/org.couchdb.user:"+name);
-        else {
-          // expect admin party if name==null
-          $("#logout span").show();
-          $("#logout a").hide();
-          $("#logout :submit").hide();
-        }
-        $("#login").hide();
-        $("#login b").hide();
-      } else {
-        $("#login").show();
-        $("#logout").hide();
+  function success(resp) {
+    var name=resp.userCtx.name;
+    if (name || resp.userCtx.roles && resp.userCtx.roles.indexOf("_admin")!==-1) {
+      $("#logout").show();
+      if (name)
+        $("#logout a").text(name)
+                      .prop('href',"/_utils/document.html?_users/org.couchdb.user:"+name)
+      else {
+        // assume admin party
+        $("#logout span").show();
+        $("#logout a").hide();
+        $("#logout :submit").hide();
       }
+      $("#login").hide();
+      $("#login b").hide();
+    } else {
+      $("#login").show();
+      $("#logout").hide();
     }
-  };
-  $.couch.session(log);
+  }
+  $.couch.session({success:success});
   $("#login").submit(function(e) {
     e.preventDefault();
-    var login={
+    $.couch.login({
       name:     $("#login :text").val(),
       password: $("#login :password").val(),
       success:function() {
-        log.success({userCtx:{name:this.name}});
+        success({userCtx:{name:this.name}});
       },
       error:function() {
         $("#login b").show();
       }
-    };
-    $.couch.login(login);
+    });
   });
   $("#logout").submit(function(e) {
     e.preventDefault();
     $.couch.logout();
-    log.success({userCtx:{name:null}});
+    success({userCtx:{name:null}});
   });
 
 });
