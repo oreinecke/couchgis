@@ -314,12 +314,14 @@ $(document).ready(function() {
     for (var id in items) {
       var item=items[id];
       if (item.shape!==this) continue;
+      if (item.do_not_move_me) return;
       // IE-10.0 loses this <a>'s focus because the map was clicked
       // once before. It works just fine if we delay it by 1ms.
       window.setTimeout(function() {
         $("#table tbody").prepend(item.tr);
         item.tr.find('a:first').focus();
       }, 1);
+      item.do_not_move_me=true;
       return;
     }
   };
