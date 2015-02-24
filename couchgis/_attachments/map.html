@@ -1380,12 +1380,14 @@ $(document).ready(function() {
   </div>
   <form id="filter"> Filter:
     <span class="types"></span><br>
-    <label>von: <input type="text" size=8 name="time" title="Zeit"></label>
-    <label>enthält: <input type="text" size=24 name="content" title="Stichwort/Suchbegriff"></label>
+    <label title="Zeitraum eingeben und Enter drücken">
+      von: <input type="text" size=8 name="time"></label>
+    <label title="Stichwort/Suchbegriff eingeben und Enter drücken">
+      enthält: <input type="text" size=24 name="content"></label>
     <label>als: <select name="field">
-      <option value="_keyword">Text</option>
+      <option value="_keyword" title="ganzen Datensatz durchsuchen">Text</option>
       <option value="_expression">Funktion</option>
-      <optgroup name="fields" label="Felder"></optgroup>
+      <optgroup name="fields" label="Felder" title="Inhalt im ausgewählten Feld suchen"></optgroup>
     </select></label>
     <ol id="cuts">
       <!-- filter cycles through these when busy -->
@@ -1408,25 +1410,32 @@ $(document).ready(function() {
         <input type="button" value="x" title="löschen"> <b>erfüllt</b> </li>
       <!-- always show selected docs -->
       <li style="display:none" id="selection"> | Auswahl
-        <input type="button" name="new" value="neu">
-        <input type="button" name="keep" value="merken"><li>
+        <input type="button" name="new" value="neu"
+          title="alle Filter löschen">
+        <input type="button" name="keep" value="merken"
+          title="Hinterlegt die aktuelle Auswahl und eröffnet&#13;eine zweite, die weiter bearbeitet werden kann.">
+      <li>
       <!-- union with stored selection -->
       <li style="display:none" id="union">
-        <input type="button" value="x" title="löschen" id="discard-selection">
+        <input type="button" value="x" id="discard-selection"
+          title="hinterlegte Auswahl löschen">
         <b>Auswahl:</b> <span></span><br>
-        <input type="button" value="umgibt" name="contains">
-        <input type="button" value="schneidet" name="intersects">
-        <input type="button" value="innerhalb" name="within">
+        <input type="button" value="umgibt" name="contains"
+          title="Datensätze der unteren Auswahl werden angezeigt,&#13;wenn sie sich innerhalb der oberen Auswahl befinden.">
+        <input type="button" value="schneidet" name="intersects"
+          title="Zeigt nur Datensätze der unteren Auswahl an,&#13;die sich mit der oberen Auswahl überschneiden.">
+        <input type="button" value="innerhalb" name="within"
+          title="Es werden nur Datensätze der unteren Auswahl&#13;angezeigt, die die obere Auswahl einschließen.">
       </li>
       <!-- stored selection related to active selection -->
       <li style="display:none" id="spatial-contains">
-        <input type="button" value="x" title="löschen">
+        <input type="button" value="x" title="räumlichen Filter aufheben">
         <span></span> <b>umgibt:</b> </li>
       <li style="display:none" id="spatial-intersects">
-        <input type="button" value="x" title="löschen">
+        <input type="button" value="x" title="räumlichen Filter aufheben">
         <span></span> <b>überschneidet sich mit:</b> </li>
       <li style="display:none" id="spatial-within">
-        <input type="button" value="x" title="löschen">
+        <input type="button" value="x" title="räumlichen Filter aufheben">
         <span></span> <b>befindet sich innerhalb:</b> </li>
     </ol>
   </form>
@@ -1451,16 +1460,20 @@ $(document).ready(function() {
   </table>
   <form id="export"> Auswahl
     <label>als <input type="text" value="export" name="filename"></label>
-    <label><input type="radio" name="filetype" value="geojson" checked>.geojson</label>
-    <label><input type="radio" name="filetype" value="xml">.xml-Tabelle</label>
-    <label><input type="radio" name="filetype" value="couchdb">CouchDB</label>
+    <label title="dient zur Anzeige von Kartendaten in QGIS/ArcGIS">
+      <input type="radio" name="filetype" value="geojson" checked>.geojson</label>
+    <label title="Tabellenformat für Microsoft Excel oder LibreOffice Calc">
+      <input type="radio" name="filetype" value="xml">.xml-Tabelle</label>
+    <label title="kopiert die Auswahl in eine neue Datenbank oder&#13;gleicht eine bestehende mit der Auswahl ab">
+      <input type="radio" name="filetype" value="couchdb">CouchDB</label>
     <span class="nowrap">
       <input type="button" value="speichern" name="download">
       <input type="button" value="URL erzeugen" name="get-url"></span>
     <input type="text" name="url" style="display:none">
     <span name="columns" class="nowrap">
       <label><input type="radio" name="select-fields" checked>alle</label>
-      <label><input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</label></span>
+      <label title="nur die Spalten exportieren, die in&#13;der oberen Tabelle ausgewählt wurden">
+        <input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</label></span>
     <span name="columns" class="nowrap">
       <label><input type="checkbox" name="include-revision" checked>_id, _rev</label>
       <label><input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</label></span>
