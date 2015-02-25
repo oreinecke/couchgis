@@ -964,10 +964,10 @@ $(document).ready(function() {
     $("#cuts").append(li);
   });
 
-  // Show or Hide #keep-selection.
+  // Show or Hide #selection.
   $("#cuts").click( function() {
     var ol=$(this);
-    var li=$("#keep-selection");
+    var li=$("#selection");
     if (ol.find(".filter-item:visible").length)
       ol.append(li.show());
     else li.hide();
@@ -981,12 +981,12 @@ $(document).ready(function() {
   // Add filtered document to #union filter item and copy the filter list into
   // it; this serves neatly as a description of with which documents the union
   // is constructed.
-  $("#keep-selection :button").click( function() {
+  $("#selection [name=keep]").click( function() {
     var union=$("#union");
     var span=union.find("span");
     if (union.css('display')!=='none')
       span.append(' <b>&cup;</b> ');
-    $("#cuts > [id!=keep-selection][id!=union]:visible").each( function() {
+    $("#cuts > [id!=selection][id!=union]:visible").each( function() {
       var li=$("<li>").html($(this).html());
       li.find(":button").remove();
       span.append(li.html());
@@ -1400,8 +1400,7 @@ $(document).ready(function() {
       <li style="display:none" class="filter-item" id="expression">
         <input type="button" value="x" title="löschen"> <b>erfüllt</b> </li>
       <!-- always show selected docs -->
-      <li style="display:none" id="keep-selection">
-        <input type="button" value="Auswahl merken"></li>
+        <input type="button" name="keep" value="Auswahl merken"></li>
       <!-- union with stored selection -->
       <li style="display:none" id="union">
         <input type="button" value="x" title="löschen" id="discard-selection">
