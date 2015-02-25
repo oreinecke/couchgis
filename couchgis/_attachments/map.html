@@ -996,6 +996,14 @@ $(document).ready(function() {
     filter_documents( {union:filters[filters.length-1].documents}, {spatial:false} );
   });
 
+  // Reset filter list.
+  $("#selection [name=new]").click( function() {
+    var li=$("#cuts > :visible");
+    li.filter("[id^=spatial]").find(":button").click();
+    li=li.filter(".filter-item").find(":button");
+    Array.prototype.reverse.apply(li).click();
+  });
+
   // Discard stored selection and hide #union filter item.
   $("#discard-selection").click( function() {
     // also clear selection summary
@@ -1400,7 +1408,9 @@ $(document).ready(function() {
       <li style="display:none" class="filter-item" id="expression">
         <input type="button" value="x" title="löschen"> <b>erfüllt</b> </li>
       <!-- always show selected docs -->
-        <input type="button" name="keep" value="Auswahl merken"></li>
+      <li style="display:none" id="selection"> | Auswahl
+        <input type="button" name="new" value="neu">
+        <input type="button" name="keep" value="merken"><li>
       <!-- union with stored selection -->
       <li style="display:none" id="union">
         <input type="button" value="x" title="löschen" id="discard-selection">
