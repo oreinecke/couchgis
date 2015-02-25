@@ -1381,7 +1381,7 @@ $(document).ready(function() {
       <optgroup name="fields" label="Felder"></optgroup>
     </select></label>
     <ol id="cuts">
-      <!-- cycle through these if filter is busy -->
+      <!-- filter cycles through these when busy -->
       <li style="display:none" class="in-progress">[-]</li>
       <li style="display:none" class="in-progress">[\]</li>
       <li style="display:none" class="in-progress">[|]</li>
@@ -1441,8 +1441,7 @@ $(document).ready(function() {
     </tr></thead>
     <tbody></tbody>
   </table>
-  <form id="export">
-    Auswahl
+  <form id="export"> Auswahl
     <label>als <input type="text" value="export" name="filename"></label>
     <label><input type="radio" name="filetype" value="geojson" checked>.geojson</label>
     <label><input type="radio" name="filetype" value="xml">.xml-Tabelle</label>
