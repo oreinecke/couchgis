@@ -114,10 +114,9 @@ $(document).ready(function() {
     } else $.ajax("_list/"+list+"?options="+options+"&keys="+keys, params);
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
-  list.parts=window.location.pathname.split('/');
-  list.db=list.parts[1];
-  list.app=list.parts[2]+'/'+list.parts[3];
-  delete list.parts;
+  var parts=window.location.pathname.split('/');
+  list.db=parts[1];
+  list.app=parts[2]+'/'+parts[3];
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
