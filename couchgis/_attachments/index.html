@@ -9,6 +9,11 @@
 <script>
 $(document).ready(function() {
 
+  var parts=window.location.pathname.split('/');
+  var db=parts[1];
+  var id=parts[2]+'/'+parts[3];
+  var page=parts[4];
+
   $.getJSON("./", function(doc) {
     var pages=$("#pages");
     // list top level html pages
@@ -17,7 +22,7 @@ $(document).ready(function() {
         pages.append('<li><a href="'+a+'">'+a+"</a>");
   });
   // point href to futon database view
-  $("#futon-db-link").prop('href', "/_utils/database.html?"+window.location.pathname.split('/')[1]);
+  $("#futon-db-link").prop('href', "/_utils/database.html?"+db);
 
 });
 </script>
