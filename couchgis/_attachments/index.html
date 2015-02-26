@@ -25,8 +25,57 @@ $(document).ready(function() {
   // point href to futon database view
   $("#futon-db-link").prop('href', "/_utils/database.html?"+db);
 
+  // get list of design documents
+  $.getJSON("../../_all_docs", {
+    start_key:'"_design/"',
+    end_key:'"_design0"'
+  }, function(data) {
+    var rows=data.rows, row;
+    var apps=[], app, current;
+    while ( row=rows.pop() ) {
+      app=row.id.match(/_design\/couchgis-(v([0-9]+)\.([0-9]+)\.([0-9]+)(.*))/);
+      if (!app) continue;
+      apps.push( app={
+        id:row.id,
+        version:app[1],
+        major:+app[2],
+        minor:+app[3],
+        patch:+app[4],
+        tag:app[5]
+      } );
+      if (row.id===id) current=app;
+    }
+    // sort by semantic version precedence
+    apps.sort( function(a,b) {
+      if (a.major!==b.major) return a.major>b.major;
+      if (a.minor!==b.minor) return a.minor>b.minor;
+      if (a.patch!==b.patch) return a.patch>b.patch;
+      return !a.tag && b.tag;
+    } ).reverse();
+    var newer=false;
+    while ( app=apps.pop() ) {
+      var a=$("#apps a").filter( function() {
+        if (app.major!==current.major || app.minor<current.minor)
+          return ".incompatible";
+        else if (app===current) {
+          newer=true;
+          return ".current";
+        } else return newer ? ".newer" : ".older";
+      }() ).filter(":first").clone().text(app.version);
+      if (app!==current)
+        a.attr("href", "../../"+app.id+"/"+page);
+      $("#apps").append(a, ' ');
+    }
+  })
+
 });
 </script>
+
+<style>
+#apps a.incompatible { color:red }
+#apps a.newer { color:green; font-weight:bold }
+#apps a.older { color:grey }
+</style>
 
   </head>
   <body>
@@ -35,6 +84,12 @@ $(document).ready(function() {
 
   <h1> Übersicht </h1>
   <ul id="pages"></ul>
+  Couch-GIS <span id="apps">
+    <a class="incompatible" title="Datensätze sind mit dieser Version&#13;möglicherweise nicht kompatibel."></a>
+    <a class="older" title="ältere Version"></a>
+    <a class="current"></a>
+    <a class="newer" title="neuere Version"></a>
+  </span><br>
   Couch-GIS bei <a target="_blank" href="https://github.com/oreinecke/couchgis">GitHub</a><br>
   Datenbank im <a href="/_utils/" id="futon-db-link">Futon</a> anschauen
   </body>
