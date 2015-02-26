@@ -19,8 +19,9 @@ $(document).ready(function() {
     // list top level html pages
     for (var a in doc._attachments)
       if (/^[^/]+\.html$/i.test(a))
-        pages.append('<li><a href="'+a+'">'+a+"</a>");
+        pages.append('<li><a href="'+a+'">'+a+'</a></li>');
   });
+
   // point href to futon database view
   $("#futon-db-link").prop('href', "/_utils/database.html?"+db);
 
