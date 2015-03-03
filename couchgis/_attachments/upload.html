@@ -165,23 +165,23 @@ $(document).ready(function() {
         while (tables.length) {
           var rows=tables.shift().xml;
           // insert empty xml if ss:Index is set
-          function normalize(xml) {
-            for (var i=0;i<xml.length;i++)
-              while ( i+1 < (xml[i]['ss:Index'] || 0) )
-                xml.splice(i++, 0, {xml:[]});
-            return xml;
+          function normalize(cells) {
+            for (var c=0;c<cells.length;c++)
+              while ( c+1 < (cells[c]['ss:Index'] || 0) )
+                cells.splice(c++, 0, {xml:[]});
+            return cells;
           }
           var columns=normalize(rows.shift().xml);
           while (rows.length) {
-            var row=rows.shift().xml;
+            var cells=rows.shift().xml;
             // LibreOffice sometimes adds a lot of empty rows to
             // the end of the file. We can safely ignore those.
-            if (row.length===1 && !row[0].xml.length) continue;
-            row=normalize(row);
+            if (cells.length===1 && !cells[0].xml.length) continue;
+            format(cells);
             var properties={};
-            for (var c=0;c<row.length;c++) {
+            for (var c=0;c<cells.length;c++) {
               if (!columns[c].xml.length) continue;
-              var data=row[c].xml[0] || {xml:""};
+              var data=cells[c].xml[0] || {xml:""};
               if (data['ss:Type']==="String") data.xml=data.xml.replace(/&amp;/g,'&')
                                                                .replace(/&#(13;&#10|10|13);/g,'\n')
                                                                .replace(/&lt;/g,'<')
