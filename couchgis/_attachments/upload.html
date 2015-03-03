@@ -164,11 +164,29 @@ $(document).ready(function() {
         if (!tables.length) throw SyntaxError("XML.parse: Missing <Table>");
         while (tables.length) {
           var rows=tables.shift().xml;
-          // insert empty xml if ss:Index is set
           function format(cells) {
+            // Insert empty <Cell/>s to match
+            // index with ss:Index attribute.
             for (var c=0;c<cells.length;c++)
               while ( c+1 < cells[c]['ss:Index'] )
                 cells.splice(c++, 0, {xml:[]});
+            // Insert blank <Data/> into empty <Cell/>s, or
+            // format data.xml according to ss:Type attribute.
+            for (var c=0, cell; cell=cells[c]; c++) {
+              var data=cell.xml[0];
+              if (data) data.xml=function(xml, type) {
+                if (type==="Number") return +xml;
+                if (type==="Boolean") return xml==="1";
+                if (type==="DateTime")
+                  return xml.replace(/-/g,'/').replace(/T.*/,'');
+                if (type=== "String")
+                  return xml.replace(/&amp;/g,'&')
+                            .replace(/&#(13;&#10|10|13);/g,'\n')
+                            .replace(/&lt;/g,'<')
+                            .replace(/&gt;/g,'>');
+              }(data.xml, data['ss:Type']);
+              else cell.xml[0]={xml:""};
+            }
             return cells;
           }
           var columns=format(rows.shift().xml);
@@ -179,19 +197,9 @@ $(document).ready(function() {
             if (cells.length===1 && !cells[0].xml.length) continue;
             format(cells);
             var properties={};
-            for (var c=0;c<cells.length;c++) {
-              if (!columns[c].xml.length) continue;
-              var data=cells[c].xml[0] || {xml:""};
-              if (data['ss:Type']==="String") data.xml=data.xml.replace(/&amp;/g,'&')
-                                                               .replace(/&#(13;&#10|10|13);/g,'\n')
-                                                               .replace(/&lt;/g,'<')
-                                                               .replace(/&gt;/g,'>');
-              if (data['ss:Type']==="Number") data.xml=parseFloat(data.xml);
-              if (data['ss:Type']==="Boolean") data.xml=(data.xml==="1");
-              if (data['ss:Type']==="DateTime") data.xml=data.xml.replace(/-/g,'/')
-                                                                 .replace(/T.*/,'');
-              properties[columns[c].xml[0].xml]=data.xml;
-            }
+            for (var c=0;c<cells.length;c++)
+              if (columns[c].xml.length)
+                properties[columns[c].xml[0].xml] = cells[c].xml[0].xml;
             features.push({properties:properties});
           }
         }
