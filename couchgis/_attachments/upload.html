@@ -167,7 +167,7 @@ $(document).ready(function() {
           // insert empty xml if ss:Index is set
           function normalize(cells) {
             for (var c=0;c<cells.length;c++)
-              while ( c+1 < (cells[c]['ss:Index'] || 0) )
+              while ( c+1 < cells[c]['ss:Index'] )
                 cells.splice(c++, 0, {xml:[]});
             return cells;
           }
