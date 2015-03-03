@@ -165,13 +165,13 @@ $(document).ready(function() {
         while (tables.length) {
           var rows=tables.shift().xml;
           // insert empty xml if ss:Index is set
-          function normalize(cells) {
+          function format(cells) {
             for (var c=0;c<cells.length;c++)
               while ( c+1 < cells[c]['ss:Index'] )
                 cells.splice(c++, 0, {xml:[]});
             return cells;
           }
-          var columns=normalize(rows.shift().xml);
+          var columns=format(rows.shift().xml);
           while (rows.length) {
             var cells=rows.shift().xml;
             // LibreOffice sometimes adds a lot of empty rows to
