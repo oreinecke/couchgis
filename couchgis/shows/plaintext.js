@@ -1,9 +1,15 @@
-// Render document as indented plaintext
-// without geometry and revision.
+// Render document as indented plaintext; omit
+// geometry and revisions, format _attachments.
 
 function(doc, req) {
   delete doc.GeoJSON;
   delete doc._revisions;
+  for (filename in doc._attachments) {
+    var a=doc._attachments[filename];
+    for ( var B=["GB", "MB", "KB", "B"]; a.length>=1024; B.pop() )
+      a.length/=1024;
+    doc._attachments[filename]=a.length.toFixed(1)+B.pop()+" ("+a.content_type+")";
+  }
   return {
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:function stringify(obj, spaces, lines) {
