@@ -11,7 +11,7 @@ function(doc, req) {
         if (obj[prop] && typeof obj[prop]==="object") {
           lines.push(spaces+prop+':');
           stringify(obj[prop], spaces+'  ', lines);
-        } else lines.push(spaces+prop+': '+obj[prop]);
+        } else lines.push(spaces+prop+':\t'+obj[prop]);
       return lines;
     }(doc, "", []).join('\n')
   };
