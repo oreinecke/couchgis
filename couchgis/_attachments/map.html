@@ -1351,6 +1351,12 @@ $(document).ready(function() {
   }
   #table a:focus {font-weight:bold}
   #table a {display:inline-block}
+  #table a.info {
+    font-style:italic;
+    font-weight:bold;
+    font-family:serif;
+    text-decoration:none
+  }
   #table td.geometry:hover,
   #table th.field:hover,
   #table th.title:hover,
@@ -1448,7 +1454,7 @@ $(document).ready(function() {
       <th class="title-time">
         Beschreibung
         <!-- optional link to source documents -->
-        <a target="_blank" style="text-decoration:none;font-weight:normal;display:none">&#8520;</a>
+        <a target="_blank" class="info" style="display:none">i</a>
       </th>
       <th><select name="field">
         <!-- unselect any column on page load -->
