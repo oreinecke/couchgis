@@ -11,5 +11,9 @@ function(doc) {
   utils.toWGS84(GeoJSON);
   utils.bbox(GeoJSON);
   utils.size(GeoJSON);
-  emit(GeoJSON.size, {bbox:GeoJSON.bbox, ranges:ranges});
+  emit(GeoJSON.size, {
+    deleted: !doc.type || undefined,
+    bbox:GeoJSON.bbox,
+    ranges:ranges
+  });
 }
