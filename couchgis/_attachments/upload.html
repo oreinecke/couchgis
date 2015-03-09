@@ -237,14 +237,12 @@ $(document).ready(function() {
     }
     $.getJSON('_view/geojson-other-doc?keys='+JSON.stringify(doc_ids), function(data) {
       var doc_ids=[], rows=data.rows, row;
-      for (var r=0; row=rows[r]; r++)
-        // Splice rows that reference the document itself.
-        if (false) rows.splice(r--, 1);
+      for (var r=0; row=rows[r]; r++) {
         // Fetch missing documents.
-        else if (!uploaded_docs[row.id]) {
-          uploaded_docs[row.id]=true;
-          doc_ids.push(row.id);
-        }
+        if (row.id in uploaded_docs) continue;
+        uploaded_docs[row.id]=true;
+        doc_ids.push(row.id);
+      }
       // Nothing to be done of no other documents are involved.
       if (rows.length) $.getJSON('/'+db+"/_all_docs", {
         keys:JSON.stringify(doc_ids), include_docs:true
