@@ -1229,9 +1229,11 @@ $(document).ready(function() {
     })[$(this).prop('name')];
     keys=JSON.stringify(keys);
     // Employ index compression if the URL is too large.
-    if (keys.length>8192) $.getJSON("_view/geojson-doc", function(data) {
+    if (keys.length>8192) {
       // get document order identical to _view/geojson
-      var rows=data.rows;
+      var rows=filters[0].documents.slice().sort();
+      for (var k=0;k<rows.length;k++)
+        rows[k]={key:rows[k][0], id:rows[k][1]};
       for (var k=0;k<rows.length;k++)
         rows[ [rows[k].key,rows[k].id] ] = k;
       var list=[];
@@ -1248,7 +1250,7 @@ $(document).ready(function() {
       url+="&end_key="+JSON.stringify([end_row.key, end_row.id]);
       for (var i=0;i<list.length;i++) list[i]-=offset;
       translate_url(url+"&compressed_keys="+indexes.compress(list));
-    }); else
+    } else
     // Otherwise provide a permant link.
       translate_url(url+"&keys="+keys);
   });
