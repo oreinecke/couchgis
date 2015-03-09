@@ -1234,19 +1234,19 @@ $(document).ready(function() {
       var rows=filters[0].documents.slice().sort();
       for (var d=0;d<documents.length;d++)
         rows[ documents[d] ]=true;
-      var list=[];
+      keys=[];
       for (var k=0;k<rows.length;k++)
-        if (rows[ rows[k] ]) list.push(k);
+        if (rows[ rows[k] ]) keys.push(k);
       // Compute start_key and end_key to reduce amount of rows that
       // are JSON.parse'ed and then just skipped by _list/export.
-      indexes.sort(list);
-      var offset=list[0];
+      indexes.sort(keys);
+      var offset=keys[0];
       while (offset && rows[offset][0]===rows[offset-1][0])
         offset--;
       url+="&start_key="+JSON.stringify([rows[offset][0], 0]);
-      url+="&end_key="+JSON.stringify(rows[list[list.length-1]]);
-      for (var i=0;i<list.length;i++) list[i]-=offset;
-      translate_url(url+"&compressed_keys="+indexes.compress(list));
+      url+="&end_key="+JSON.stringify(rows[keys[keys.length-1]]);
+      for (var i=0;i<keys.length;i++) keys[i]-=offset;
+      translate_url(url+"&compressed_keys="+indexes.compress(keys));
     } else
     // Otherwise provide a permant link.
       translate_url(url+"&keys="+keys);
