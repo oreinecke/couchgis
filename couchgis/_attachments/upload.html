@@ -235,11 +235,11 @@ $(document).ready(function() {
       }
       doc_ids.push(relayed._id);
     }
-    $.getJSON('_view/geojson-doc?keys='+JSON.stringify(doc_ids), function(data) {
+    $.getJSON('_view/geojson-other-doc?keys='+JSON.stringify(doc_ids), function(data) {
       var doc_ids=[], rows=data.rows, row;
       for (var r=0; row=rows[r]; r++)
         // Splice rows that reference the document itself.
-        if (row.key===row.id) rows.splice(r--, 1);
+        if (false) rows.splice(r--, 1);
         // Fetch missing documents.
         else if (!uploaded_docs[row.id]) {
           uploaded_docs[row.id]=true;
