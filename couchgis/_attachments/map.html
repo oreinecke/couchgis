@@ -1232,11 +1232,11 @@ $(document).ready(function() {
     if (keys.length>8192) {
       // get document order identical to _view/geojson
       var rows=filters[0].documents.slice().sort();
-      for (var k=0;k<rows.length;k++)
-        rows[ rows[k] ] = k;
-      var list=[];
       for (var d=0;d<documents.length;d++)
-        list.push(rows[ documents[d] ]);
+        rows[ documents[d] ]=true;
+      var list=[];
+      for (var k=0;k<rows.length;k++)
+        if (rows[ rows[k] ]) list.push(k);
       // Compute start_key and end_key to reduce amount of rows that
       // are JSON.parse'ed and then just skipped by _list/export.
       indexes.sort(list);
