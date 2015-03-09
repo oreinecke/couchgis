@@ -64,7 +64,7 @@ $(document).ready(function() {
       optgroup.append($("<option>").text(data.rows.pop().key[0]));
   });
 
-  $.getJSON("_view/geojson-other-doc", function(data) {
+  $.getJSON("_view/geojson-doc", function(data) {
     var geojson_doc={};
     var rows=data.rows, row;
     while ( row=rows.pop() )
@@ -1286,7 +1286,7 @@ $(document).ready(function() {
       target:$("#export [name=filename]").val(),
       doc_ids:[list.app].concat(keys)
     };
-    $.post("_view/geojson-other-doc", JSON.stringify({keys:keys}), function(data) {
+    $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
       while (data.rows.length)
         replication.doc_ids.push(data.rows.pop().id);
       var complete=function(jqXHR, textStatus) {

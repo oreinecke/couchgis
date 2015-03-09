@@ -235,7 +235,7 @@ $(document).ready(function() {
       }
       doc_ids.push(relayed._id);
     }
-    $.getJSON('_view/geojson-other-doc?keys='+JSON.stringify(doc_ids), function(data) {
+    $.getJSON('_view/geojson-doc?keys='+JSON.stringify(doc_ids), function(data) {
       var doc_ids=[], rows=data.rows, row;
       for (var r=0; row=rows[r]; r++) {
         // Fetch missing documents.
