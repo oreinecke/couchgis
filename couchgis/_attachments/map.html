@@ -70,7 +70,7 @@ $(document).ready(function() {
     while ( row=rows.pop() )
       ( geojson_doc[row.key] || (geojson_doc[row.key]=[]) ).push([row.key, row.id]);
     // get list of GeoJSON keys, largest to smallest item
-    $.getJSON("_view/dimensions?reduce=false&start_key=0", function(data) {
+    $.getJSON("_view/size", function(data) {
       var rows=data.rows, row;
       var documents=filters[0].documents;
       while ( row=rows.pop() ) {
