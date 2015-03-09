@@ -287,7 +287,7 @@ $(document).ready(function() {
             }
             tr.append(td);
           }
-          var color=fillColors[slice[0].value.doc.type];
+          var color=fillColors[slice.pop().value.doc.type];
           if (item.shape.solid) {
             item.shape.setOptions({fillColor:color});
             item.strokeColor="black";
