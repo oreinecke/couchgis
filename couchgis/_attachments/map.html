@@ -64,7 +64,7 @@ $(document).ready(function() {
       optgroup.append($("<option>").text(data.rows.pop().key[0]));
   });
 
-  $.getJSON("_view/geojson-doc", function(data) {
+  $.getJSON("_view/geojson-other-doc", function(data) {
     var geojson_doc={};
     var rows=data.rows, row;
     while ( row=rows.pop() )
@@ -73,8 +73,10 @@ $(document).ready(function() {
     $.getJSON("_view/dimensions?reduce=false&start_key=0", function(data) {
       var rows=data.rows, row;
       var documents=filters[0].documents;
-      while ( row=rows.pop() )
+      while ( row=rows.pop() ) {
+        if (!row.value.deleted) documents.push([row.id, row.id]);
         Array.prototype.push.apply(documents, geojson_doc[row.id]);
+      }
       function finalize() {
         filter_documents(filter_documents.commands);
         map.addListener('bounds_changed', call.this_one_next(update_items));
