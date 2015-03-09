@@ -1282,12 +1282,12 @@ $(document).ready(function() {
 
   $("#export [name=replicate]").click( function() {
     $(this).prop('disabled', true);
+    var replication={
+      source:list.db, create_target:true,
+      target:$("#export [name=filename]").val(),
+      doc_ids:[list.app]
+    };
     $.post("_view/geojson-doc", JSON.stringify({keys:keys}), function(data) {
-      var replication={
-        source:list.db, create_target:true,
-        target:$("#export [name=filename]").val(),
-        doc_ids:[list.app]
-      };
       while (data.rows.length)
         replication.doc_ids.push(data.rows.pop().id);
       var complete=function(jqXHR, textStatus) {
