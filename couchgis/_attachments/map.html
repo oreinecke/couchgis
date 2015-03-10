@@ -77,6 +77,9 @@ $(document).ready(function() {
         if (!row.value.deleted) documents.push([row.id, row.id]);
         Array.prototype.push.apply(documents, geojson_doc[row.id]);
       }
+      documents=filters[0].documents.slice().sort();
+      for (var d=0;d<documents.length;d++)
+        documents[d].index=d;
       function finalize() {
         filter_documents(filter_documents.commands);
         map.addListener('bounds_changed', call.this_one_next(update_items));
