@@ -1,19 +1,13 @@
-// Emit size as key and bbox for reduce.
+// Emit bbox and time for unification.
 
 function(doc) {
-  var utils=require('views/lib/utils');
-  var ranges=require('views/lib/ranges')(doc.time);
-  if (doc.GeoJSON==null) {
-    emit(null, {ranges:ranges});
-    return;
+  var value={ ranges:require('views/lib/ranges')(doc.time) };
+  if (doc.GeoJSON) {
+    var utils=require('views/lib/utils');
+    var GeoJSON=utils.clone(doc.GeoJSON);
+    utils.toWGS84(GeoJSON);
+    utils.bbox(GeoJSON);
+    value.bbox=GeoJSON.bbox;
   }
-  var GeoJSON=utils.clone(doc.GeoJSON);
-  utils.toWGS84(GeoJSON);
-  utils.bbox(GeoJSON);
-  utils.size(GeoJSON);
-  emit(GeoJSON.size, {
-    deleted: !doc.type || undefined,
-    bbox:GeoJSON.bbox,
-    ranges:ranges
-  });
+  emit(null, value);
 }
