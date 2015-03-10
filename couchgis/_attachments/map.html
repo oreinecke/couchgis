@@ -1233,10 +1233,28 @@ $(document).ready(function() {
     keys=JSON.stringify(keys);
     // Employ index compression if the URL is too large.
     if (keys.length>8192) {
+      // Provide key range to reduce the amount rows to process.
+      var start_key={}, end_key={};
       keys=[];
       for (var d=0, doc; doc=documents[d]; d++) {
         keys.push(doc.index);
+        start_key = start_key.index<doc.index ? start_key : doc;
+        end_key = end_key.index>doc.index ? end_key : doc;
       }
+      documents=filters[0].documents;
+      var offset=start_key.index;
+      // Step forward and then backward to get the smallest
+      // index of all documents attached to the first geometry.
+      var d=documents.indexOf(start_key), c=d;
+      while (d-- && start_key[0]===documents[d][0])
+        if (documents[d].index<offset)
+          offset=documents[d].index;
+      while (++c!==documents.length && start_key[0]===documents[c][0])
+        if (documents[c].index<offset)
+          offset=documents[c].index;
+      for (var i=0;i<keys.length;i++) keys[i]-=offset;
+      url+="&start_key="+JSON.stringify([start_key[0], 0]);
+      url+="&end_key="+JSON.stringify(end_key);
       translate_url(url+"&compressed_keys="+indexes.compress(keys));
     } else
     // Otherwise provide a permant link.
