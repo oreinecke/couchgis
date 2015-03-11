@@ -77,9 +77,26 @@ $(document).ready(function() {
         if (!row.value.deleted) documents.push([row.id, row.id]);
         Array.prototype.push.apply(documents, geojson_doc[row.id]);
       }
-      documents=filters[0].documents.slice().sort();
-      for (var d=0;d<documents.length;d++)
-        documents[d].index=d;
+      var position=0;
+      var documents=[];
+      // Process document indexing in small chunks to
+      // allow the page to respond to other events.
+      var interval=window.setInterval(function() {
+        // get next sorted chunk
+        var chunk=filters[0].documents.slice(position, position+=200).sort();
+        if (!chunk.length) {
+          // tag documents with index
+          for (var d=0;d!==documents.length;d++)
+            documents[d].index=d;
+          window.clearInterval(interval);
+          return;
+        }
+        // merge sorted chunks into accumulated documents
+        for ( var d=documents.length-1, doc; doc=chunk.pop(); ) {
+          while (documents[d]>doc) d--;
+          documents.splice(d+1, 0, doc);
+        }
+      }, 50);
       function finalize() {
         filter_documents(filter_documents.commands);
         map.addListener('bounds_changed', call.this_one_next(update_items));
