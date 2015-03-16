@@ -77,8 +77,8 @@ $(document).ready(function() {
         if (!row.value.deleted) documents.push([row.id, row.id]);
         Array.prototype.push.apply(documents, geojson_doc[row.id]);
       }
-      var position=0;
-      var documents=[];
+      var position=200;
+      documents=documents.slice(0,200).sort();
       // Process document indexing in small chunks to
       // allow the page to respond to other events.
       var interval=window.setInterval(function() {
