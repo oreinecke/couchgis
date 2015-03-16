@@ -94,12 +94,11 @@ $(document).ready(function() {
         // merge sorted chunks into accumulated documents
         var d=documents.length-1;
         var left=documents[d].toString();
-        for ( var doc; doc=chunk.pop(); ) {
+        for ( var doc; doc=chunk.pop(); documents.splice(d+1, 0, doc) ) {
           var right=doc.toString();
           while (left>right)
             if ( left=documents[--d] )
               left=left.toString();
-          documents.splice(d+1, 0, doc);
        }
       }, 50);
       function finalize() {
