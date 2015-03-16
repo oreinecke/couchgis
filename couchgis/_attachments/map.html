@@ -92,10 +92,15 @@ $(document).ready(function() {
           return;
         }
         // merge sorted chunks into accumulated documents
-        for ( var d=documents.length-1, doc; doc=chunk.pop(); ) {
-          while (documents[d]>doc) d--;
+        var d=documents.length-1;
+        var left=documents[d].toString();
+        for ( var doc; doc=chunk.pop(); ) {
+          var right=doc.toString();
+          while (left>right)
+            if ( left=documents[--d] )
+              left=left.toString();
           documents.splice(d+1, 0, doc);
-        }
+       }
       }, 50);
       function finalize() {
         filter_documents(filter_documents.commands);
