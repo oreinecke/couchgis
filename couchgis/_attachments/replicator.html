@@ -14,9 +14,9 @@ $(document).ready(function() {
   // in case I want to rename db/app/replicator.html
   // they are obtained from window.location here
   var parts=window.location.pathname.split('/');
-  var db=parts[1];
-  var app=parts[2]+'/'+parts[3];
-  var page=parts[4];
+  var page=parts.pop();
+  var app=parts.splice(-2).join('/');
+  var db=parts.pop();
   $("#localapp").attr({href:"http://localhost:5984/"+db+'/'+app+'/'+page});
   $("#centralapp").attr({href:centralhost+'/'+db+'/'+app+'/'+page});
   if (window.location.hostname==="lsh1908.selfhost.eu") $("div").show();

@@ -10,9 +10,9 @@
 $(document).ready(function() {
 
   var parts=window.location.pathname.split('/');
-  var db=parts[1];
-  var id=parts[2]+'/'+parts[3];
-  var page=parts[4];
+  var page=parts.pop();
+  var id=parts.splice(-2).join('/');
+  var db=parts.pop();
 
   $.getJSON("./", function(doc) {
     var pages=$("#pages");

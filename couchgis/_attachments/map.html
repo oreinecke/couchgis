@@ -140,9 +140,9 @@ $(document).ready(function() {
     } else $.ajax("_list/"+list+"?options="+options+"&keys="+keys, params);
   }
   // ok this also looks retarded but it keeps my stuff in one place at least
-  var parts=window.location.pathname.split('/');
-  list.db=parts[1];
-  list.app=parts[2]+'/'+parts[3];
+  var parts=window.location.pathname.split('/').slice(0,-1);
+  list.app=parts.splice(-2).join('/');
+  list.db=parts.pop();
 
   // It is very likely that the oftentimes inexperienced user clicks and
   // scrolls the map like an ape (on adderall). Then, event handler callbacks
@@ -1244,7 +1244,7 @@ $(document).ready(function() {
     var translate_url=({
       'download':function(url) { window.open(url+"&download", "_self"); },
       'get-url':function(url) {
-        url=window.location.origin+'/'+list.db+'/'+list.app+'/'+url;
+        url=window.location.href.split('/').slice(0,-1).join('/')+'/'+url;
         // hide download button
         $("#export [name=get-url]").hide();
         // display the url in a selected text input
