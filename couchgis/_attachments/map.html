@@ -208,27 +208,15 @@ $(document).ready(function() {
     }
     if (!geometries.length && !documents.length)
       return success({rows:[]});
-    var successful=false;
-    function ajax() {
-      $.ajax("_view/geojson", {
-        type:"POST",
-        data:'{"keys":'+JSON.stringify(documents.concat(geometries))+'}',
-        dataType:"json",
-        success:success,
-        complete:function() {
-          // Sadly, this seems to be the only way to catch
-          // CouchDB's internal server error or whatever this is.
-          if (!successful)
-            window.setTimeout(ajax, 50);
-        }
-      });
-    }
-    ajax();
-    // Even more sad: I need to add this timer
-    // because Chrome does not call 'complete'.
-    window.setTimeout(function() { if (!successful) ajax(); }, 3000);
+    $.ajax("_view/geojson", {
+      type:"POST",
+      data:'{"keys":'+JSON.stringify(documents.concat(geometries))+'}',
+      dataType:"json",
+      timeout:3000,
+      success:success,
+      error:function() { $.ajax(this); }
+    });
     function success(data) {
-      successful=true;
       var rows=data.rows;
       geometries=geometries.length;
       documents=documents.length;
