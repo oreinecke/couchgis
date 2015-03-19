@@ -192,7 +192,7 @@ what it does. The application does not try _that_ hard to be mean to you or to
 ruin your day.
 
 Some notes include (you should probably have the map page open to know what
-these are refering to):
+these are referring to):
 - Where it says "Text" (below the map) or any of the document's fields, it
   actually means _case insensitive regular expression pattern_ by default. This
   allows for instance to select documents with `doc.Vegetation` matching
