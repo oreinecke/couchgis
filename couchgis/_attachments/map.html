@@ -396,7 +396,7 @@ $(document).ready(function() {
     // Query GeoCouch spatial handler if installed,
     // but limit output to 1500 items (~300kb).
     if (update_items.GeoCouch && options.bbox) $.getJSON("_spatial/bbox", {
-      count:true, bbox:options.bbox.toString()
+      bbox:options.bbox.toString()
     }, function(data) {
       var rows=data.rows;
       if (rows) {
