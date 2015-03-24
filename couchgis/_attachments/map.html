@@ -399,7 +399,6 @@ $(document).ready(function() {
       bbox:options.bbox.toString()
     }, function(data) {
       var rows=data.rows;
-      if (rows) {
         var ids={}, row;
         // hash each geometry id to true for faster look-up
         while ( row=rows.pop() ) ids[row.id]=true;
@@ -412,12 +411,6 @@ $(document).ready(function() {
         delete options.bbox;
         delete options.limit;
         list("bbox-filter/bbox", options, success);
-      } else if (data.count>1500) {
-        options.keys=vp.prefix.concat(keys.slice(vp.position));
-        list("bbox-filter/bbox", options, success);
-      } else $.getJSON("_spatial/bbox", {
-        bbox:options.bbox.toString()
-      }, this.success);
     }); else list("bbox-filter/bbox", options, success);
     function success(data) {
       var documents=update_items.documents, position=0;
