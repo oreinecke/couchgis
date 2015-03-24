@@ -399,9 +399,13 @@ $(document).ready(function() {
       bbox:options.bbox.toString()
     }, function(data) {
       var r=/"id":"([^"]+)/g, ids={};
-      var m;
+      var interval=window.setInterval( function() {
         // hash each geometry id to true for faster look-up
-        while ( m=r.exec(data) ) ids[ m[1] ]=true;
+        for (var k=2500, m; m=r.exec(data); k--) {
+          ids[ m[1] ]=true;
+          if (k===0) return;
+        }
+        window.clearInterval(interval);
         var prefix=[];
         // fill keys intersected with ids into prefix
         for (var k=0, key; key=keys[k]; k++)
@@ -411,6 +415,7 @@ $(document).ready(function() {
         delete options.bbox;
         delete options.limit;
         list("bbox-filter/bbox", options, success);
+      }, 50);
     }, "text"); else list("bbox-filter/bbox", options, success);
     function success(data) {
       var documents=update_items.documents, position=0;
