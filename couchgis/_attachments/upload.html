@@ -697,16 +697,14 @@ $(document).ready(function() {
         if (!data[keys[f]]) continue;
         var feature=features[f];
         feature.bbox=data[keys[f]].GeoJSON.bbox;
-        var options=encodeURIComponent(JSON.stringify({
-          bbox:feature.bbox,
-          similarity:0.0001
-        }));
         var found_geometry=function() {
           $("#show-suggestions :button").prop('disabled', false);
           $("#reduce [name=next]").click();
           found_geometry=function() {};
-        }
-        $.getJSON("_list/bbox-filter/bbox?options="+options, function(id, feature) {
+        };
+        $.getJSON("_list/bbox-filter", { options:JSON.stringify({
+          bbox:feature.bbox, similarity:0.0001
+        }) }, function(id, feature) {
           return function(data) {
             // remove from items if geometry is new
             if (id===feature.id && !feature.properties.GeoJSON_clone)
