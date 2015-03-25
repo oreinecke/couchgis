@@ -26,3 +26,27 @@ exports.encode=function(fields) {
 exports.pretty=function(path, extra) {
   return path.match(match_parts).join('.'+extra);
 }
+
+// Descend field by field into nested object hierarchies.
+exports.values=function(obj, fields, result) {
+  if (result===undefined) result=[];
+  var value=obj;
+  for (var f=0; f!==fields.length; f++) {
+    if (value===undefined || value===null)
+      return result;
+    if (Array.isArray(value)) {
+      for (var i=0;i!==value.length;i++)
+        values(value[i], fields.slice(f), result);
+      return result;
+    }
+    value=value[fields[f]];
+  }
+  if (value===undefined || value===null)
+    return result;
+  if (Array.isArray(value)) {
+    Array.prototype.push.apply(result, value);
+    return result;
+  }
+  result.push(value);
+  return result;
+}
