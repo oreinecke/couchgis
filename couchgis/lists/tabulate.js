@@ -91,12 +91,9 @@ function(head, req) {
     };
     if (fields.length) matches_value=function(doc) {
       for (var f=0;f<fields.length;f++) {
-        var field=fields[f];
-        var value=doc;
-        for (var g=0; g!==field.length; g++)
-          if ( (value=value[field[g]])===undefined )
-            return false;
-        if (!values[f].test(value)) return false;
+        var doc_values=path.values(doc, fields[f]);
+        do if (doc_values.length===0) return false;
+        while (!values[f].test(doc_values.pop()));
       }
       return true;
     };
