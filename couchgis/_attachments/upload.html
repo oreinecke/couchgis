@@ -521,6 +521,25 @@ $(document).ready(function() {
             if (typeof obj[c]!=="object")
               if (components.length) break; else delete obj[c];
       }
+      // format array-like objects into arrays
+      (function arrayify(obj) {
+        var array_like=true;
+        var keys=[];
+        for (var p in obj) {
+          if (obj[p]===doc.GeoJSON) continue;
+          if (obj[p] && typeof obj[p]==="object")
+            obj[p]=arrayify(obj[p]);
+          p=+p;
+          if (p!==p) array_like=false;
+          if (array_like) keys.push(p);
+        }
+        if (!array_like) return obj;
+        keys.sort(function(a,b) { return b-a; });
+        var result=[];
+        while (keys.length)
+          result.push(obj[keys.pop()]);
+        return result;
+      }(doc));
       // clean up redundant JSON recursively
       (function empty(obj) {
         // There is no semantic difference between
