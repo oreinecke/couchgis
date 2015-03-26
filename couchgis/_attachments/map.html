@@ -294,14 +294,16 @@ $(document).ready(function() {
           for (var c=0, column; column=columns[c]; c++) {
             td=$("<td>");
             for (var s=0;s<slice.length;s++) {
-              var value=slice[s].value.doc;
-              for (var p=0; value && p!==column.path.length; p++)
-                value=value[column.path[p]];
-              td.append(
-                $("<span>").text(value)
-                           .addClass('field')
-                           .click({ field:column.field, value:value },
-                                    update_geometry.create_filter), '<br>');
+              var values=path.values(slice[s].value.doc, column.path), value;
+              while ( value=values.pop() ) {
+                td.append(
+                  $("<span>").text(value)
+                             .addClass('field')
+                             .click({ field:column.field, value:value },
+                                      update_geometry.create_filter) );
+                if (values.length!==0) td.append(', ');
+              }
+              td.append('<br>');
             }
             tr.append(td);
           }
