@@ -500,7 +500,7 @@ $(document).ready(function() {
       // write properties with adjusted labels
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
-        if (fields[prop].val()=="") continue;
+        if (fields[prop].val()==="") continue;
         var obj=doc, field;
         var components=path.decode(fields[prop].val());
         // build nested object from field components
@@ -519,16 +519,17 @@ $(document).ready(function() {
         var result=true;
         // Arrays need to be spliced.
         if (Array.isArray(obj)) {
-          for (var p=0; p<obj.length; p++)
+          for (var p=0; p!==obj.length; p++)
             if (empty(obj[p])) obj.splice(p--, 1);
             else result=false;
           return result;
         }
         for (var p in obj)
-          if (p==="GeoJSON" && obj===doc || !empty(obj[p])) result=false;
-          else delete obj[p];
+          if (obj[p]!==doc.GeoJSON && empty(obj[p]))
+            delete obj[p];
+          else result=false;
         return result;
-      })(doc);
+      }(doc));
       // Use either the newly defined GeoJSON_clone or the previous
       // one. Update the geometry itself only if none is referenced.
       if (!doc.GeoJSON_clone && feature.geometry)
