@@ -277,7 +277,7 @@ $(document).ready(function() {
           for (var s=0;s<slice.length;s++) {
             var doc=slice[s].value.doc;
             var a=$("<a>");
-            a.text( doc[doc.type]||doc.type )
+            a.text( path.values(doc, [doc.type]).join(', ') || doc.type )
              .one("mouseenter", update_geometry.show_document)
              .attr({
               href:"_show/edit/"+doc._id,
