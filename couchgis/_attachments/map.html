@@ -289,7 +289,7 @@ $(document).ready(function() {
             if (doc.info)
               td.append(' ', info.clone()
                                  .one("mouseenter", update_geometry.show_document)
-                                 .prop('href', doc.info).prop('title', "...").show());
+                                 .prop('href', doc.info).show());
             td.append('<br>');
           }
           tr.append(td);
@@ -1477,7 +1477,7 @@ $(document).ready(function() {
       <th class="title-time">
         Beschreibung
         <!-- optional link to source documents -->
-        <a target="_blank" class="info" style="display:none">i</a>
+        <a target="_blank" class="info" title="..." style="display:none">i</a>
       </th>
       <th><select name="field">
         <!-- unselect any column on page load -->
