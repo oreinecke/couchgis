@@ -83,6 +83,8 @@ function(head, req) {
         for (var g=0;g!==length;g++) {
           value=value[field[g]];
           if (value==null) return false;
+          while (Array.isArray(value))
+            value=value[0];
         }
         if (value[field[length]]==null)
           return false;
