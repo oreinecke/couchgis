@@ -77,13 +77,15 @@ function(head, req) {
       }
     }
     if (non_nulls.length) defines_field=function(doc) {
-      for (var f=0;f<non_nulls.length;f++) {
-        var field=non_nulls[f];
+      for (var f=0, field; field=non_nulls[f]; f++) {
         var value=doc;
-        for (var g=0;g<field.length;g++) {
+        var length=field.length-1;
+        for (var g=0;g!==length;g++) {
           value=value[field[g]];
           if (value==null) return false;
         }
+        if (value[field[length]]==null)
+          return false;
       }
       return true;
     };
