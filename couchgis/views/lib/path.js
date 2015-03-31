@@ -12,9 +12,12 @@ exports.decode=function(path) {
 // [" OBJ.","object's field"] -> "' OBJ.'. objects's field"
 
 exports.encode=function(fields) {
-  for (var f=0;f<fields.length;f++)
-    if (/\.|^\s|\s$/.test(fields[f])) fields[f]="'"+fields[f]+"'";
-  return fields.join('.');
+  var result=fields[0];
+  var r=/\.|^\s|\s$/;
+  if (r.test(result)) result="'"+result+"'";
+  for ( var f=1, field; field=fields[f++]; result+="."+field )
+    if (r.test(field)) field="'"+field+"'";
+  return result;
 };
 
 // Pretty-print path with extra characters after the dot.
