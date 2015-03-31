@@ -116,12 +116,10 @@ function(head, req) {
     if (include_WKT) extra_fields.unshift("_WKT");
     if (include_geojson_id) extra_fields.unshift("GeoJSON_clone");
     if (include_revision) extra_fields=["_id", "_rev"].concat(extra_fields);
-    if (fields==null) {
-      fields=extra_fields;
-      for (var f=0;f<features.length;f++)
-      for (var prop in features[f].properties)
-        if (fields.indexOf(prop)===-1) fields.push(prop);
-    } else fields=extra_fields.concat(fields?fields.split(':'):[]);
+    fields=extra_fields;
+    for (var f=0;f<features.length;f++)
+    for (var prop in features[f].properties)
+      if (fields.indexOf(prop)===-1) fields.push(prop);
     send('<?xml version="1.0"?>');
     send('<?mso-application progid="Excel.Sheet"?>');
     send('<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"');
