@@ -150,9 +150,8 @@ function(head, req) {
         properties._WKT=geometry.type.toUpperCase() + function toWKT(c) {
           if (typeof c[0]==="number")
             return c[0].toPrecision(13)+' '+c[1].toPrecision(13);
-          var part='';
-          for (var i=0; i<c.length; part+=toWKT(c[i++]))
-            if (i) part+=', ';
+          var part=toWKT(c[0]);
+          for (var i=1;i!==c.length;i++) part+=', '+toWKT(c[i]);
           return '('+part+')';
         }(geometry.type==="Point" ? [coordinates] : coordinates);
       }
