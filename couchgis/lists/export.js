@@ -111,12 +111,11 @@ function(head, req) {
       features:features
     }));
   case "xml":
-    var extra_fields=["type", "time"];
-    if (include_JSON) extra_fields.unshift("_JSON");
-    if (include_WKT) extra_fields.unshift("_WKT");
-    if (include_geojson_id) extra_fields.unshift("GeoJSON_clone");
-    if (include_revision) extra_fields=["_id", "_rev"].concat(extra_fields);
-    fields=extra_fields;
+    var fields=["type", "time"];
+    if (include_JSON) fields.unshift("_JSON");
+    if (include_WKT) fields.unshift("_WKT");
+    if (include_geojson_id) fields.unshift("GeoJSON_clone");
+    if (include_revision) fields.unshift("_id", "_rev");
     for (var f=0;f<features.length;f++)
     for (var prop in features[f].properties)
       if (fields.indexOf(prop)===-1) fields.push(prop);
