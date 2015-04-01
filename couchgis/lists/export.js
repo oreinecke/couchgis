@@ -13,6 +13,8 @@ function(head, req) {
   var path=require('views/lib/path');
   var include_revision='include_revision' in req.query;
   var field_set=req.query.fields;
+  if (field_set!==undefined)
+    field_set=':'+field_set+':';
   var include_geojson_id='include_geojson_id' in req.query;
   var EPSG=req.query.EPSG;
   var include_WKT='include_WKT' in req.query;
@@ -80,7 +82,7 @@ function(head, req) {
         if (field_set===undefined) break;
         if (!/^[A-ZÄÖÜ]/.test(field)) continue;
         if (/^GeoJSON/.test(field)) continue;
-        if (field_set.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
+        if (field_set.indexOf(':'+field.replace(/\.[0-9]+/g, '')+':')===-1)
           delete doc[field];
       }
       features.push({
