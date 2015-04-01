@@ -7,9 +7,9 @@ function(doc) {
     if (!/^[A-ZÄÖÜ]/.test(field)) continue;
     if (/^GeoJSON/.test(field)) continue;
     (function flat_fields(obj, fields) {
-      if (!obj || typeof obj!=="object")
+      if (typeof obj!=="object")
         emit([path.encode(fields), doc.type, obj]);
-      else for (var field in obj)
+      else if (obj!==null) for (var field in obj)
         flat_fields(obj[field], fields.concat([field]));
     }(doc[field], [field]));
   }
