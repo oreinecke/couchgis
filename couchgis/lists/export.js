@@ -111,14 +111,14 @@ function(head, req) {
       features:features
     }));
   case "xml":
-    var fields=["type", "time"];
-    if (include_JSON) fields.unshift("_JSON");
-    if (include_WKT) fields.unshift("_WKT");
-    if (include_geojson_id) fields.unshift("GeoJSON_clone");
-    if (include_revision) fields.unshift("_id", "_rev");
+    var columns=["type", "time"];
+    if (include_JSON) columns.unshift("_JSON");
+    if (include_WKT) columns.unshift("_WKT");
+    if (include_geojson_id) columns.unshift("GeoJSON_clone");
+    if (include_revision) columns.unshift("_id", "_rev");
     for (var f=0;f<features.length;f++)
     for (var prop in features[f].properties)
-      if (fields.indexOf(prop)===-1) fields.push(prop);
+      if (columns.indexOf(prop)===-1) columns.push(prop);
     send('<?xml version="1.0"?>');
     send('<?mso-application progid="Excel.Sheet"?>');
     send('<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"');
@@ -136,8 +136,8 @@ function(head, req) {
     send('<Worksheet ss:Name="'+filename+'">');
     send('<Table>');
     send('<Row ss:AutoFitHeight="0" ss:Height="24">');
-    for (var g=0;g<fields.length;g++)
-      send('<Cell><Data ss:Type="String">'+path.pretty(fields[g],'&#13;&#10;')+'</Data></Cell>');
+    for (var g=0;g!==columns.length;g++)
+      send('<Cell><Data ss:Type="String">'+path.pretty(columns[g],'&#13;&#10;')+'</Data></Cell>');
     send('</Row>');
     for (var f=0;f<features.length;f++) {
       send('<Row>');
@@ -152,9 +152,8 @@ function(head, req) {
           return '('+part+')';
         }(geometry.type==="Point" ? [coordinates] : coordinates);
       }
-      for (var g=0;g<fields.length;g++) {
-        var field=fields[g];
-        var data=properties[field];
+      for (var g=0;g!==columns.length;g++) {
+        var data=properties[columns[g]];
         if (typeof data==="number")
           send('<Cell><Data ss:Type="Number">'+data+'</Data></Cell>');
         else if (typeof data==="string")
