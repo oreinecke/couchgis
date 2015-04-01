@@ -153,15 +153,15 @@ function(head, req) {
         }(geometry.type==="Point" ? [coordinates] : coordinates);
       }
       for (var g=0;g!==columns.length;g++) {
-        var data=properties[columns[g]];
-        if (typeof data==="number")
+        var data=properties[columns[g]], type=typeof data;
+        if (type==="number")
           send('<Cell><Data ss:Type="Number">'+data+'</Data></Cell>');
-        else if (typeof data==="string")
+        else if (type==="string")
           send('<Cell><Data ss:Type="String">'+data.replace(/&/g,'&amp;')
                                                    .replace(/\n/g,'&#13;&#10;')
                                                    .replace(/</g,'&lt;')
                                                    .replace(/>/g,'&gt;')+'</Data></Cell>');
-        else if (typeof data==="boolean")
+        else if (type==="boolean")
           send('<Cell><Data ss:Type="Boolean">'+data?1:0+'</Data></Cell>');
         else send('<Cell/>');
       }
