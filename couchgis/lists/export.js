@@ -69,13 +69,13 @@ function(head, req) {
       }
       // create flat column names from nested objects
       (function flatten(obj, fields) {
-        if (!obj || typeof obj!=="object")
-          doc[path.encode(fields)]=obj;
-        else for (var prop in obj) {
+        for (var prop in obj) {
           var obj2=obj[prop];
           delete obj[prop];
           fields.push(prop);
-          flatten(obj2, fields);
+          if (obj2 && typeof obj2==="object")
+            flatten(obj2, fields);
+          else doc[path.encode(fields)]=obj2;
           fields.pop(prop);
         }
       }(doc, []));
