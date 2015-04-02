@@ -68,6 +68,7 @@ function(head, req) {
         doc._JSON=JSON.stringify(_JSON);
       }
       // create flat column names from nested objects
+      // and remove fields that aren't in field_set
       (function flatten(obj, fields) {
         for (var prop in obj) {
           var obj2=obj[prop];
@@ -75,18 +76,17 @@ function(head, req) {
           fields.push(prop);
           if (obj2 && typeof obj2==="object")
             flatten(obj2, fields);
-          else doc[path.encode(fields)]=obj2;
+          else {
+            var field=path.encode(fields);
+            if (field_set===undefined ||
+                !/^[A-ZÄÖÜ]/.test(field) ||
+                /^GeoJSON/.test(field) ||
+                field_set.indexOf(':'+field+':')!==-1)
+            doc[field]=obj2;
+          }
           fields.pop(prop);
         }
       }(doc, []));
-      // remove fields that aren't in field_set
-      for (var field in doc) {
-        if (field_set===undefined) break;
-        if (!/^[A-ZÄÖÜ]/.test(field)) continue;
-        if (/^GeoJSON/.test(field)) continue;
-        if (field_set.indexOf(':'+field.replace(/\.[0-9]+/g, '')+':')===-1)
-          delete doc[field];
-      }
       features.push({
         type:"Feature",
         properties:doc,
