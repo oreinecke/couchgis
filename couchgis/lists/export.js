@@ -67,26 +67,29 @@ function(head, req) {
         delete _JSON.GeoJSON_clone;
         doc._JSON=JSON.stringify(_JSON);
       }
+      var indexed_path=[];
       // create flat column names from nested objects
       // and remove fields that aren't in field_set
-      (function flatten(obj, fields) {
+      (function flatten(obj) {
+        var indexed_path_length=indexed_path.length;
         for (var prop in obj) {
           var obj2=obj[prop];
           delete obj[prop];
-          fields.push(prop);
+          prop=path.encode([prop]);
+          indexed_path[indexed_path_length]=prop;
           if (obj2 && typeof obj2==="object")
-            flatten(obj2, fields);
+            flatten(obj2);
           else {
-            var field=path.encode(fields);
+            prop=indexed_path.join('.');
             if (field_set===undefined ||
-                !/^[A-ZÄÖÜ]/.test(field) ||
-                /^GeoJSON/.test(field) ||
-                field_set.indexOf(':'+field+':')!==-1)
-            doc[field]=obj2;
+                !/^[A-ZÄÖÜ]/.test(indexed_path[0]) ||
+                /^GeoJSON/.test(indexed_path[0]) ||
+                field_set.indexOf(':'+prop+':')!==-1)
+            doc[prop]=obj2;
           }
-          fields.pop(prop);
         }
-      }(doc, []));
+        indexed_path.pop();
+      }(doc));
       features.push({
         type:"Feature",
         properties:doc,
