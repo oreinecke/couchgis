@@ -19,6 +19,7 @@ function(head, req) {
   var EPSG=req.query.EPSG;
   var include_WKT='include_WKT' in req.query;
   var include_JSON='include_JSON' in req.query;
+  var vertical_arrays='vertical_arrays' in req.query;
   var index=0, next_index=indexes.pop();
   start({headers:{
     'Content-Type':{
