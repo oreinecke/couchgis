@@ -69,38 +69,55 @@ function(head, req) {
         doc._JSON=JSON.stringify(_JSON);
       }
       var indexed_path=[], short_path=[];
+      var arrays={};
       // create flat column names from nested objects
       // and remove fields that aren't in field_set
-      (function flatten(obj) {
+      (function flatten(obj, store_as_array) {
         var indexed_path_length=indexed_path.length;
         var short_path_length=short_path.length;
+        store_as_array |= vertical_arrays && Array.isArray(obj);
         for (var prop in obj) {
           var obj2=obj[prop];
           delete obj[prop];
-          prop=path.encode([prop]);
-          if (!Array.isArray(obj))
+          if (!Array.isArray(obj)) {
+            prop=path.encode([prop]);
             short_path[short_path_length]=prop;
+          } else if (vertical_arrays) prop='*';
           indexed_path[indexed_path_length]=prop;
           if (obj2 && typeof obj2==="object")
-            flatten(obj2);
-          else {
+            flatten(obj2, store_as_array);
+          else if (field_set===undefined ||
+                   !/^[A-ZÄÖÜ]/.test(indexed_path[0]) ||
+                   /^GeoJSON/.test(indexed_path[0]) ||
+                   field_set.indexOf(':'+short_path.join('.')+':')!==-1) {
             prop=indexed_path.join('.');
-            if (field_set===undefined ||
-                !/^[A-ZÄÖÜ]/.test(indexed_path[0]) ||
-                /^GeoJSON/.test(indexed_path[0]) ||
-                field_set.indexOf(':'+short_path.join('.')+':')!==-1) {
-            doc[prop]=obj2;
+            if (store_as_array)
+              if (prop in arrays) arrays[prop].push(obj2)
+              else arrays[prop]=[obj2];
+            else doc[prop]=obj2;
           }
         }
         if (!Array.isArray(obj))
           short_path.pop();
         indexed_path.pop();
       }(doc));
-      features.push({
-        type:"Feature",
-        properties:doc,
-        geometry:geometry
-      });
+      while (arrays) {
+        for (var prop in arrays) {
+          var array=arrays[prop];
+          doc[prop]=array.pop();
+          if (array.length===0)
+            delete arrays[prop];
+        }
+        features.push({
+          type:"Feature",
+          properties:doc,
+          geometry:geometry
+        });
+        doc={_id:doc._id};
+        var prop=false;
+        for (prop in arrays) break;
+        if (!prop) arrays=false;
+      }
     }
   }
   if (filetype==="geojson" || include_WKT) {
