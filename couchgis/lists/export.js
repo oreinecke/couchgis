@@ -45,16 +45,16 @@ function(head, req) {
     delete geometry.EPSG;
     while (row && !row.value.doc) row=getRow();
     for (var doc; row && (doc=row.value.doc); row=getRow()) {
-      if (next_index===undefined || next_index===index++)
-        next_index=indexes.pop();
-      else continue;
+      if (index++<next_index) continue;
+      else next_index=indexes.pop();
       if (doc._id in doc_ids) continue;
       if (filetype==="xml") doc_ids[doc._id]=true;
       delete doc.info;
       delete doc.ranges;
       if (!include_revision) {
         delete doc._rev;
-        delete doc._id;
+        if (vertical_arrays) doc._id=index;
+        else delete doc._id;
       }
       if (!include_geojson_id)
         delete doc.GeoJSON_clone;
@@ -147,6 +147,7 @@ function(head, req) {
     if (include_WKT) columns.unshift("_WKT");
     if (include_geojson_id) columns.unshift("GeoJSON_clone");
     if (include_revision) columns.unshift("_id", "_rev");
+    else if (vertical_arrays) columns.unshift("_id");
     for (var f=0;f<features.length;f++)
     for (var prop in features[f].properties)
       if (columns.indexOf(prop)===-1) columns.push(prop);
