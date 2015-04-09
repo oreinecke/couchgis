@@ -294,7 +294,7 @@ $(document).ready(function() {
           for (var c=0, column; column=columns[c]; c++) {
             td=$("<td>");
             for (var s=0;s<slice.length;s++) {
-              var values=path.values(slice[s].value.doc, column.path), value;
+              var values=path.values(slice[s].value.doc, column.path).reverse(), value;
               while ( value=values.pop() ) {
                 td.append(
                   $("<span>").text(value)
