@@ -75,9 +75,17 @@ $(document).ready(function() {
       var documents=filters[0].documents;
       while ( row=rows.pop() ) {
         if (!row.value.deleted) documents.push([row.id, row.id]);
-        Array.prototype.push.apply(documents, geojson_doc[row.id]);
+        var attached_docs=geojson_doc[row.id];
+        if (!attached_docs) continue;
+        Array.prototype.push.apply(documents, attached_docs);
+        attached_docs.attached=true;
       }
       var unsorted_docs=documents.slice();
+      // Documents without existing geometry still appear in _view/geojson
+      // and therefore must be taken into account for document indexes.
+      for (var id in geojson_doc)
+        if (!geojson_doc[id].attached)
+          Array.prototype.push.apply(unsorted_docs, geojson_doc[id]);
       var position=0;
       documents=[];
       // Process document indexing in small chunks to
