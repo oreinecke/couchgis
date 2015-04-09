@@ -77,13 +77,14 @@ $(document).ready(function() {
         if (!row.value.deleted) documents.push([row.id, row.id]);
         Array.prototype.push.apply(documents, geojson_doc[row.id]);
       }
+      var unsorted_docs=documents.slice();
       var position=0;
       documents=[];
       // Process document indexing in small chunks to
       // allow the page to respond to other events.
       var interval=window.setInterval(function() {
         // get next sorted chunk
-        var chunk=filters[0].documents.slice(position, position+=200).sort();
+        var chunk=unsorted_docs.slice(position, position+=200).sort();
         if (!chunk.length) {
           // tag documents with index
           for (var d=0;d!==documents.length;d++)
