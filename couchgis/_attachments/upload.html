@@ -19,8 +19,6 @@ $(document).ready(function() {
   var db=window.location.pathname.split('/').splice(-4,1);
   var map;
   var features=[];
-  var submit=$("#upload :submit");
-  var revert=$("#upload :button");
   var fields={};
   var values={};
   // doc ids and revisions from _bulk_docs response
@@ -354,8 +352,8 @@ $(document).ready(function() {
     $("#modify, #reduce, #reduce span").hide();
     $("#reduce [name=show]").show();
     $("#upload b, #results").html("");
-    submit.prop('disabled', true).show();
-    revert.hide();
+    $("#upload :submit").prop('disabled', true).show();
+    $("#upload [name=revert]").hide();
     show_geometry(-1);
     features=[];
     // When the url or all files have finished loading, we
@@ -371,7 +369,7 @@ $(document).ready(function() {
         for (var prop in properties)
           fields[prop]=false;
       }
-      submit.prop('disabled', false);
+      $("#upload :submit").prop('disabled', false);
       $("#modify div").html('');
       show_fields();
       uploaded_docs={};
@@ -550,8 +548,8 @@ $(document).ready(function() {
         zoom: 17, mapTypeId: Maps.MapTypeId.SATELLITE,
         center: new LatLng(50.83730534254573, 13.938310197234163)
       });
-      submit.hide();
-      revert.show();
+      $("#upload :submit").hide();
+      $("#upload [name=revert]").show();
       var results=[];
       // Get IDs of new documents and update revisions if no error occured.
       while (data.length) {
@@ -570,7 +568,7 @@ $(document).ready(function() {
     e.preventDefault();
   });
 
-  revert.click(function() {
+  $("#upload [name=revert]").click(function() {
     var docs=[];
     // delete or upload previous revision
     for (var f=0;f<features.length;f++) {
@@ -583,8 +581,8 @@ $(document).ready(function() {
     }
     relay_geometries();
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
-      submit.show();
-      revert.hide();
+      $("#upload :submit").show();
+      $("#upload [name=revert]").hide();
       show_fields();
       $("#reduce").hide();
       while (data.length) {
