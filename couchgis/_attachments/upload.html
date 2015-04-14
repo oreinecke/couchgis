@@ -18,10 +18,14 @@ $(document).ready(function() {
   var path=require('views/lib/path');
   var db=window.location.pathname.split('/').splice(-4,1)[0];
   var map;
-  var features=[];
+
+  // map property name to its form element
   var fields={};
   var values={};
-  // doc ids and revisions from _bulk_docs response
+
+  // feature set provided by the #upload form source
+  var features;
+  // documents that are already in the database
   var uploaded_docs;
 
   $.getJSON("_view/type-year?group_level=1", function(data) {
@@ -354,8 +358,8 @@ $(document).ready(function() {
     $("#upload b, #results").html("");
     $("#upload :submit").prop('disabled', true).show();
     $("#upload [name=revert]").hide();
-    show_geometry(-1);
     features=[];
+    show_geometry(-1);
     // When the url or all files have finished loading, we
     // need to fetch existing documents, set-up #modify div
     // and incorporate changed geometry links.
