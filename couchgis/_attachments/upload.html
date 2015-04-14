@@ -373,12 +373,12 @@ $(document).ready(function() {
         for (var prop in properties)
           fields[prop]=false;
       }
-      $("#upload :submit").prop('disabled', false);
       $("#modify div").html('');
       show_fields();
       uploaded_docs={};
       // store existing documents
       $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:doc_ids}), function(data) {
+        $("#upload :submit").prop('disabled', false);
         while (data.rows.length) {
           var row=data.rows.pop();
           uploaded_docs[row.id]=row.doc;
