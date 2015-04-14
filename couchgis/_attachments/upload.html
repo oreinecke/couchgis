@@ -363,6 +363,11 @@ $(document).ready(function() {
     // need to fetch existing documents, set-up #modify div
     // and incorporate changed geometry links.
     function finalize() {
+      // group features with same _ids
+      for (var f=0; f!==features.length; f++) features[f].toString=function() {
+        return typeof this.properties._id + this.properties._id;
+      }
+      features.sort();
       fields={};
       values={};
       var doc_ids=[];
