@@ -16,7 +16,7 @@
 $(document).ready(function() {
 
   var path=require('views/lib/path');
-  var db=window.location.pathname.split('/').splice(-4,1);
+  var db=window.location.pathname.split('/').splice(-4,1)[0];
   var map;
   var features=[];
   var fields={};
