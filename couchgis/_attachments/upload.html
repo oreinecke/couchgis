@@ -505,12 +505,12 @@ $(document).ready(function() {
       for (var prop in feature.properties) {
         if (fields[prop].prop('disabled')) continue;
         if (fields[prop].val()==="") continue;
-        var obj=doc, field;
+        var obj=doc;
         var components=path.decode(fields[prop].val());
+        var field=components.pop();
         // build nested object from field components
-        while ((field=components.shift()) && components.length)
-          obj=obj[field]||(obj[field]={});
-        // remove undefined fields
+        for ( var c; c=components.shift(); obj=obj[c] )
+          if (typeof obj[c]!=="object") obj[c]={};
         obj[field]=feature.properties[prop];
       }
       // clean up redundant JSON recursively
