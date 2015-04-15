@@ -440,7 +440,9 @@ $(document).ready(function() {
           };
           reader.readAsText(file);
         } else {
-          for (var basename in ogr2ogr_uploads) {
+          var basename;
+          for (basename in ogr2ogr_uploads) break;
+          if (basename===undefined) return finalize();
             // construct request body or something.
             $.ajax("/_ogr2ogr", {
               type:"POST", dataType:"text",
@@ -453,9 +455,6 @@ $(document).ready(function() {
               }
             });
             delete ogr2ogr_uploads[basename];
-            return;
-          }
-          finalize();
         }
       }());
     }
