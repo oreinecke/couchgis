@@ -443,18 +443,18 @@ $(document).ready(function() {
           var basename;
           for (basename in ogr2ogr_uploads) break;
           if (basename===undefined) return finalize();
-            // construct request body or something.
-            $.ajax("/_ogr2ogr", {
-              type:"POST", dataType:"text",
-              contentType:"application/json",
-              data:JSON.stringify(ogr2ogr_uploads[basename]),
-              error:compose_error_message,
-              success:function(data) {
-                load_features(data, "geojson");
-                load_next();
-              }
-            });
-            delete ogr2ogr_uploads[basename];
+          // construct request body or something.
+          $.ajax("/_ogr2ogr", {
+            type:"POST", dataType:"text",
+            contentType:"application/json",
+            data:JSON.stringify(ogr2ogr_uploads[basename]),
+            error:compose_error_message,
+            success:function(data) {
+              load_features(data, "geojson");
+              load_next();
+            }
+          });
+          delete ogr2ogr_uploads[basename];
         }
       }());
     }
