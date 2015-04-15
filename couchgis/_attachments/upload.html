@@ -507,11 +507,19 @@ $(document).ready(function() {
         if (fields[prop].val()==="") continue;
         var obj=doc, value=feature.properties[prop];
         var components=path.decode(fields[prop].val());
+        // There is no semantic difference between
+        // these values and a missing property.
+        if ([null,"","null","undefined"].indexOf(value)===-1) {
           var field=components.pop();
           // build nested object from field components
           for ( var c; c=components.shift(); obj=obj[c] )
             if (typeof obj[c]!=="object") obj[c]={};
           obj[field]=value;
+        } else
+          // remove blank fields if addressed directly
+          for ( var c; c=components.shift(); obj=obj[c] )
+            if (typeof obj[c]!=="object")
+              if (components.length) break; else delete obj[c];
       }
       // clean up redundant JSON recursively
       (function empty(obj) {
