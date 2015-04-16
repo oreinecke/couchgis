@@ -74,9 +74,11 @@ function(head, req) {
         else for (var prop in obj) {
           var obj2=obj[prop];
           delete obj[prop];
-          flatten(obj2, fields.concat([prop]));
+          fields.push(prop);
+          flatten(obj2, fields);
+          fields.pop(prop);
         }
-      })(doc, []);
+      }(doc, []));
       // remove fields that aren't in field_set
       for (var field in doc) {
         if (field_set===undefined) break;
