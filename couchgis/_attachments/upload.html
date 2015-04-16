@@ -379,13 +379,12 @@ $(document).ready(function() {
       uploaded_docs={};
       // store existing documents
       $.post('/'+db+"/_all_docs?include_docs=true", JSON.stringify({keys:doc_ids}), function(data) {
-        data=JSON.parse(data);
         while (data.rows.length) {
           var row=data.rows.pop();
           uploaded_docs[row.id]=row.doc;
         }
         relay_geometries();
-      });
+      }, "json");
     }
     // Compose a meaningful error message out of a jqXHR.
     function compose_error_message(jqXHR) {
