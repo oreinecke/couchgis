@@ -12,7 +12,7 @@ function(head, req) {
   else indexes=[];
   var path=require('views/lib/path');
   var include_revision='include_revision' in req.query;
-  var fields=req.query.fields;
+  var field_set=req.query.fields;
   var include_geojson_id='include_geojson_id' in req.query;
   var EPSG=req.query.EPSG;
   var include_WKT='include_WKT' in req.query;
@@ -75,11 +75,12 @@ function(head, req) {
           flatten(obj2, fields.concat([prop]));
         }
       })(doc, []);
+      // remove fields that aren't in field_set
       for (var field in doc) {
-        if (fields==null) break;
+        if (field_set===undefined) break;
         if (!/^[A-ZÄÖÜ]/.test(field)) continue;
         if (/^GeoJSON/.test(field)) continue;
-        if (fields.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
+        if (field_set.search('(^|:)'+field.replace(/[.+()]/g, "\\$&")+'(:|$)')===-1)
           delete doc[field];
       }
       features.push({
