@@ -9,7 +9,10 @@ function(doc) {
     (function flat_fields(obj, fields) {
       if (typeof obj!=="object")
         emit([path.encode(fields), doc.type, obj]);
-      else if (obj!==null) for (var field in obj)
+      else if (Array.isArray(obj))
+        for (var i=0;i<obj.length;i++)
+          flat_fields(obj[i], fields);
+      else for (var field in obj)
         flat_fields(obj[field], fields.concat([field]));
     }(doc[field], [field]));
   }
