@@ -375,6 +375,18 @@ $(document).ready(function() {
         while (id!==null && id!=="" && next && next.properties._id===id);
         feature.next=next;
       }
+      // move special fields to the top of each group
+      for (var f=0, feature; feature=features[f]; ) {
+        var specials={
+          _rev:undefined, _deleted:undefined, GeoJSON_clone:undefined
+        };
+        do for (var p in specials) {
+          if (!(p in features[f].properties)) continue;
+          specials[p] = specials[p] || features[f].properties[p];
+          features[f].properties[p]="";
+        } while (feature.next!==features[++f]);
+        $.extend(feature.properties, specials);
+      }
       fields={};
       values={};
       var doc_ids=[];
