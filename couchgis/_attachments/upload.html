@@ -638,7 +638,6 @@ $(document).ready(function() {
     $("#reduce :button").prop('disabled', true);
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
       $("#reduce :button").prop('disabled', false);
-      data=JSON.parse(data);
       function select_me() {
         shape.setOptions({strokeColor:"#000000"});
         this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
@@ -687,7 +686,7 @@ $(document).ready(function() {
                                (feature.bbox[2]+feature.bbox[0])/2.0));
       shape = (feature.items[feature.properties.GeoJSON_clone] || feature).shape
       select_me.apply(shape);
-    });
+    }, "json");
   }
 
   // skip to next/previous document with similar geometry
@@ -744,7 +743,7 @@ $(document).ready(function() {
           };
         }(keys[f], feature));
       }
-    });
+    }, "json");
   });
 
 });
