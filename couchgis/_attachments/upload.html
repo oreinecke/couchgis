@@ -673,15 +673,15 @@ $(document).ready(function() {
         var spans={ true: $("#clone-from"), false: $("#create-new") };
         spans[!this.GeoJSON_clone].hide();
         spans[!!this.GeoJSON_clone].show();
-        for (var f=0;f<features.length;f++) {
-          if (!features[f].items || features[f]===feature) continue;
+        for (var feature2=features[0]; feature2; feature2=feature2.next) {
+          if (!feature2.items || feature2===feature) continue;
           // Update reference count of each feature; A feature is only allowed
           // for geometry clone selection if no other feature references it.
-          features[f].cloned += features[f].id===this.GeoJSON_clone;
-          features[f].cloned -= features[f].id===feature.properties.GeoJSON_clone;
+          feature2.cloned += feature2.id===this.GeoJSON_clone;
+          feature2.cloned -= feature2.id===feature.properties.GeoJSON_clone;
           // Hide suggestions that already link to other geometries.
-          if (feature.id in features[f].items)
-            features[f].items[feature.id].hidden = shape!==feature[feature.id].shape;
+          if (feature.id in feature2.items)
+            feature2.items[feature.id].hidden = shape!==feature[feature.id].shape;
         }
         feature.properties.GeoJSON_clone=this.GeoJSON_clone;
       }
