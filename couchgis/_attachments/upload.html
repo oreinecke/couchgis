@@ -368,6 +368,13 @@ $(document).ready(function() {
         return typeof this.properties._id + this.properties._id;
       }
       features.sort();
+      // add a pointer to the next feature group to each first feature
+      for (var f=0, feature; feature=features[f]; ) {
+        var id=feature.properties._id, next;
+        do next=features[++f];
+        while (id!==null && id!=="" && next && next.properties._id===id);
+        feature.next=next;
+      }
       fields={};
       values={};
       var doc_ids=[];
