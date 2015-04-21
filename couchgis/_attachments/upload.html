@@ -621,19 +621,14 @@ $(document).ready(function() {
   function show_geometry(f) {
     // remove previous shapes from map canvas
     var feature=features[$("#show-suggestions a").html()-1];
-    if (feature) {
-      if (feature.shape) feature.shape.setMap();
-      delete feature.shape;
-      for (var id in feature.items) {
-        if (feature.items[id].hidden) continue;
-        feature.items[id].shape.setMap();
-        delete feature.items[id].shape;
-      }
+    for (var id in feature && feature.items) {
+      if (feature.items[id].hidden) continue;
+      feature.items[id].shape.setMap();
+      delete feature.items[id].shape;
     }
     $("#show-suggestions a").html(f+1);
     if (!( feature=features[f] )) return;
     var keys=[];
-    if (!feature.items[feature.id]) keys.push([feature.id, 0]);
     for (var id in feature.items) keys.push([id, 0]);
     $("#reduce :button").prop('disabled', true);
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
@@ -664,29 +659,27 @@ $(document).ready(function() {
           features[f].cloned += features[f].id===this.GeoJSON_clone;
           features[f].cloned -= features[f].id===feature.properties.GeoJSON_clone;
           // Hide suggestions that already link to other geometries.
-          (features[f].items[feature.id] || {}).hidden
-            = this.GeoJSON_clone && this.GeoJSON_clone!==feature.id;
+          if (feature.id in features[f].items)
+            features[f].items[feature.id].hidden = shape!==feature[feature.id].shape;
         }
         feature.properties.GeoJSON_clone=this.GeoJSON_clone;
       }
       while (data.rows.length) {
         var row=data.rows.pop();
-        var GeoJSON_clone=feature.items[row.key[0]] && row.key[0];
-        if (GeoJSON_clone && feature.items[GeoJSON_clone].hidden)
+        if (feature.items[row.key[0]].hidden)
           continue;
         var GeoJSON=row.value.GeoJSON;
         shape=create_shape(GeoJSON.type, expand_options({
-          fillColor:GeoJSON_clone!==feature.id?"#0000FF":"#00FF00",
+          fillColor:row.key[0]===feature.id?"#00FF00":"#0000FF",
           map:map, coordinates: GeoJSON.coordinates, draggable: true
         }));
-        shape.GeoJSON_clone=GeoJSON_clone;
+        shape.GeoJSON_clone = uploaded_docs[row.key[0]] && row.key[0];
         shape.addListener('click', select_me);
-        (feature.items[row.key[0]] || feature).shape=shape;
+        feature.items[row.key[0]].shape=shape;
       }
       map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0,
                                (feature.bbox[2]+feature.bbox[0])/2.0));
-      shape = (feature.items[feature.properties.GeoJSON_clone] || feature).shape
-      select_me.apply(shape);
+      select_me.apply(feature.items[feature.id].shape);
     }, "json");
   }
 
@@ -714,7 +707,7 @@ $(document).ready(function() {
     fields.GeoJSON_clone=fields.GeoJSON_clone;
     var keys=[];
     for (var f=0;f<features.length;f++)
-      keys.push(features[f].properties.GeoJSON_clone || features[f].id)
+      keys.push(features[f].id)
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
       var found_geometry=function() {
         $("#show-suggestions :button").prop('disabled', false);
@@ -722,27 +715,22 @@ $(document).ready(function() {
         found_geometry=function() {};
       };
       for (var f=0;f<features.length;f++) {
-        if (!data[keys[f]]) continue;
         var feature=features[f];
-        feature.bbox=data[keys[f]].GeoJSON.bbox;
+        if (!data[feature.id]) continue;
+        feature.bbox=data[feature.id].GeoJSON.bbox;
         $.getJSON("_list/bbox-filter", { options:JSON.stringify({
           bbox:feature.bbox, similarity:0.0001
-        }) }, function(id, feature) {
+        }) }, function(feature) {
           return function(data) {
-            // remove from items if geometry is new
-            if (id===feature.id && !feature.properties.GeoJSON_clone)
-              delete data[id];
-            // This leaves doc.items undefined if data is
-            // empty or consists only of the cloned geometry.
-            for (var id2 in data) {
-              if (id2===id) continue;
+            for (var id in data) {
+              if (id===feature.id) continue;
               feature.items=data;
               feature.cloned=0;
               found_geometry();
               return;
             }
           };
-        }(keys[f], feature));
+        }(feature));
       }
     }, "json");
   });
