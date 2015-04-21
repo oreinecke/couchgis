@@ -243,14 +243,13 @@ $(document).ready(function() {
     }
     $.getJSON('_view/geojson-doc?keys='+JSON.stringify(doc_ids), function(data) {
       var doc_ids=[], rows=data.rows, row;
-      for (var r=0; row=rows[r]; r++) {
-        // Fetch missing documents.
-        if (row.id in uploaded_docs) continue;
-        uploaded_docs[row.id]=true;
-        doc_ids.push(row.id);
-      }
       // Nothing to be done of no other documents are involved.
-      if (rows.length) $.getJSON('/'+db+"/_all_docs", {
+      if (!rows.length) return;
+      // Fetch missing documents.
+      for (var r=0; row=rows[r]; r++)
+        if (!uploaded_docs[row.id])
+          doc_ids.push(row.id);
+      $.getJSON('/'+db+"/_all_docs", {
         keys:JSON.stringify(doc_ids), include_docs:true
       }, function(data) {
         while ( row=data.rows.pop() ) {
@@ -278,16 +277,14 @@ $(document).ready(function() {
                                                         .match(/[^\s,;&]+/g).length===1 )
               acceptor=relays[rows.splice(r,1)[0].id];
             row=rows[r-1] || {};
-          } while (row.key===key && r--)
+          } while (row.key===key && r--);
           if (!acceptor && relayed._deleted===true) {
             // If the deleted document is not pointed at exclusively, we just
             // unset its type, thus hiding it from most of the indexed views.
             // Its geometry is still seen in _view/bbox and _view/geojson.
             delete relayed._deleted;
             relayed.type=null;
-            if (fields.type) continue;
-            fields.type=false;
-            show_fields();
+            fields.type=fields.type;
             continue;
           }
           if (acceptor && relayed._deleted===true) {
@@ -300,7 +297,7 @@ $(document).ready(function() {
             relayed.GeoJSON_clone=acceptor.properties._id;
             delete acceptor.unchanged;
           }
-          while ( r!==rows.length ) {
+          while (r!==rows.length) {
             row=rows.pop();
             var relay=relays[row.id].properties;
             relay.GeoJSON_clone = relay.GeoJSON_clone.replace(
@@ -308,12 +305,10 @@ $(document).ready(function() {
               relayed.GeoJSON_clone
             );
             delete relays[row.id].unchanged;
+            fields.GeoJSON_clone=fields.GeoJSON_clone;
           }
-          // Add special field GeoJSON_clone and update #modify div
-          if (fields.GeoJSON_clone) continue;
-          fields.GeoJSON_clone=false;
-          show_fields();
         }
+        show_fields();
         // Unstage unchanged documents from upload.
         for (var f=0;f<features.length;f++) {
           if (!features[f].unchanged) continue;
