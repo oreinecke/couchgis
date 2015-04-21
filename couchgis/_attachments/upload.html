@@ -225,11 +225,11 @@ $(document).ready(function() {
   // next upload, and fix related documents accordingly.
   function relay_geometries() {
     var doc_ids=[], relays={};
-    for (var f=0;f<features.length;f++) {
-      var relayed=features[f].properties;
+    for (var feature=features[0]; feature; feature=feature.next) {
+      var relayed=feature.properties;
       var doc=uploaded_docs[relayed._id];
       // Map document id to its feature.
-      if (doc) relays[relayed._id]=features[f];
+      if (doc) relays[relayed._id]=feature;
       // Nothing to be done if the document wasn't in the
       // database before or doesn't have its own geometry.
       if (!doc || doc.GeoJSON_clone) continue;
@@ -254,8 +254,8 @@ $(document).ready(function() {
       }, function(data) {
         while ( row=data.rows.pop() ) {
           uploaded_docs[row.id]=row.doc;
-          features.push( relays[row.id]={
-            unchanged:true,
+          features.unshift( relays[row.id]={
+            unchanged:true, next:features[0],
             properties:{
               _id:row.doc._id, _rev:row.doc._rev,
               GeoJSON_clone:row.doc.GeoJSON_clone
@@ -505,8 +505,8 @@ $(document).ready(function() {
     var type=$("#modify [name=type]").val();
     var time=$("#modify [name=time]").val();
     var docs=[];
-    for (var f=0;f<features.length;f++) {
-      var feature=features[f];
+    for (var f=0, feature; feature=features[f]; ) {
+      while (features[f]!==feature.next) f++;
       var doc=uploaded_docs[feature.properties._id] || {};
       // detach doc from uploaded_docs
       doc=JSON.parse(JSON.stringify(doc));
@@ -601,11 +601,11 @@ $(document).ready(function() {
       $("#upload [name=revert]").show();
       var results=[];
       // Merge bulk response into features.
-      while (data.length) {
-        var item=data.pop();
+      for (var feature=features[0]; feature; feature=feature.next) {
+        var item=data.shift();
         var result=item.ok && "ok" || item.error+" ("+item.reason+")";
         results[result] = results[result] + 1 || 1;
-        $.extend(features[data.length], item);
+        $.extend(feature, item);
       }
       for (var result in results)
         results.push(results[result]+" "+result);
@@ -618,7 +618,7 @@ $(document).ready(function() {
     relay_geometries();
     var docs=[];
     // delete or upload previous revision
-    for (var f=0, feature; feature=features[f]; f++) {
+    for (var feature=features[0]; feature; feature=feature.next) {
       if (!feature.ok) continue;
       var doc=uploaded_docs[feature.id] || { _id:feature.id, _deleted:true };
       doc._rev=feature.rev;
@@ -629,7 +629,7 @@ $(document).ready(function() {
       $("#upload [name=revert]").hide();
       show_fields();
       $("#reduce").hide();
-      for (var f=0, feature; feature=features[f]; f++) {
+      for (var feature=features[0]; feature; feature=feature.next) {
         if (!feature.ok) continue;
         var item=data.shift();
         // update rev in case we want to upload again
@@ -727,16 +727,15 @@ $(document).ready(function() {
     // Add GeoJSON_clone field indicator.
     fields.GeoJSON_clone=fields.GeoJSON_clone;
     var keys=[];
-    for (var f=0;f<features.length;f++)
-      keys.push(features[f].id)
+    for (var feature=features[0]; feature; feature=feature.next)
+      keys.push(feature.id);
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
       var found_geometry=function() {
         $("#show-suggestions :button").prop('disabled', false);
         $("#reduce [name=next]").click();
         found_geometry=function() {};
       };
-      for (var f=0;f<features.length;f++) {
-        var feature=features[f];
+      for (var feature=features[0]; feature; feature=feature.next) {
         if (!data[feature.id]) continue;
         feature.bbox=data[feature.id].GeoJSON.bbox;
         $.getJSON("_list/bbox-filter", { options:JSON.stringify({
