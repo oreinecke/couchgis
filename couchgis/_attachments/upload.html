@@ -542,10 +542,6 @@ $(document).ready(function() {
       }(doc));
       // clean up redundant JSON recursively
       (function empty(obj) {
-        // There is no semantic difference between
-        // these values and a missing property.
-        if ([null,"","null","undefined"].indexOf(obj)!==-1)
-          return true;
         if (typeof obj!=="object") return false;
         var result=true;
         // Arrays need to be spliced.
