@@ -575,15 +575,12 @@ $(document).ready(function() {
       $("#upload :submit").hide();
       $("#upload [name=revert]").show();
       var results=[];
-      // Get IDs of new documents and update revisions if no error occured.
+      // Merge bulk response into features.
       while (data.length) {
         var item=data.pop();
         var result=item.ok && "ok" || item.error+" ("+item.reason+")";
         results[result] = results[result] + 1 || 1;
-        var uploaded_doc = uploaded_docs[item.id] || {};
-        features[data.length].id = item.id;
-        features[data.length].rev =
-                uploaded_doc._rev = item.rev || uploaded_doc._rev;
+        $.extend(features[data.length], item);
       }
       for (var result in results)
         results.push(results[result]+" "+result);
@@ -593,27 +590,26 @@ $(document).ready(function() {
   });
 
   $("#upload [name=revert]").click(function() {
+    relay_geometries();
     var docs=[];
     // delete or upload previous revision
-    for (var f=0;f<features.length;f++) {
-      var feature=features[f];
-      docs.push( uploaded_docs[feature.id] || {
-        _deleted:true,
-        _id:feature.id,
-        _rev:feature.rev
-      });
+    for (var f=0, feature; feature=features[f]; f++) {
+      if (!feature.ok) continue;
+      var doc=uploaded_docs[feature.id] || { _id:feature.id, _deleted:true };
+      doc._rev=feature.rev;
+      docs.push(doc);
     }
-    relay_geometries();
     $.couch.db(db).bulkSave( {docs:docs}, { success:function(data) {
       $("#upload :submit").show();
       $("#upload [name=revert]").hide();
       show_fields();
       $("#reduce").hide();
-      while (data.length) {
-        var item=data.pop();
-        if (!uploaded_docs[item.id] || item.error) continue;
+      for (var f=0, feature; feature=features[f]; f++) {
+        if (!feature.ok) continue;
+        var item=data.shift();
         // update rev in case we want to upload again
-        features[data.length].properties._rev=item.rev;
+        if (item.ok && uploaded_docs[feature.id])
+          feature.properties._rev=item.rev;
       }
     }});
   });
