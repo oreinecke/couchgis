@@ -378,10 +378,11 @@ $(document).ready(function() {
       fields={};
       values={};
       var doc_ids=[];
-      for (var f=0;f<features.length;f++) {
-        var properties=features[f].properties;
-        if (properties._id) doc_ids.push(properties._id);
-        for (var prop in properties)
+      for (var feature=features[0]; feature; feature=feature.next) {
+        var id=feature.properties._id;
+        if (id && typeof id==="string")
+          doc_ids.push(id);
+        for (var prop in feature.properties)
           fields[prop]=false;
       }
       $("#modify div").html('');
