@@ -711,20 +711,20 @@ $(document).ready(function() {
     $("#show-suggestions").show();
     $("#show-suggestions :button").prop('disabled', true);
     // Add GeoJSON_clone field indicator.
-    fields.GeoJSON_clone = fields.GeoJSON_clone || false;
+    fields.GeoJSON_clone=fields.GeoJSON_clone;
     var keys=[];
     for (var f=0;f<features.length;f++)
       keys.push(features[f].properties.GeoJSON_clone || features[f].id)
     $.post("_list/bbox-filter/bbox", JSON.stringify({keys:keys}), function(data) {
+      var found_geometry=function() {
+        $("#show-suggestions :button").prop('disabled', false);
+        $("#reduce [name=next]").click();
+        found_geometry=function() {};
+      };
       for (var f=0;f<features.length;f++) {
         if (!data[keys[f]]) continue;
         var feature=features[f];
         feature.bbox=data[keys[f]].GeoJSON.bbox;
-        var found_geometry=function() {
-          $("#show-suggestions :button").prop('disabled', false);
-          $("#reduce [name=next]").click();
-          found_geometry=function() {};
-        };
         $.getJSON("_list/bbox-filter", { options:JSON.stringify({
           bbox:feature.bbox, similarity:0.0001
         }) }, function(id, feature) {
