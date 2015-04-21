@@ -631,20 +631,21 @@ $(document).ready(function() {
       }
     }
     $("#show-suggestions a").html(f+1);
-    if (!(feature=features[f])) return;
+    if (!( feature=features[f] )) return;
     var keys=[];
     if (!feature.items[feature.id]) keys.push([feature.id, 0]);
     for (var id in feature.items) keys.push([id, 0]);
     $("#reduce :button").prop('disabled', true);
     $.post("_view/geojson", JSON.stringify({keys:keys}), function(data) {
       $("#reduce :button").prop('disabled', false);
+      var shape;
       function select_me() {
         shape.setOptions({strokeColor:"#000000"});
         this.setOptions({strokeColor:"#FF0000", zIndex:-new Date().getTime()});
         shape=this;
-        var a=$("#clone-from a");
-        a.prop('href', "_show/edit/"+this.GeoJSON_clone);
         if (this.GeoJSON_clone) {
+          var a=$("#clone-from a");
+          a.prop('href', "_show/edit/"+this.GeoJSON_clone);
           $.getJSON('/'+db+'/'+this.GeoJSON_clone, function(doc) {
             a.text(doc[doc.type] || doc);
             if (doc.time) a.append(' ('+doc.time+')');
@@ -660,8 +661,8 @@ $(document).ready(function() {
           if (!features[f].items || features[f]===feature) continue;
           // Update reference count of each feature; A feature is only allowed
           // for geometry clone selection if no other feature references it.
-          features[f].cloned += (this.GeoJSON_clone===features[f].id);
-          features[f].cloned -= (feature.properties.GeoJSON_clone===features[f].id);
+          features[f].cloned += features[f].id===this.GeoJSON_clone;
+          features[f].cloned -= features[f].id===feature.properties.GeoJSON_clone;
           // Hide suggestions that already link to other geometries.
           (features[f].items[feature.id] || {}).hidden
             = this.GeoJSON_clone && this.GeoJSON_clone!==feature.id;
@@ -674,7 +675,7 @@ $(document).ready(function() {
         if (GeoJSON_clone && feature.items[GeoJSON_clone].hidden)
           continue;
         var GeoJSON=row.value.GeoJSON;
-        var shape=create_shape(GeoJSON.type, expand_options({
+        shape=create_shape(GeoJSON.type, expand_options({
           fillColor:GeoJSON_clone!==feature.id?"#0000FF":"#00FF00",
           map:map, coordinates: GeoJSON.coordinates, draggable: true
         }));
