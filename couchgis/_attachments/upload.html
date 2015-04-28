@@ -541,6 +541,11 @@ $(document).ready(function() {
       // save document description as doc[doc.type]
       if ($("#description-include").prop('checked') && doc.type)
         doc[doc.type]=$("#description-value").val() || doc[doc.type] || undefined;
+      // merge lists into props
+      for (var list in lists)
+        for (var field in lists[list])
+          for (var i=0, a=lists[list][field]; i!==a.length; i++)
+            props[list+'.'+i+field.slice(1)]=a[i];
       // merge properties into document
       for (var field in props) {
         var components=path.decode(field);
