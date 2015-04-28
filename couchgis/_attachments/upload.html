@@ -506,16 +506,26 @@ $(document).ready(function() {
     var time=$("#modify [name=time]").val();
     var docs=[];
     for (var f=0, feature; feature=features[f]; ) {
-      var props={};
+      var props={}, lists={}, g=f;
       do for (var p in features[f].properties) {
         if (fields[p].prop('disabled')) continue;
         var field=fields[p].val();
-        if (field.test(/^\s*$/)) continue;
+        var components=path.decode(field);
+        if (components=="") continue;
         var value=features[f].properties[p];
         if (["",null,"null","undefined"].indexOf(value)!==-1)
           value=undefined;
-        if (!(field in props) || value!==undefined)
-          props[field]=value;
+        var index=components.indexOf('*');
+        if (index===-1) {
+          if (!(field in props) || value!==undefined)
+            props[field]=value;
+        } else {
+          field=path.encode(components.slice(0,index));
+          var list=lists[field] || (lists[field]={});
+          field=path.encode(components.slice(index));
+          if (!list[field]) list[field]=[];
+          list[field][f-g]=value;
+        }
       } while (feature.next!==features[++f]);
       var doc=uploaded_docs[props._id] || {};
       // detach doc from uploaded_docs
