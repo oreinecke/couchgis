@@ -87,7 +87,7 @@ $(document).ready(function() {
         if (!geojson_doc[id].attached)
           Array.prototype.push.apply(unsorted_docs, geojson_doc[id]);
       var position=0;
-      documents=[];
+      documents=[{ toString:function(){} }];
       // Process document indexing in small chunks to
       // allow the page to respond to other events.
       var interval=window.setInterval(function() {
@@ -95,8 +95,8 @@ $(document).ready(function() {
         var chunk=unsorted_docs.slice(position, position+=200).sort();
         if (!chunk.length) {
           // tag documents with index
-          for (var d=0;d!==documents.length;d++)
-            documents[d].index=d;
+          for (var d=1;d!==documents.length;d++)
+            documents[d].index=d-1;
           window.clearInterval(interval);
           return;
         }
@@ -106,8 +106,7 @@ $(document).ready(function() {
         for ( var doc; doc=chunk.pop(); documents.splice(d+1, 0, doc) ) {
           var right=doc.toString();
           while (left>right)
-            if ( left=documents[--d] )
-              left=left.toString();
+            left=documents[--d].toString();
        }
       }, 50);
       function finalize() {
