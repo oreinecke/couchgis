@@ -571,6 +571,7 @@ $(document).ready(function() {
           if (obj[p]===doc.GeoJSON) continue;
           if (obj[p] && typeof obj[p]==="object")
             obj[p]=arrayify(obj[p]);
+          if (!array_like) continue;
           p=+p;
           if (p!==p) array_like=false;
           if (array_like) keys.push(p);
