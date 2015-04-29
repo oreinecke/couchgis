@@ -586,14 +586,8 @@ $(document).ready(function() {
       // clean up redundant JSON recursively
       (function empty(obj) {
         if (typeof obj!=="object") return false;
+        if (Array.isArray(obj)) return Array.length;
         var result=true;
-        // Arrays need to be spliced.
-        if (Array.isArray(obj)) {
-          for (var p=0; p!==obj.length; p++)
-            if (empty(obj[p])) obj.splice(p--, 1);
-            else result=false;
-          return result;
-        }
         for (var p in obj)
           if (obj[p]!==doc.GeoJSON && empty(obj[p]))
             delete obj[p];
