@@ -1220,7 +1220,7 @@ $(document).ready(function() {
     var documents=filters[filters.length-1].documents;
     var keys=[], id=null;
     // ignore geometry keys for xml
-    var include_geometry=$("#export [name=filetype]:checked").val()!=="xml";
+    var include_geometry=$("#export [value=geojson]").is(":checked");
     for (var d=0;d<documents.length;d++) {
       var key=documents[d];
       if (include_geometry && id!==key[0]) keys.push([key[0],0]);
@@ -1230,7 +1230,7 @@ $(document).ready(function() {
     $("#export [name^='&']:checked").each(function() {
       url+=$(this).val();
     });
-    if ($("#export [name=select-fields]:checked").val()==="from-table") {
+    if ($("#export [value=from-table]").is(":checked")) {
       var fields=[];
       $("#table thead .field").each(function() { fields.push($(this).text()); });
       url+="&fields="+fields.join(':').replace(/\+/g,'%2B').replace(/\s/g,'%20');
