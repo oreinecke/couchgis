@@ -1227,10 +1227,9 @@ $(document).ready(function() {
       keys.push(key);
       id=key[0];
     }
-    if ($("#export [name=include-revision]").prop('checked'))
-      url+="&include_revision";
-    if ($("#export [name=include-geojson-id]").prop('checked'))
-      url+="&include_geojson_id";
+    $("#export [name^='&']:checked").each(function() {
+      url+=$(this).val();
+    });
     if ($("#export [name=select-fields]:checked").val()==="from-table") {
       var fields=[];
       $("#table thead .field").each(function() { fields.push($(this).text()); });
@@ -1511,8 +1510,11 @@ $(document).ready(function() {
       <label title="nur die Spalten exportieren, die in&#13;der oberen Tabelle ausgewählt wurden">
         <input type="radio" name="select-fields" value="from-table">ausgewählte Spalten</label></span>
     <span name="columns" class="nowrap">
-      <label><input type="checkbox" name="include-revision" checked>_id, _rev</label>
-      <label><input type="checkbox" name="include-geojson-id" checked>Geometrie-Schlüssel</label></span>
+      <label><input type="checkbox" value="&include_revision" checked>_id, _rev</label>
+      <label><input type="checkbox" value="&include_geojson_id" checked>Geometrie-Schlüssel</label></span>
+    <label name="columns"
+      title="Listenelemente werden untereinander angeordnet&#13;(xml) oder auf mehrere Features verteilt (geojson)">
+      <input type="checkbox" value="&vertical_arrays">Listen als Zeilen</label>
     <input type="button" value="replizieren" name="replicate" style="display:none">
     <a name="replicant" target="_blank" style="display:none">zur Datenbank wechseln</a><br>
     <a name="replicate-status" style="display:none"></a>
