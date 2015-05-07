@@ -202,6 +202,7 @@ $(document).ready(function() {
             for (var c=0;c<cells.length;c++) {
               if (!columns[c].xml.length) continue;
               var column=columns[c].xml[0].xml;
+              if (!column) continue;
               if (column in properties)
                 throw SyntaxError("XML.parse: Duplicate column "+column);
               properties[column] = cells[c].xml[0].xml;
