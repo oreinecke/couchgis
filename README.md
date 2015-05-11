@@ -290,6 +290,9 @@ In CouchDB creating new or changing documents is more or less the same, as soon
 as the Bulk Document API is in use. The application works with, and extends its
 principle in some way.
 - If neither `_id` nor `_rev` exists, a new document will be attached.
+- If no `_rev` is stated, and `_id` points to a non-existent document, a new
+  document will be attached as well. Unlike the Bulk Document API, I let
+  CouchDB provide a nicer document id.
 - If `_id` and `_rev` match an existing document, the application will update
   its fields with the ones specified in the uploaded data. Unmentioned fields
   are left untouched. If you want to delete a field, set its cell to an empty
@@ -374,6 +377,37 @@ nested objects from this notation by adhering to a few simple rules:
   object":{"object's field":true}}`
 - At the end, empty objects are scratched from the new document:
   `{"obj.prop":"null", "obj.field":"undefined"} -> {}`
+
+###Managing Arrays with Spreadsheets
+
+Since spreadsheets are fixed fieldsets, they are unpleasant in describing JSON
+arrays, i.e. lists of variable length. I've provided two ways to lay out array
+items onto a spreadsheet or FeatureCollection:
+
+- One row per document: A column is used for each array item, as if the array
+  was an ordinary object. This is useful for short or fixed array lengths, for
+  instance if there is a latin equivalent:
+
+   _id |  _rev  |     Vegetation.0    | Vegetation.1
+  -----|--------|---------------------|-------------
+  ab45 | 2-8945 | Coniferous Woodland | Pinophytia
+
+  Unlike in javascript, any number may be an index. Arrays are formatted at the
+  end. Use negative or fractional indexes to prepend or insert items.
+
+- Multiple rows per document: The item's index is replaced with an asterik, and
+  items expand into multiple rows for each document. The document id is quoted
+  in each row. This makes sense if you have long lists with values that relate
+  to each other:
+
+   _id |  _rev  |   Use.*.Type   | Use.*.Area
+  -----|--------|----------------|-----------
+  ab45 | 2-8945 | Hunting Ground | 17.0
+  ab45 |        | Logging        |  2.3
+
+  Rows don't need to be sorted by id. Fields like `_rev`, that aren't lists,
+  only need their values quoted in one place. It doesn't even need to be in the
+  first row.
 
 ###How LibreOffice Calc Handles Line Breaks
 
