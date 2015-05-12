@@ -1227,7 +1227,7 @@ $(document).ready(function() {
       keys.push(key);
       id=key[0];
     }
-    $("#export [name^='&']:checked").each(function() {
+    $("#export [value^='&']:checked").each(function() {
       url+=$(this).val();
     });
     if ($("#export [value=from-table]").is(":checked")) {
