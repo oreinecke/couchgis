@@ -104,7 +104,7 @@ function(head, req) {
       while (arrays) {
         for (var prop in arrays) {
           var array=arrays[prop];
-          doc[prop]=array.pop();
+          doc[prop]=array.shift();
           if (array.length===0)
             delete arrays[prop];
         }
