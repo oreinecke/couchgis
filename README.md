@@ -222,8 +222,8 @@ these are referring to):
 ###Search Performance
 
 As the number of documents exceeds 10000, response time will depend on the
-complexity of the filter. Whenever possible, CouchGIS will improve response
-time by using a secondary index, instead of the documents itself:
+complexity of the filter. Whenever possible, CouchGIS improves response time
+by using a secondary index, instead of the documents itself:
 - Selecting one or more document types usually responds instantly.
 - Restricting documents to a certain time range also responds instantly. I
   recommend taking a look at [_view/type-year](couchgis/views/type-year). It
