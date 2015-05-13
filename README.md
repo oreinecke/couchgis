@@ -405,9 +405,9 @@ items onto a spreadsheet or FeatureCollection:
   ab45 | 2-8945 | Hunting Ground | 17.0
   ab45 |        | Logging        |  2.3
 
-  Rows don't need to be sorted by id. Fields like `_rev`, that aren't lists,
-  only need their values quoted in one place. It doesn't even need to be in the
-  first row.
+  Rows don't need to be sorted by id. If the document is new and hasn't an id
+  yet, any number is ok. Fields like `_rev`, that aren't lists, only need their
+  values quoted in one place. It doesn't even need to be in the first row.
 
 ###How LibreOffice Calc Handles Line Breaks
 
