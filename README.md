@@ -409,6 +409,10 @@ items onto a spreadsheet or FeatureCollection:
   yet, any number is ok. Fields like `_rev`, that aren't lists, only need their
   values quoted in one place. It doesn't even need to be in the first row.
 
+When uploading new revisions, both layouts can be used at the same time. This
+allows some crafty array manipulation (like shifting an element of Use.* to the
+top if its area equals 2.3).
+
 ###How LibreOffice Calc Handles Line Breaks
 
 LibreOffice Calc handles line breaks in a very crappy way. I can't really blame
