@@ -267,8 +267,8 @@ $(document).ready(function() {
           var tr=item.tr, td;
           if (tr) tr.find(":not(.geometry)").remove();
           else {
-            td=bull.clone().show()
-                           .one("click", item, update_geometry.highlight_shape);
+            td=bull.clone().show();
+            td.one("click", item, update_geometry.highlight_shape);
             tbody.append( tr=$("<tr>").append(td) );
           }
           td=$("<td>");
