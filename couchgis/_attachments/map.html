@@ -260,7 +260,6 @@ $(document).ready(function() {
           geometries--;
           if (timeout) return;
         }
-        window.clearInterval(interval);
         while (documents!==0) {
           var item=items[rows[rows.length-1].key[0]];
           var slice=rows.splice(1-item.keys.length);
@@ -316,7 +315,9 @@ $(document).ready(function() {
             item.strokeColor=color;
           }
           item.keep_documents=true;
+          if (timeout) return;
         }
+        window.clearInterval(interval);
         $("#table tbody").append(tbody);
         old_tbody.remove();
         call.that_last_one();
