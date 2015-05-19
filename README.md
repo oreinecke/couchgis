@@ -267,7 +267,7 @@ itself for each relation. I have the following to say to this:
 _"So, shouldn't I do this in Quantum GIS? It sure runs way faster there!!"_ -
 Well, yes, and no. My spatial filter runs within the CouchJS query server and
 is outperformed easily by any compiled version thereof. However, it is not
-nearly as painful to use as in Quantum GIS: you don't have to split _one layer_
+nearly as painful to use as in Quantum GIS: You don't have to split _one layer_
 into _two layers_, and you don't have to store the result in _yet another_
 shapefile, and if you've made a mistake, you don't have to _navigate through
 the same menu again, and set up a dialog exactly as you did before_. So it
