@@ -269,8 +269,7 @@ $(document).ready(function() {
           else {
             td=bull.clone().show()
                            .one("click", item, update_geometry.highlight_shape);
-            tr=$("<tr>").append(td);
-            tbody.append( item.tr=tr );
+            tbody.append( tr=$("<tr>").append(td) );
           }
           td=$("<td>");
           for (var s=0;s<slice.length;s++) {
@@ -315,6 +314,10 @@ $(document).ready(function() {
             item.strokeColor=color;
           }
           item.keep_documents=true;
+          // Cluster <tr>'s that are already inside #table tbody;
+          // Otherwise each element would trigger a page re-flow.
+          if (item.tr) continue;
+          item.tr=tr;
           if (timeout) return;
         }
         window.clearInterval(interval);
