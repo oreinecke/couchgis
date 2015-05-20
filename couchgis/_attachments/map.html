@@ -534,10 +534,12 @@ $(document).ready(function() {
       keys.splice(0);
       for (var d=0, id=null, doc; doc=documents[d]; d++)
         if (id!==doc[0]) keys.push(id=doc[0]);
-      for (var id in items)
-        items[id].keep_documents=false;
       viewports.splice(1);
-      call.this_one_next(update_items)();
+      call.this_one_next(function() {
+        for (var id in items)
+          items[id].keep_documents=false;
+        update_items();
+      })();
       return;
     }
     // Aquire first property as name of new_filter.
