@@ -1222,7 +1222,8 @@ $(document).ready(function() {
   $("#export").find("[name=download], [name=get-url]").click( function() {
     var url="_list/export/geojson";
     url+="?filename="+$("#export [name=filename]").val();
-    url+="&filetype="+$("#export [name=filetype]:checked").val();
+    var filetype=$("#export [name=filetype]:checked").val();
+    url+="&filetype="+filetype;
     var documents=filters[filters.length-1].documents;
     var keys=[], id=null;
     // ignore geometry keys for xml
