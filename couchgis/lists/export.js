@@ -32,7 +32,6 @@ function(head, req) {
   }});
   var features=[];
   var row=getRow();
-  var doc_ids={};
   while (row) {
     while (row && row.value.GeoJSON && row.value.GeoJSON.error!==0.0)
       row=getRow();
@@ -47,8 +46,6 @@ function(head, req) {
     for (var doc; row && (doc=row.value.doc); row=getRow()) {
       if (index++<next_index) continue;
       else next_index=indexes.pop();
-      if (doc._id in doc_ids) continue;
-      if (filetype==="xml") doc_ids[doc._id]=true;
       delete doc.info;
       delete doc.ranges;
       if (!include_revision) {

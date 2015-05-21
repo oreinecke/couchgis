@@ -1225,15 +1225,6 @@ $(document).ready(function() {
     var filetype=$("#export [name=filetype]:checked").val();
     url+="&filetype="+filetype;
     var documents=filters[filters.length-1].documents;
-    var keys=[], id=null;
-    // ignore geometry keys for xml
-    var include_geometry=$("#export [value=geojson]").is(":checked");
-    for (var d=0;d<documents.length;d++) {
-      var key=documents[d];
-      if (include_geometry && id!==key[0]) keys.push([key[0],0]);
-      keys.push(key);
-      id=key[0];
-    }
     $("#export [value^='&']:checked").each(function() {
       url+=$(this).val();
     });
@@ -1252,6 +1243,18 @@ $(document).ready(function() {
         $("#export [name=url]").val(url).show().select();
       }
     })[$(this).prop('name')];
+    var keys=[], id, doc_ids={};
+    for (var d=0, doc; doc=documents[d]; d++) {
+      if (doc[1] in doc_ids) continue;
+      // Provide geometry for GeoJSON export.
+      if (filetype==="geojson" && id!==doc[0])
+        keys.push([doc[0],0]);
+      // Don't export the same document twice into a spreadsheet.
+      if (filetype==="xml")
+        doc_ids[doc[1]]=true;
+      id=doc[0];
+      keys.push(doc);
+    }
     keys=JSON.stringify(keys);
     // Employ index compression if the URL is too large.
     if (keys.length>8192) {
