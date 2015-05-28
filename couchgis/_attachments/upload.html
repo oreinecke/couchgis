@@ -373,7 +373,7 @@ $(document).ready(function() {
       for (var f=0, feature; feature=features[f]; ) {
         var id=feature.properties._id, next;
         do next=features[++f];
-        while (id!==null && id!=="" && next && next.properties._id===id);
+        while (id!=null && id!=="" && next && next.properties._id===id);
         feature.next=next;
       }
       // move special fields to the top of each group
