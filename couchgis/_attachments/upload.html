@@ -758,7 +758,7 @@ $(document).ready(function() {
       for (var feature=features[0]; feature; feature=feature.next) {
         if (!data[feature.id]) continue;
         feature.bbox=data[feature.id].GeoJSON.bbox;
-        $.getJSON("_list/bbox-filter", { options:JSON.stringify({
+        $.getJSON("_list/bbox-filter/bbox", { options:JSON.stringify({
           bbox:feature.bbox, similarity:0.0001
         }) }, function(feature) {
           return function(data) {
