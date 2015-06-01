@@ -714,13 +714,14 @@ $(document).ready(function() {
           fillColor:row.key[0]===feature.id?"#00FF00":"#0000FF",
           map:map, coordinates: GeoJSON.coordinates, draggable: true
         }));
-        shape.GeoJSON_clone = uploaded_docs[row.key[0]] && row.key[0];
+        if (row.key[0]!==feature.id)
+          shape.GeoJSON_clone = row.key[0];
         shape.addListener('click', select_me);
         feature.items[row.key[0]].shape=shape;
       }
       map.setCenter(new LatLng((feature.bbox[3]+feature.bbox[1])/2.0,
                                (feature.bbox[2]+feature.bbox[0])/2.0));
-      select_me.apply(feature.items[feature.id].shape);
+      select_me.apply(feature.items[feature.properties.GeoJSON_clone || feature.id].shape);
     }, "json");
   }
 
