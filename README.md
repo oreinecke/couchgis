@@ -67,12 +67,12 @@ decision).
 
 Reserved fields are:
 
-###`doc._id` and `doc._rev`
+### `doc._id` and `doc._rev`
 
 CouchDB creates these automatically, so I do not recommend ever trying to set
 them when uploading/editing documents.
 
-###`doc.GeoJSON` or `doc.GeoJSON_clone`
+### `doc.GeoJSON` or `doc.GeoJSON_clone`
 
 The former must be set to a valid [GeoJSON][1] object and the latter to one or
 more ids of existing documents that all have the `GeoJSON` property (there is
@@ -118,7 +118,7 @@ long as it is from QGIS, but for ArcGIS I cannot guarantee anything.
 [2]: http://geojson.org/geojson-spec.html#named-crs
 [3]: http://proj4js.org/
 
-###`doc.type`
+### `doc.type`
 
 Documents have to give at least a tiny bit of explanation on what we can expect
 to find in them. Or vice versa, if we look for certain information, it should
@@ -128,14 +128,14 @@ example, since "Use by Area" should surely go to some different document type.
 By removing `doc.type` or setting it to false-ish, the document is hidden from
 the map page, but its `GeoJSON` will still be referenceable by other documents.
 
-###`doc[doc.type]`
+### `doc[doc.type]`
 
 It is nice to have that property set, because it yields a meaningful title
 almost all the time. And I cannot think of any case where it wouldn't make
 sense to use it. For all these reasons, the map page uses `doc[doc.type]`
 as an item title, or `doc.type` if the former is missing.
 
-###`doc.time`
+### `doc.time`
 
 In every attribute table that I had to review, date information was a mess.
 There's always a column for day/month/year, probably with one of them missing,
@@ -162,7 +162,7 @@ string as such:
 Any character other than dash/comma/ampersand/semicolon can be freely used.
 This way document times may also read "von ca. 1970 - 2000" or something.
 
-###`doc.info`
+### `doc.info`
 
 If you have pdf's, spreadsheets etc. that provide some insight into your
 uploaded features (I am usually handed a DVD or something), attach them to an
@@ -219,7 +219,7 @@ these are referring to):
                         // to define functions if it implies less typing.
 ```
 
-###Search Performance
+### Search Performance
 
 As the number of documents exceeds 10000, response time will depend on the
 complexity of the filter. Whenever possible, CouchGIS improves response time
@@ -243,7 +243,7 @@ ditto for full-text search. This doesn't matter if the amount of documents was
 already been reduced by a previous search, since CouchGIS won't filter excluded
 documents again.
 
-###Spatial Relations
+### Spatial Relations
 
 As of version 1.0.7, there's rudimentary support for so-called _spatial
 relations_. That means, given a fixed geometry, you can check what other
@@ -304,7 +304,7 @@ principle in some way.
 
 [4]: http://github.com/oreinecke/couch-ogr2ogr
 
-###Search and Link to Existing Geometry
+### Search and Link to Existing Geometry
 
 Oftentimes the database already contains a document that has a geometry similar
 to the one being uploaded. It is possible to show existing similar geometries
@@ -336,7 +336,7 @@ the bulk upload is fixed before being committed to the database:
 - if **a** is pointed to **a2** and vice versa, I have no idea and this case is
   not provided for.
 
-###Tabular Document Representation
+### Tabular Document Representation
 
 All software mentioned at the beginning can not cope with nested objects, so
 they have to be converted into a flat-hierarchy representation. The example
@@ -378,7 +378,7 @@ nested objects from this notation by adhering to a few simple rules:
 - At the end, empty objects are scratched from the new document:
   `{"obj.prop":"null", "obj.field":"undefined"} -> {}`
 
-###Managing Arrays with Spreadsheets
+### Managing Arrays with Spreadsheets
 
 Since spreadsheets are fixed fieldsets, they are unpleasant in describing JSON
 arrays, i.e. lists of variable length. I've provided two ways to lay out array
@@ -413,7 +413,7 @@ When uploading new revisions, both layouts can be used at the same time. This
 allows some crafty array manipulation (like shifting an element of Use.* to the
 top if its area equals 2.3).
 
-###How LibreOffice Calc Handles Line Breaks
+### How LibreOffice Calc Handles Line Breaks
 
 LibreOffice Calc handles line breaks in a very crappy way. I can't really blame
 them for not properly supporing an outdated and bulky format. Sadly, it still
